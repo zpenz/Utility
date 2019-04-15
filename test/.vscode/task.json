@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "build & debug tests",
+        "type": "shell",
+        "command": "clang++",
+        "args": [
+          "-g",
+          "-std=c++14",
+          "${file_name}",
+          "-o",
+          "${file_name}.exe"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": [
+          "$gcc"
+        ]
+      }
+    ]
+  }

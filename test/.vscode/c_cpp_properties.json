@@ -1,0 +1,56 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "macFrameworkPath": [
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks"
+            ],
+            "compilerPath": "/usr/bin/clang++",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        },
+        {
+             "name": "Win32",
+             "includePath": [
+                 "${workspaceRoot}",
+                 "E:/Microsoft Visual Studio/IDE/VC/Tools/MSVC/14.16.27023/include/memory",
+                 "D:/LLVM/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++",
+                 "D:/LLVM/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/x86_64-w64-mingw32",
+                 "D:/LLVM/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/backward",
+                 "D:/LLVM/lib/gcc/x86_64-w64-mingw32/8.1.0/include",
+                 "D:/LLVM/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/tr1",
+                 "D:/LLVM/x86_64-w64-mingw32/include"
+             ],
+             "defines": [
+                 "_DEBUG",
+                 "UNICODE",
+                 "__GNUC__=6",
+                 "__cdecl=__attribute__((__cdecl__))"
+             ],
+             "intelliSenseMode": "clang-x64",
+             "browse": {
+                 "path": [
+                     "${workspaceRoot}",
+                     "D:/LLVM/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++",
+                     "D:/LLVM/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/x86_64-w64-mingw32",
+                     "D:/LLVM/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/backward",
+                     "D:/LLVM/lib/gcc/x86_64-w64-mingw32/8.1.0/include",
+                     "D:/LLVM/lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/tr1",
+                     "D:/LLVM/x86_64-w64-mingw32/include"
+                 ]
+             },
+             "limitSymbolsToIncludedHeaders": true,
+             "databaseFilename": "",
+             "compilerPath": "D:\\LLVM\\bin\\clang.exe",
+             "cStandard": "c11",
+             "cppStandard": "c++14" 
+        }
+    ],
+    "version": 4
+}

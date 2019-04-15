@@ -1,0 +1,11 @@
+drop table test if exist;
+
+drop table --- action-name
+test       --- action-op
+if         --- conditon-start
+exist      --- conditon-content
+;          --- end
+
+
+
+
