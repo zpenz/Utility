@@ -1,1 +1,2 @@
-ipch.*
+/ipch
+ipch/* 
