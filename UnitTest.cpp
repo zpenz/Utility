@@ -2,6 +2,9 @@
 #include "pString.hpp"
 #include <vector>
 #include <cstdio>
+#include <cstdlib>
+#include <stdarg.h>
+#include <sys/stat.h>
 
 using namespace Contain;
 
@@ -217,6 +220,10 @@ next:
         
         for(int index=0;index<TableSize;index++){
             AString TableName = Parse::mCreateList.at(index).TableName;
+            AString ClassName = TableName;
+            AString FolerName = ClassName;
+            AString GFileName = FolerName+"/test.php";
+            mkdir(FolerName.c_str(),0755);
             Filed PrimaryKey  = Parse::mCreateList.at(index).PrimaryKey;
             auto   ThisFiled  = Parse::mCreateList.at(index);
             auto   FiledList  = Parse::mCreateList.at(index).FiledList;
@@ -284,14 +291,36 @@ next:
                 }
             }
             ret+="        }\n";
+            //Add Action
+            AString AddCode = "<?php \n    include_once(\'"+GFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return (new "+ClassName+"(\n            ";
+            for(int indexY=0;indexY<FiledSize;indexY++){
+                if(indexY == FiledSize - 1){
+                    AddCode+= "GetRealValueSafe(\""+FiledList.at(indexY).FiledName+"\")\n            ))->Add();\n    })());";
+                }
+                else
+                    AddCode+="GetRealValueSafe(\""+FiledList.at(indexY).FiledName+"\"),\n            ";
+            }
+            auto AddFile = fopen(FolerName+"/Add.php","wr");
+            fwrite(AddCode.c_str(),sizeof(char),AddCode._length(),AddFile);
+            fclose(AddFile);
 
             //TotalCount
             ret+="\n        public static function GetTotalCount(){\n            return MysqlHelper::SafeQueryResult(\"SELECT count(*) AS 'count' FROM "
             + TableName + " WHERE 1 = ?\",'i',1);\n        }\n";
+            //Count Action
+            AString CountCode = "<?php \n    include_once(\'"+GFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::GetTotalCount();\n    })());";
+            auto CountFile = fopen(FolerName+"/Count.php","wr");
+            fwrite(CountCode.c_str(),sizeof(char),CountCode._length(),CountFile);
+            SAFE_CLOSE(CountFile);
 
             //GetList temp
             ret+="\n        public static function GetList($page,$num=10000){\n            $start = $num*($page-1);\n            MysqlHelper::$UseUTF8 = true;\n            ";
                     ret+="return MysqlHelper::SafeQueryResult(\"SELECT * FROM "+TableName+" LIMIT ?,?\",\"dd\",$start,$num);\n        }\n\n";
+            //GetList Action
+            AString GetListCode = "<?php \n    include_once(\'"+GFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::GetList(\n            GetRealValueSafe('page',1),\n            GetRealValueSafe('num',10000));\n    })());";
+            auto GetListFile = fopen(FolerName+"/GetList.php","wr");
+            fwrite(GetListCode.c_str(),sizeof(char),GetListCode._length(),GetListFile);
+            SAFE_CLOSE(GetListFile);
             
             //Find
             ret+="        //FIND FUNCTIONS START----------------------------------------------------\n";
@@ -305,15 +334,30 @@ next:
                 // }
             }
             ret+="        //FIND FUNCTIONS END----------------------------------------------------\n\n        ";
+            //Find Action 
+            for(int indexY=0;indexY<FiledSize;indexY++){
+                AString temp = Normalize(FiledList.at(indexY).FiledName);
+                AString FindCode = "<?php \n    include_once(\'"+GFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::FindBy"+temp+"(\n            GetRealValueSafe('value'),\n            GetRealValueSafe('page',1),\n            GetRealValueSafe('num',10000));\n    })());";
+                SHOW_MESSAGE((FolerName+"/FindBy"+temp+".php").c_str(),1);
+                auto FindFile = fopen((FolerName+"/FindBy"+temp+".php").c_str(),"wr");
+                SHOW_MESSAGE(FindFile,1);
+                fwrite(FindCode.c_str(),sizeof(char),FindCode._length(),FindFile);
+                SAFE_CLOSE(FindFile);
+            }
+
+            //Delete
             ret+="public static function Delete($unique){\n            $ret = MysqlHelper::S_IsEmptySet(\"SELECT * FROM "+TableName+" WHERE "+ PrimaryKey.FiledName + " = ?\",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n            if($ret->resultcode<0) return new ReturnObject(-2,\"delete a no exist record\");\n            ";
             ret+="//TODO: if have file link . delete link before delete record!\n            $ret = MysqlHelper::SafeQueryResult(\"SELECT * FROM "+TableName+" WHERE "+PrimaryKey.FiledName + "= ? \",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n            if($ret->resultcode<0) return $ret;\n            \n            return MysqlHelper::SafeQuery(\"DELETE FROM "+TableName+" WHERE "+PrimaryKey.FiledName+" = ?\",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n        }\n\n";
+            AString DeleteCode = "<?php \n    include_once(\'"+GFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::Delete(\n            GetRealValueSafe('value')\n        );\n    })());\n";
+            auto DeleteFile = fopen(FolerName+"/Delete.php","wr");
+            fwrite(DeleteCode.c_str(),sizeof(char),DeleteCode._length(),DeleteFile);
+            SAFE_CLOSE(DeleteFile);
 
             ret+="    }\n";
-
-            auto file = fopen("test.php","wr");
+            auto file = fopen(GFileName,"wr");
             fwrite(ret.c_str(),sizeof(char),ret._length(),file);
-            fclose(file);
-            
+            SAFE_CLOSE(file);
+
             break;
         }
     }

@@ -19,4 +19,7 @@ namespace utility{
 
     #define CONDITION_MESSAGE(condition,message)\
         if(condition){ SHOW_MESSAGE(message,true);}
+
+    #define SAFE_CLOSE(subject)\
+        if(subject){ fclose(subject);} 
 }
