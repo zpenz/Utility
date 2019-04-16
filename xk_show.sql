@@ -9,7 +9,7 @@ CREATE TABLE xk_shows (
   show_author varchar(50) COMMENT '作者',
   show_content longtext NOT NULL COMMENT '内容',
   show_img varchar(1024) NOT NULL COMMENT '图片',
-  show_position varchar(200) COMMENT '文件存放位置 %NOREPEAT%',
+  show_position varchar(200) COMMENT '文件存放位置 %NOREPEAT% %FILE REF%',
   show_total_type varchar(200) COMMENT '大方向类型',
   show_type varchar(50) NOT NULL COMMENT '文件类型',
   update_time varchar(50)  NOT NULL COMMENT '最后更新时间',

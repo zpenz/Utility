@@ -347,11 +347,26 @@ next:
 
             //Delete
             ret+="public static function Delete($unique){\n            $ret = MysqlHelper::S_IsEmptySet(\"SELECT * FROM "+TableName+" WHERE "+ PrimaryKey.FiledName + " = ?\",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n            if($ret->resultcode<0) return new ReturnObject(-2,\"delete a no exist record\");\n            ";
-            ret+="//TODO: if have file link . delete link before delete record!\n            $ret = MysqlHelper::SafeQueryResult(\"SELECT * FROM "+TableName+" WHERE "+PrimaryKey.FiledName + "= ? \",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n            if($ret->resultcode<0) return $ret;\n            \n            return MysqlHelper::SafeQuery(\"DELETE FROM "+TableName+" WHERE "+PrimaryKey.FiledName+" = ?\",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n        }\n\n";
-            AString DeleteCode = "<?php \n    include_once(\'"+GFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::Delete(\n            GetRealValueSafe('value')\n        );\n    })());\n";
+            ret+="//TODO: if have file link . delete link before delete record!\n            $ret = MysqlHelper::SafeQueryResult(\"SELECT * FROM "+TableName+" WHERE "+PrimaryKey.FiledName + "= ? \",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n            if($ret->resultcode<0) return $ret;\n            \n            return MysqlHelper::SafeQuery(\"DELETE FROM "+TableName+" WHERE "+PrimaryKey.FiledName+" = ?\",'"+ToType(PrimaryKey.FiledType)+"',$unique);";
+            for(int indexY=0;indexY<FiledSize;indexY++){
+                //Delete File Ref
+                AString temp = FiledList.at(indexY).FiledName;
+                if(FiledList.at(indexY).FiledComment.Contain(FILEREFCOND)){
+                    ret+="unlink($ret->value(\""+temp+"\"));\n            ";
+                }
+            }
+            ret+="\n        }\n\n        ";
+            AString DeleteCode = "<?php \n    include_once(\'"+GFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::Delete(\n            GetRealValueSafe('value')\n        );\n    })());\n        ";
             auto DeleteFile = fopen(FolerName+"/Delete.php","wr");
             fwrite(DeleteCode.c_str(),sizeof(char),DeleteCode._length(),DeleteFile);
             SAFE_CLOSE(DeleteFile);
+
+            //DeleteArray
+            ret+="public static function DeleteArray($IdArray){\n            foreach($IdArray as $item){\n              if(($ret="+ClassName+"::Delete($item))->resultcode<0) return new ReturnObject(-224,\"failed when delete {$item} failed reason: {$ret->data}\");\n            }\n            return new ReturnObject(0,\"Delete All Ok!\");"+"\n        }\n";
+            AString DeleteArrayCode = "<?php \n    include_once(\'"+GFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::DeleteArray(\n            GetRealValueSafe('array','none')\n        );\n    })());\n";
+            auto DeleteArrayFile = fopen(FolerName+"/DeleteArray.php","wr");
+            fwrite(DeleteArrayCode.c_str(),sizeof(char),DeleteArrayCode._length(),DeleteArrayFile);
+            SAFE_CLOSE(DeleteArrayFile);
 
             ret+="    }\n";
             auto file = fopen(GFileName,"wr");
