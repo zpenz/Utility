@@ -324,8 +324,7 @@ using namespace utility;
         const String<T> replace(const String<T>& src,const String<T>& sbj){
             auto pos = -1;
             while(-1!=(pos=find(src))){
-                SHOW_MESSAGE(pos,1);
-                *this = substr(0,pos)+sbj+substr(pos+src._length(),length-1 -substr(0,pos)._length() -1);
+                *this = substr(0,pos)+sbj+substr(pos+src._length(),_length() -substr(0,pos)._length()-src._length());
             }
             return *this;
         }

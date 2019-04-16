@@ -8,7 +8,7 @@
         "args": [
           "-g",
           "-std=c++14",
-          "${file}",
+          "${file} pString.cpp",
           "-o",
           "${fileBasenameNoExtension}"
         ],

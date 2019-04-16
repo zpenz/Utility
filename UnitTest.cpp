@@ -294,9 +294,14 @@ int main(int argc, char const *argv[])
         // Parse::parse();
         // Parse::Test();
 
-        AString test = "123456781213123";
-        test.replace("1","test");
-        SHOW_MESSAGE(test.c_str(),1);
+        AString test = "1234567812131230002300";
+        // test.replace("23","");
+        auto test2 = test.replace("23","test---");
+        SHOW_MESSAGE(test2._length(),1);
+        SHOW_MESSAGE(test2.c_str(),1);
+        // test.replace("23","xc");
+        // SHOW_MESSAGE(test.c_str(),1);
+        // SHOW_MESSAGE(test._length(),1);
 
         // SHOW_MESSAGE(Parse::mCreateList.size(),1);
         
