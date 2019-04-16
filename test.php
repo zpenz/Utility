@@ -1,7 +1,7 @@
 <?php
     include_once("../common.php");
     include_once("../const.php");
-    //This File is Generate Auto By UnitTest.cpp.
+    //This File is Generate Auto By Test.
 
     //TableName: xk_shows
     Class xk_shows{
@@ -32,9 +32,23 @@
             $this->show_for_vip = $show_for_vip;
             $this->xk_videolink = $xk_videolink;
         }
-       public function Check(){
+
+        public function Check(){
+            if(!empty($this->show_title)){
+                $ret=MysqlHelper::S_IsEmptySet("SELECT * FROM xk_shows WHERE show_title = ?",'s',$this->show_title);
+                if($ret->resultcode<0) return $ret;
+                if($ret->data !=0) return new ReturnObject(-233,"show_title can not repeat");
+            }
+
+            if(!empty($this->show_position)){
+                $ret=MysqlHelper::S_IsEmptySet("SELECT * FROM xk_shows WHERE show_position = ?",'s',$this->show_position);
+                if($ret->resultcode<0) return $ret;
+                if($ret->data !=0) return new ReturnObject(-233,"show_position can not repeat");
+            }
+
             return new ReturnObject(0,"");
         }
+
        public function Add(){
             $ret = $this->Check();
             if($ret->resultcode!=0) return $ret;
@@ -80,7 +94,7 @@
         }
 
         //FIND FUNCTIONS START----------------------------------------------------
-        public static function FindBySHOW_ID($value,$page=1,$num=10000){
+        public static function FindByShowId($value,$page=1,$num=10000){
             $start = $num*($page-1);
             MysqlHelper::$UseUTF8 = true;
             $count = MysqlHepler::SafeQueryResult("SELECT count(*) AS 'count' FROM xk_shows WHERE show_id = ?",$value);
@@ -88,7 +102,7 @@
             array_push($ret,$count);
             return $ret;
         }
-        public static function FindBySHOW_TITLE($value,$page=1,$num=10000){
+        public static function FindByShowTitle($value,$page=1,$num=10000){
             $start = $num*($page-1);
             MysqlHelper::$UseUTF8 = true;
             $count = MysqlHepler::SafeQueryResult("SELECT count(*) AS 'count' FROM xk_shows WHERE show_title = ?",$value);
@@ -96,7 +110,7 @@
             array_push($ret,$count);
             return $ret;
         }
-        public static function FindBySHOW_DESCRIBE($value,$page=1,$num=10000){
+        public static function FindByShowDescribe($value,$page=1,$num=10000){
             $start = $num*($page-1);
             MysqlHelper::$UseUTF8 = true;
             $count = MysqlHepler::SafeQueryResult("SELECT count(*) AS 'count' FROM xk_shows WHERE show_describe = ?",$value);
@@ -104,7 +118,7 @@
             array_push($ret,$count);
             return $ret;
         }
-        public static function FindBySHOW_AUTHOR($value,$page=1,$num=10000){
+        public static function FindByShowAuthor($value,$page=1,$num=10000){
             $start = $num*($page-1);
             MysqlHelper::$UseUTF8 = true;
             $count = MysqlHepler::SafeQueryResult("SELECT count(*) AS 'count' FROM xk_shows WHERE show_author = ?",$value);
@@ -112,7 +126,7 @@
             array_push($ret,$count);
             return $ret;
         }
-        public static function FindBySHOW_CONTENT($value,$page=1,$num=10000){
+        public static function FindByShowContent($value,$page=1,$num=10000){
             $start = $num*($page-1);
             MysqlHelper::$UseUTF8 = true;
             $count = MysqlHepler::SafeQueryResult("SELECT count(*) AS 'count' FROM xk_shows WHERE show_content = ?",$value);
@@ -120,7 +134,7 @@
             array_push($ret,$count);
             return $ret;
         }
-        public static function FindBySHOW_IMG($value,$page=1,$num=10000){
+        public static function FindByShowImg($value,$page=1,$num=10000){
             $start = $num*($page-1);
             MysqlHelper::$UseUTF8 = true;
             $count = MysqlHepler::SafeQueryResult("SELECT count(*) AS 'count' FROM xk_shows WHERE show_img = ?",$value);
@@ -128,7 +142,7 @@
             array_push($ret,$count);
             return $ret;
         }
-        public static function FindBySHOW_POSITION($value,$page=1,$num=10000){
+        public static function FindByShowPosition($value,$page=1,$num=10000){
             $start = $num*($page-1);
             MysqlHelper::$UseUTF8 = true;
             $count = MysqlHepler::SafeQueryResult("SELECT count(*) AS 'count' FROM xk_shows WHERE show_position = ?",$value);
@@ -136,7 +150,7 @@
             array_push($ret,$count);
             return $ret;
         }
-        public static function FindBySHOW_TOTAL_TYPE($value,$page=1,$num=10000){
+        public static function FindByShowTotalType($value,$page=1,$num=10000){
             $start = $num*($page-1);
             MysqlHelper::$UseUTF8 = true;
             $count = MysqlHepler::SafeQueryResult("SELECT count(*) AS 'count' FROM xk_shows WHERE show_total_type = ?",$value);
@@ -144,7 +158,7 @@
             array_push($ret,$count);
             return $ret;
         }
-        public static function FindBySHOW_TYPE($value,$page=1,$num=10000){
+        public static function FindByShowType($value,$page=1,$num=10000){
             $start = $num*($page-1);
             MysqlHelper::$UseUTF8 = true;
             $count = MysqlHepler::SafeQueryResult("SELECT count(*) AS 'count' FROM xk_shows WHERE show_type = ?",$value);
@@ -152,7 +166,7 @@
             array_push($ret,$count);
             return $ret;
         }
-        public static function FindByUPDATE_TIME($value,$page=1,$num=10000){
+        public static function FindByUpdateTime($value,$page=1,$num=10000){
             $start = $num*($page-1);
             MysqlHelper::$UseUTF8 = true;
             $count = MysqlHepler::SafeQueryResult("SELECT count(*) AS 'count' FROM xk_shows WHERE update_time = ?",$value);
@@ -160,7 +174,7 @@
             array_push($ret,$count);
             return $ret;
         }
-        public static function FindBySHOW_FOR_VIP($value,$page=1,$num=10000){
+        public static function FindByShowForVip($value,$page=1,$num=10000){
             $start = $num*($page-1);
             MysqlHelper::$UseUTF8 = true;
             $count = MysqlHepler::SafeQueryResult("SELECT count(*) AS 'count' FROM xk_shows WHERE show_for_vip = ?",$value);
@@ -168,7 +182,7 @@
             array_push($ret,$count);
             return $ret;
         }
-        public static function FindByXK_VIDEOLINK($value,$page=1,$num=10000){
+        public static function FindByXkVideolink($value,$page=1,$num=10000){
             $start = $num*($page-1);
             MysqlHelper::$UseUTF8 = true;
             $count = MysqlHepler::SafeQueryResult("SELECT count(*) AS 'count' FROM xk_shows WHERE xk_videolink = ?",$value);
@@ -177,4 +191,15 @@
             return $ret;
         }
         //FIND FUNCTIONS END----------------------------------------------------
+
+        public static function Delete($unique){
+            $ret = MysqlHelper::S_IsEmptySet("SELECT * FROM xk_shows WHERE show_id = ?",'i',$unique);
+            if($ret->resultcode<0) return new ReturnObject(-2,"delete a no exist record");
+            //TODO: if have file link . delete link before delete record!
+            $ret = MysqlHelper::SafeQueryResult("SELECT * FROM xk_shows WHERE show_id= ? ",'i',$unique);
+            if($ret->resultcode<0) return $ret;
+            
+            return MysqlHelper::SafeQuery("DELETE FROM xk_shows WHERE show_id = ?",'i',$unique);
+        }
+
     }

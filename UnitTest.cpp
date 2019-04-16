@@ -55,13 +55,13 @@ struct ForeignKey{
 
 struct CreateExpression{
     AString TableName;
-    AString PrimaryKey;
+    Filed   PrimaryKey;
     AString OtherTableDesc;
     vector<Filed> FiledList;
     vector<ForeignKey> ForeignList;
 };
 
-constexpr const char* FINDCONDITION = "%FINDCOND%";
+constexpr const char* REPEATCOND = "%NOREPEAT%";
 
 class Parse{
     public:
@@ -124,8 +124,8 @@ class Parse{
 
                     if(it->Equal(",")) it++;
                     if(it->ToLowwer().Equal("primary") && (it+1)->ToLowwer().Equal("key")){
-                        it += 2;
-                        temp.PrimaryKey = *it++;
+                        it += 3;
+                        temp.PrimaryKey.FiledName = *it++;
                         PushFlag = false;
                         goto next;
                     }
@@ -158,7 +158,8 @@ next:
 
                         if((it->ToUpperN()).Equal("COMMENT")){
                             it+=2;
-                            filed.FiledComment = *it++;
+                            while(!it->Equal("'"))
+                                filed.FiledComment += *it++;
                             SHOW_MESSAGE(filed.FiledComment,1);
                         }
                         filed.OtherDesc+=*it;
@@ -170,14 +171,25 @@ next:
                     if(PushFlag) 
                         temp.FiledList.push_back(filed); 
                 }
+
+                //Set Primary Key
+                for(int index=0;index<temp.FiledList.size();index++){
+                    if(temp.FiledList.at(index).FiledName.Equal(temp.PrimaryKey.FiledName)) { 
+                        temp.PrimaryKey = temp.FiledList.at(index); 
+                        break;
+                    }
+                }
+
                 mCreateList.push_back(temp);
             }
         }
+
+
     }
 
     static void Test(){
         AString ret = "<?php\n    include_once(\"../common.php\");\n    include_once(\"../const.php\");\n";
-        ret+=AString("    //This File is Generate Auto By ")+__FILE__+".\n\n";
+        ret+=AString("    //This File is Generate Auto By Test")+".\n\n";
         size_t TableSize = Parse::mCreateList.size();
 
         auto ToType = [](AString & subject)->AString{
@@ -190,9 +202,22 @@ next:
                 return 'd';
             return 's';
         };
+
+        auto Normalize = [](AString subject)->AString{
+            subject.ToLowwer();
+            if(subject._length()>0){
+                subject = ((AString)subject[0]).ToUpper()+subject.substr(1,subject._length()-1);
+            }
+            int pos = -1;
+            while(-1!=(pos=subject.find("_"))){
+                subject = subject.substr(0,pos)+((AString)subject[pos+1]).ToUpper()+subject.substr(pos+2,subject._length()-pos-2);
+            }
+            return subject;
+        };
         
         for(int index=0;index<TableSize;index++){
             AString TableName = Parse::mCreateList.at(index).TableName;
+            Filed PrimaryKey  = Parse::mCreateList.at(index).PrimaryKey;
             auto   ThisFiled  = Parse::mCreateList.at(index);
             auto   FiledList  = Parse::mCreateList.at(index).FiledList;
             size_t FiledSize  = FiledList.size();
@@ -214,10 +239,18 @@ next:
             for(int indexY = 0;indexY<FiledSize;indexY++){
                 ret+= "            $this->"+Parse::mCreateList.at(index).FiledList.at(indexY).FiledName+" = $"+Parse::mCreateList.at(index).FiledList.at(indexY).FiledName+";\n";
             }
-            ret+="        }\n";
+            ret+="        }\n\n";
 
             //Check
-            ret+="       public function Check(){\n            return new ReturnObject(0,\"\");\n        }\n";
+            ret+="        public function Check(){\n            ";
+            for(int indexY =0;indexY<FiledSize;indexY++){
+                AString TempFiledName = FiledList.at(indexY).FiledName;
+                if(FiledList.at(indexY).FiledComment.Contain(REPEATCOND)){
+                    ret+= "if(!empty($this->"+TempFiledName+")){\n                $ret=MysqlHelper::S_IsEmptySet(\"SELECT * FROM "+TableName+" WHERE "+TempFiledName+" = ?\",'"+ToType(TempFiledName)+"',$this->"+TempFiledName+");\n";
+                    ret+= "                if($ret->resultcode<0) return $ret;\n                if($ret->data !=0) return new ReturnObject(-233,\""+TempFiledName+" can not repeat\");\n            }\n\n            ";
+                }
+            }
+            ret+= "return new ReturnObject(0,\"\");\n        }\n\n";
 
             //Add
             ret+="       public function Add(){\n            $ret = $this->Check();\n            if($ret->resultcode!=0) return $ret;\n            MysqlHelper::$UseUTF8 =true;\n\n            ";
@@ -265,13 +298,16 @@ next:
             for(int indexY = 0;indexY<FiledSize ;indexY++){
                 // SHOW_MESSAGE(FiledList.at(indexY).FiledComment.c_str(),1);
                 // if(FiledList.at(indexY).FiledComment.Contain(FINDCONDITION)){
-                    ret+="        public static function FindBy"+FiledList.at(indexY).FiledName.ToUpperN()+"($value,$page=1,$num=10000){\n            $start = $num*($page-1);\n            MysqlHelper::$UseUTF8 = true;\n            ";
+                    ret+="        public static function FindBy"+Normalize(FiledList.at(indexY).FiledName.ToUpperN())+"($value,$page=1,$num=10000){\n            $start = $num*($page-1);\n            MysqlHelper::$UseUTF8 = true;\n            ";
                     ret+="$count = MysqlHepler::SafeQueryResult(\"SELECT count(*) AS 'count' FROM "+TableName+" WHERE "+FiledList.at(indexY).FiledName+" = ?\",$value);\n            ";
                     ret+="$ret   = MysqlHelper::SafeQueryResult(\"SELECT * FROM "+TableName+" WHERE "+FiledList.at(indexY).FiledName+" = ? LIMIT ?,? \",\'"+ToType(FiledList.at(indexY).FiledType)+"dd\'"+",$value,$start,$num);\n            ";
                     ret+="array_push($ret,$count);\n            return $ret;\n        }\n";
                 // }
             }
-            ret+="        //FIND FUNCTIONS END----------------------------------------------------\n";
+            ret+="        //FIND FUNCTIONS END----------------------------------------------------\n\n        ";
+            ret+="public static function Delete($unique){\n            $ret = MysqlHelper::S_IsEmptySet(\"SELECT * FROM "+TableName+" WHERE "+ PrimaryKey.FiledName + " = ?\",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n            if($ret->resultcode<0) return new ReturnObject(-2,\"delete a no exist record\");\n            ";
+            ret+="//TODO: if have file link . delete link before delete record!\n            $ret = MysqlHelper::SafeQueryResult(\"SELECT * FROM "+TableName+" WHERE "+PrimaryKey.FiledName + "= ? \",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n            if($ret->resultcode<0) return $ret;\n            \n            return MysqlHelper::SafeQuery(\"DELETE FROM "+TableName+" WHERE "+PrimaryKey.FiledName+" = ?\",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n        }\n\n";
+
             ret+="    }\n";
 
             auto file = fopen("test.php","wr");
@@ -290,18 +326,9 @@ int main(int argc, char const *argv[])
 {
 
     {
-        // Parse::init("xk_show.sql");
-        // Parse::parse();
-        // Parse::Test();
-
-        AString test = "1234567812131230002300";
-        // test.replace("23","");
-        auto test2 = test.replace("23","test---");
-        SHOW_MESSAGE(test2._length(),1);
-        SHOW_MESSAGE(test2.c_str(),1);
-        // test.replace("23","xc");
-        // SHOW_MESSAGE(test.c_str(),1);
-        // SHOW_MESSAGE(test._length(),1);
+        Parse::init("xk_show.sql");
+        Parse::parse();
+        Parse::Test();
 
         // SHOW_MESSAGE(Parse::mCreateList.size(),1);
         
