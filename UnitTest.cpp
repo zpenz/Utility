@@ -64,7 +64,8 @@ struct CreateExpression{
     vector<ForeignKey> ForeignList;
 };
 
-constexpr const char* REPEATCOND = "%NOREPEAT%";
+constexpr const char* REPEATCOND  = "%NOREPEAT%";
+constexpr const char* FILEREFCOND = "%FILE REF%";
 
 class Parse{
     public:
@@ -187,12 +188,10 @@ next:
             }
         }
 
-
     }
 
     static void Test(){
-        AString ret = "<?php\n    include_once(\"../common.php\");\n    include_once(\"../const.php\");\n";
-        ret+=AString("    //This File is Generate Auto By Test")+".\n\n";
+
         size_t TableSize = Parse::mCreateList.size();
 
         auto ToType = [](AString & subject)->AString{
@@ -219,17 +218,20 @@ next:
         };
         
         for(int index=0;index<TableSize;index++){
+            AString ret = "<?php\n    include_once(\"../common.php\");\n    include_once(\"../const.php\");\n";
+            ret+=AString("    //This File is Generate Auto By Test")+".\n\n";
+
             AString TableName = Parse::mCreateList.at(index).TableName;
-            AString ClassName = TableName;
+            AString ClassName = Normalize(TableName);
             AString FolerName = ClassName;
-            AString GFileName = FolerName+"/test.php";
+            AString GFileName = FolerName+"/"+ClassName+".php";
             mkdir(FolerName.c_str(),0755);
             Filed PrimaryKey  = Parse::mCreateList.at(index).PrimaryKey;
             auto   ThisFiled  = Parse::mCreateList.at(index);
             auto   FiledList  = Parse::mCreateList.at(index).FiledList;
             size_t FiledSize  = FiledList.size();
             ret+="    //TableName: "+TableName+"\n";
-            ret+="    Class "+TableName+"{\n";
+            ret+="    Class "+ClassName+"{\n";
             for(int indexY = 0;indexY<FiledSize;indexY++){
                 ret+="        public $"+Parse::mCreateList.at(index).FiledList.at(indexY).FiledName+";\n";
             }
@@ -338,9 +340,7 @@ next:
             for(int indexY=0;indexY<FiledSize;indexY++){
                 AString temp = Normalize(FiledList.at(indexY).FiledName);
                 AString FindCode = "<?php \n    include_once(\'"+GFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::FindBy"+temp+"(\n            GetRealValueSafe('value'),\n            GetRealValueSafe('page',1),\n            GetRealValueSafe('num',10000));\n    })());";
-                SHOW_MESSAGE((FolerName+"/FindBy"+temp+".php").c_str(),1);
                 auto FindFile = fopen((FolerName+"/FindBy"+temp+".php").c_str(),"wr");
-                SHOW_MESSAGE(FindFile,1);
                 fwrite(FindCode.c_str(),sizeof(char),FindCode._length(),FindFile);
                 SAFE_CLOSE(FindFile);
             }
@@ -358,7 +358,6 @@ next:
             fwrite(ret.c_str(),sizeof(char),ret._length(),file);
             SAFE_CLOSE(file);
 
-            break;
         }
     }
 };

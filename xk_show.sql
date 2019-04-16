@@ -20,10 +20,10 @@ CREATE TABLE xk_shows (
 
 CREATE TABLE xk_user (
   user_id int(100) unsigned NOT NULL AUTO_INCREMENT, 
-  user_account varchar(50) NOT NULL COMMENT '用户账户',
+  user_account varchar(50) NOT NULL COMMENT '用户账户 %NOREPEAT%',
   user_password varchar(50) NOT NULL COMMENT '用户密码',
-  user_email_addr varchar(100) NOT NULL COMMENT '邮箱地址',
-  user_phone_number  int(11) NOT NULL COMMENT '手机号',
+  user_email_addr varchar(100) NOT NULL COMMENT '邮箱地址 %NOREPEAT%',
+  user_phone_number  int(11) NOT NULL COMMENT '手机号 %NOREPEAT%',
   PRIMARY KEY(user_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
 
@@ -39,9 +39,9 @@ DROP TABLE IF EXISTS xk_welcome_user;
 CREATE TABLE xk_welcome_user(
   user_id int(100) unsigned NOT NULL AUTO_INCREMENT, 
   user_welcome_user_name varchar(100) NOT NULL COMMENT '来宾姓名',
-  user_company_name varchar(200) NOT NULL COMMENT '公司名',
-  user_phone_number varchar(12) NOT NULL COMMENT '手机号',
-  user_email_addr varchar(100) NOT NULL COMMENT '邮箱',
+  user_company_name varchar(200) NOT NULL COMMENT '公司名 %NOREPEAT%',
+  user_phone_number varchar(12) NOT NULL COMMENT '手机号 %NOREPEAT%',
+  user_email_addr varchar(100) NOT NULL COMMENT '邮箱 %NOREPEAT%',
   user_partner_nums varchar(100)  NOT NULL COMMENT '同行人数',
   user_leave_message longtext NOT NULL COMMENT '留言',
   PRIMARY KEY(user_id)
