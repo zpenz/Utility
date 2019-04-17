@@ -9,7 +9,7 @@ CREATE TABLE xk_shows (
   show_author varchar(50) COMMENT '作者',
   show_content longtext NOT NULL COMMENT '内容',
   show_img varchar(1024) NOT NULL COMMENT '图片',
-  show_position varchar(200) COMMENT '文件存放位置 %NOREPEAT% %FILE REF%',
+  show_position varchar(200) COMMENT '文件存放位置 %NOREPEAT% %FILEREF%',
   show_total_type varchar(200) COMMENT '大方向类型',
   show_type varchar(50) NOT NULL COMMENT '文件类型',
   update_time varchar(50)  NOT NULL COMMENT '最后更新时间',
@@ -43,6 +43,6 @@ CREATE TABLE xk_welcome_user(
   user_phone_number varchar(12) NOT NULL COMMENT '手机号 %NOREPEAT%',
   user_email_addr varchar(100) NOT NULL COMMENT '邮箱 %NOREPEAT%',
   user_partner_nums varchar(100)  NOT NULL COMMENT '同行人数',
-  user_leave_message longtext NOT NULL COMMENT '留言',
+  user_leave_message longtext NOT NULL COMMENT '留言 %FILEREF%',
   PRIMARY KEY(user_id)
 )ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;

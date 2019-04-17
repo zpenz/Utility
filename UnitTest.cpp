@@ -65,7 +65,7 @@ struct CreateExpression{
 };
 
 constexpr const char* REPEATCOND  = "%NOREPEAT%";
-constexpr const char* FILEREFCOND = "%FILE REF%";
+constexpr const char* FILEREFCOND = "%FILEREF%";
 
 class Parse{
     public:
@@ -296,11 +296,17 @@ next:
             //Add Action
             AString AddCode = "<?php \n    include_once(\'"+GFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return (new "+ClassName+"(\n            ";
             for(int indexY=0;indexY<FiledSize;indexY++){
+                AString temp = FiledList.at(indexY).FiledComment;
                 if(indexY == FiledSize - 1){
-                    AddCode+= "GetRealValueSafe(\""+FiledList.at(indexY).FiledName+"\")\n            ))->Add();\n    })());";
+                    if(!temp.Contain(FILEREFCOND))
+                         AddCode  += "GetRealValueSafe(\""+FiledList.at(indexY).FiledName+"\")\n            ))->Add();\n    })());";
+                    else AddCode  += "FileOperator::getFile(\""+FiledList.at(indexY).FiledName+"\")\n            ))->Add();\n    })());";
                 }
-                else
-                    AddCode+="GetRealValueSafe(\""+FiledList.at(indexY).FiledName+"\"),\n            ";
+                else{
+                    if(!temp.Contain(FILEREFCOND))
+                         AddCode  += "GetRealValueSafe(\""+FiledList.at(indexY).FiledName+"\"),\n            ";
+                    else AddCode  += "FileOperator::getFile(\""+FiledList.at(indexY).FiledName+"\"),\n            ";
+                }      
             }
             auto AddFile = fopen(FolerName+"/Add.php","wr");
             fwrite(AddCode.c_str(),sizeof(char),AddCode._length(),AddFile);
@@ -347,7 +353,7 @@ next:
 
             //Delete
             ret+="public static function Delete($unique){\n            $ret = MysqlHelper::S_IsEmptySet(\"SELECT * FROM "+TableName+" WHERE "+ PrimaryKey.FiledName + " = ?\",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n            if($ret->resultcode<0) return new ReturnObject(-2,\"delete a no exist record\");\n            ";
-            ret+="//TODO: if have file link . delete link before delete record!\n            $ret = MysqlHelper::SafeQueryResult(\"SELECT * FROM "+TableName+" WHERE "+PrimaryKey.FiledName + "= ? \",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n            if($ret->resultcode<0) return $ret;\n            \n            return MysqlHelper::SafeQuery(\"DELETE FROM "+TableName+" WHERE "+PrimaryKey.FiledName+" = ?\",'"+ToType(PrimaryKey.FiledType)+"',$unique);";
+            ret+="//TODO: if have file link . delete link before delete record!\n            $ret = MysqlHelper::SafeQueryResult(\"SELECT * FROM "+TableName+" WHERE "+PrimaryKey.FiledName + "= ? \",'"+ToType(PrimaryKey.FiledType)+"',$unique);\n            if($ret->resultcode<0) return $ret;\n            ";
             for(int indexY=0;indexY<FiledSize;indexY++){
                 //Delete File Ref
                 AString temp = FiledList.at(indexY).FiledName;
@@ -355,6 +361,7 @@ next:
                     ret+="unlink($ret->value(\""+temp+"\"));\n            ";
                 }
             }
+            ret+="\n            return MysqlHelper::SafeQuery(\"DELETE FROM "+TableName+" WHERE "+PrimaryKey.FiledName+" = ?\",'"+ToType(PrimaryKey.FiledType)+"',$unique);";
             ret+="\n        }\n\n        ";
             AString DeleteCode = "<?php \n    include_once(\'"+GFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::Delete(\n            GetRealValueSafe('value')\n        );\n    })());\n        ";
             auto DeleteFile = fopen(FolerName+"/Delete.php","wr");
@@ -388,8 +395,7 @@ int main(int argc, char const *argv[])
         Parse::parse();
         Parse::Test();
 
-        // SHOW_MESSAGE(Parse::mCreateList.size(),1);
-        
+        // SHOW_MESSAGE(Parse::mCreateList1.size(),1);        
         // for(int index=0;index<Parse::mCreateList.size();index++){
         //      SHOW_MESSAGE(Parse::mCreateList.at(index).TableName,1);
         //  }
