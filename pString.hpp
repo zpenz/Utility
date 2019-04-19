@@ -227,7 +227,7 @@ using namespace utility;
             return -1;
         }
 
-        int find(const String<T>& src){
+        int find(const String<T>& src) const{
             if(src.length>length) return -1;
             int pos = 0;
             while(pos<length){
@@ -243,7 +243,7 @@ using namespace utility;
             return -1;
         }
 
-        int rfind(const String<T>& src){
+        int rfind(const String<T>& src) const{
             if(src.length>length) return -1;
             int pos = length-1;
             while(pos>=0){
@@ -259,7 +259,7 @@ using namespace utility;
             return -1;
         }
 
-        bool Contain(const String<T>& src){
+        bool Contain(const String<T>& src) const{
             return !(-1==this->find(src));
         }
 

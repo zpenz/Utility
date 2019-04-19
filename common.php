@@ -17,6 +17,8 @@ define("DEFAULT_MAX_UPLOAD_FILE_SIZE",100);
 define("LOG_FILE_NAME","xk_web_log.log");
 define("UNLEGAL_VALUE",'XK_UNLEGAL');
 
+define('BASIC_PATH',str_replace('\\','/',dirname(dirname(__FILE__))).'/');
+
 define("MAX_CURL_TIME",10);
 
 date_default_timezone_set("Asia/Hong_Kong");
@@ -116,6 +118,12 @@ class ReturnObject
     public function first(){
         return $this->data[0];
     }
+
+    public function second(){
+        if(count($this->data)>1)
+            return $this->data[1];
+        else return new ReturnObject(-99,"invaild index");
+    }
 }
 
 //do not save mysqli object
@@ -173,7 +181,7 @@ class MysqlHelper{
         $result = $stmt->result_metadata();
         Log::LogInfo(json_encode($result));
         if($result==false)
-            return new ReturnObject(-2010,"this query can not fetch result try SafeQuery");
+            return new ReturnObject(0,"this query can not fetch result if you want to get result ,use try SafeQuery!");
 
         while($field=$result->fetch_field())
             $variables[] = &$data[$field->name];

@@ -46,3 +46,15 @@ CREATE TABLE xk_welcome_user(
   user_leave_message longtext NOT NULL COMMENT '留言 %FILEREF%',
   PRIMARY KEY(user_id)
 )ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `frpc_info` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID主键',
+  `bind_port` int(11) NOT NULL COMMENT 'frps绑定端口',
+  `vhost_http_port` int(11) NOT NULL COMMENT 'frps外部端口 %NOREPEAT%',
+  `password` varchar(128) NOT NULL unique COMMENT '密码 %NOREPEAT%',
+  email varchar(128) NOT NULL COMMENT 'email %NOREPEAT%',
+  sn varchar(128) NOT NULL COMMENT '序列号 serial number',
+  subdomain varchar(32) NOT NULL COMMENT '子域名',
+  xk_key varchar(16) NOT NULL COMMENT 'session key',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
