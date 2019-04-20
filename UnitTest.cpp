@@ -372,18 +372,37 @@ next:
             fwrite(GetListCode.c_str(),sizeof(char),GetListCode._length(),GetListFile);
             SAFE_CLOSE(GetListFile);
             
-            //Find
+            //Find 
             ret+="        //FIND FUNCTIONS START----------------------------------------------------\n";
             for(int indexY = 0;indexY<FiledSize ;indexY++){
                 // SHOW_MESSAGE(FiledList.at(indexY).FiledComment.c_str(),1);
                 // if(FiledList.at(indexY).FiledComment.Contain(FINDCONDITION)){
-                    ret+="        public static function FindBy"+Normalize(FiledList.at(indexY).FiledName.ToUpperN())+"($value,$page=1,$num=10000){\n            $start = $num*($page-1);\n            MysqlHelper::$UseUTF8 = true;\n            ";
+                for(int indexZ =0;indexZ<FiledSize ;indexZ++){
+                    ret+="        public static function FindBy"+Normalize(FiledList.at(indexY).FiledName.ToUpperN())+"OrderBy"+Normalize(FiledList.at(indexZ).FiledName.ToUpperN())+"($value,$page=1,$num=10000){\n            $start = $num*($page-1);\n            MysqlHelper::$UseUTF8 = true;\n            ";
                     ret+="$CountRet = MysqlHelper::SafeQueryResult(\"SELECT count(*) AS 'count' FROM "+TableName+" WHERE "+FiledList.at(indexY).FiledName+" = ?\",'"+ToType(FiledList.at(indexY).FiledType)+"',$value);\n            ";
                     ret+="if($CountRet->resultcode<0) return $CountRet;";
-                    ret+="$ret   = MysqlHelper::SafeQueryResult(\"SELECT * FROM "+TableName+" WHERE "+FiledList.at(indexY).FiledName+" = ? LIMIT ?,? \",\'"+ToType(FiledList.at(indexY).FiledType)+"dd\'"+",$value,$start,$num);\n            ";
+                    ret+="$ret   = MysqlHelper::SafeQueryResult(\"SELECT * FROM "+TableName+" WHERE "+FiledList.at(indexY).FiledName+" = ? ORDER BY "+FiledList.at(indexZ).FiledName+" LIMIT ?,? \",\'"+ToType(FiledList.at(indexY).FiledType)+"dd\'"+",$value,$start,$num);\n            ";
                     ret+="array_push($ret->data,$CountRet->value('count'));\n            return $ret;\n        }\n";
+                }
                 // }
             }
+            //Find By Two Condition
+            if(FiledList.size()>1)
+            for(int indexY = 0;indexY<FiledSize ;indexY++){
+                // SHOW_MESSAGE(FiledList.at(indexY).FiledComment.c_str(),1);
+                // if(FiledList.at(indexY).FiledComment.Contain(FINDCONDITION)){
+                for(int indexZ =0;indexZ<FiledSize ;indexZ++){
+                    for(int indexA =0 ;indexA<FiledSize;indexA++){
+                        ret+="        public static function FindBy"+Normalize(FiledList.at(indexY).FiledName.ToUpperN())+"And"+Normalize(FiledList.at(indexZ).FiledName.ToUpperN())+"OrderBy"+Normalize(FiledList.at(indexA).FiledName.ToUpperN())+"($former,$latter,$page=1,$num=10000){\n            $start = $num*($page-1);\n            MysqlHelper::$UseUTF8 = true;\n            ";
+                        ret+="$CountRet = MysqlHelper::SafeQueryResult(\"SELECT count(*) AS 'count' FROM "+TableName+" WHERE "+FiledList.at(indexY).FiledName+" = ? AND "+FiledList.at(indexZ).FiledName+" = ? \",'"+ToType(FiledList.at(indexY).FiledType)+ToType(FiledList.at(indexZ).FiledType)+"',$former,$latter);\n            ";
+                        ret+="if($CountRet->resultcode<0) return $CountRet;";
+                        ret+="$ret   = MysqlHelper::SafeQueryResult(\"SELECT * FROM "+TableName+" WHERE "+FiledList.at(indexY).FiledName+" = ? AND "+FiledList.at(indexZ).FiledName+" = ? ORDER BY "+FiledList.at(indexA).FiledName+" LIMIT ?,? \",\'"+ToType(FiledList.at(indexY).FiledType)+ToType(FiledList.at(indexZ).FiledType)+"dd\'"+",$former,$latter,$start,$num);\n            ";
+                        ret+="array_push($ret->data,$CountRet->value('count'));\n            return $ret;\n        }\n";
+                    }
+                }
+                // }
+            }
+
             ret+="        //FIND FUNCTIONS END----------------------------------------------------\n\n        ";
             //Find Action 
             for(int indexY=0;indexY<FiledSize;indexY++){
@@ -413,7 +432,7 @@ next:
                     // if(FiledList.at(indexZ).FiledName.Equal(ThisFiled.PrimaryKey.FiledName)) continue;
                     ret+="        public static function Alter"+Normalize(FiledList.at(indexY).FiledName.ToUpperN())+"By"+Normalize(FiledList.at(indexZ).FiledName)+"($unique,$value){\n            MysqlHelper::$UseUTF8 = true;\n            ";
                     ret+="$count = MysqlHelper::SafeQueryResult(\"SELECT count(*) AS 'count' FROM "+TableName+" WHERE "+FiledList.at(indexY).FiledName+" = ?\",'"+ToType(FiledList.at(indexY).FiledType)+"',$value);\n            ";
-                    ret+="$ret   = MysqlHelper::SafeQueryResult(\"UPDATE "+TableName+" SET "+FiledList.at(indexY).FiledName+" = ? WHERE "+FiledList.at(indexZ).FiledName+" = ?\",\'"+ToType(FiledList.at(indexY).FiledType)+ToType(FiledList.at(indexZ).FiledType)+"\'"+",$value,$unique);\n            ";
+                    ret+="$ret   = MysqlHelper::SafeQuery(\"UPDATE "+TableName+" SET "+FiledList.at(indexY).FiledName+" = ? WHERE "+FiledList.at(indexZ).FiledName+" = ?\",\'"+ToType(FiledList.at(indexY).FiledType)+ToType(FiledList.at(indexZ).FiledType)+"\'"+",$value,$unique);\n            ";
                     ret+="array_push($ret,$count);\n            return $ret;\n        }\n";
                 }
             }
