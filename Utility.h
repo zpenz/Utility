@@ -21,5 +21,6 @@ namespace utility{
         if(condition){ SHOW_MESSAGE(message,true);}
 
     #define SAFE_CLOSE(subject)\
-        if(subject){ fclose(subject);} 
+        if(subject){ fclose(subject);}
+ 
 }

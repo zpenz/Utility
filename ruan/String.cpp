@@ -267,12 +267,11 @@ using namespace utility;
             return Empty(*this);
         }
 
-        String<T> substr(int pos){
+        String<T> substr(int pos) {
             return String<T>(*this,pos);
         }
 
-        String<T> substr(int start,int length)
-        {
+        String<T> substr(int start,int length){
             return String<T>(*this,start,start+length);
         }
 

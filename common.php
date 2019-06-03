@@ -27,7 +27,7 @@ ini_set('pcre.backtrack_limit',-1); //RegexMaxLimit
 
 class xkSession
 {
-    public  static function safeStart(){
+    public static function safeStart(){
         $status=session_status();
         if($status!=PHP_SESSION_ACTIVE)
             session_start();

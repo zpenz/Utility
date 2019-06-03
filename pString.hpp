@@ -5,6 +5,7 @@
  #include <fstream>
  #include <cctype>
  #include <cmath>
+ #include <string.h>
 
 //  using namespace Math;
 #include "Utility.h"
@@ -202,17 +203,17 @@ using namespace utility;
         }
 
         const T operator[](int index){
-            CONDITION_MESSAGE(index<0 || index>length-1,"invalid index");
+            CONDITION_MESSAGE(index<0 || index>length-1,"invalid index:");
             return buffer.get()[index];
         }
 
-        const T* c_str(){
+        const T* c_str() const{
             return buffer.get();
         }
 
-        const T At(int pos){
+        const T At(int pos) {
             CONDITION_MESSAGE(pos>length || pos<0,"invalid pos param!");
-            return buffer[pos];
+            return buffer.get()[pos];
         }
 
         int IndexOf(const T element){
