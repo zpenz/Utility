@@ -12,5 +12,4 @@ lua/*
 *.ipch
 *.bin
 *.php
-
-
+*.txt
