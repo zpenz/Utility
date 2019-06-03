@@ -9,8 +9,8 @@
     define("XK_SHOW_TYPE_NEWS",6);
 
     //登陆账户密码
-    define("XK_LOGIN_USERNAME",'xk');
-    define("XK_LOGIN_SIMPLE_PASSWORD",'123');
+    define("XK_LOGIN_USERNAME",'');
+    define("XK_LOGIN_SIMPLE_PASSWORD",'');
 
     $XK_TYPE_ARRAY = array(
         "原理",

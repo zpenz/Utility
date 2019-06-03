@@ -9,4 +9,8 @@ XkAgent/*
 ruan/*
 lua/*
 .vecode/*
+*.ipch
+*.bin
+*.php
+
 

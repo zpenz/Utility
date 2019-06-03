@@ -1,10 +1,10 @@
 <?php
 define("REMOTE_SERVER",FALSE);
 
-define("host", "106.14.127.106:3306");
-define("username", "root");
-define("password", "123");
-define("db", "xk");
+define("host", "");
+define("username", "");
+define("password", "");
+define("db", "");
 
 define("_DEBUG","0");
 define("SAVE_ABSOULT_PATH",FALSE);
