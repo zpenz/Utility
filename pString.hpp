@@ -352,6 +352,21 @@ using namespace utility;
             return des == *this;
         }
 
+        //KeyValueType
+        template<typename type=String<T> >
+        struct KeyValuePair{
+            type _key;
+            type _value;
+            KeyValuePair(type key,type value):_key(key),_value(value){}
+        };
+        
+
+        KeyValuePair<> Cut(const String<T>& split) const{
+            int pos = this->rfind(split);
+            if(pos<0) return KeyValuePair<>(*this,*this);
+            return KeyValuePair<>(String<T>(*this,0,pos-split.length),String<T>(*this,pos+1,length-pos+split.length));
+        }
+        
         ///des copy last 0
         friend String<T> operator+(const String<T>& src,const String<T>& des){
             T tempbuffer[src.length+des.length+1];
@@ -376,6 +391,7 @@ using namespace utility;
             }
             return *this;
         }
+
 
         bool operator==(const String<T>& des)const{
             if(size!=des.size && length!=des.length) return false;
