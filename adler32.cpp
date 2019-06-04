@@ -460,7 +460,7 @@ void Reverse(AString a,AString b){
 
     for_each(sl.rbegin(), sl.rend(), [](Snake &item) {
         SHOW_MESSAGE(item.start, 1);
-        SHOW_MESSAGE(item.mid, 1);
+        SHOW_MESSAGE(item.mid, 1); 
     }); 
 }
 
