@@ -360,10 +360,23 @@ using namespace utility;
             KeyValuePair(type key,type value):_key(key),_value(value){}
         };
         
-        KeyValuePair<> Cut(const String<T>& split) const{
-            int pos = this->rfind(split);
-            if(pos<0) return KeyValuePair<>(*this,*this);
-            return KeyValuePair<>(String<T>(*this,0,pos),String<T>(*this,pos+split.length,length));
+        KeyValuePair<> Cut(const String<T>& split,long cutpos=-1) const{
+            long count = cutpos<0?cutpos*-1:cutpos;
+            long pos = 0;
+            auto temp = *this;
+            long realpos = 0;
+            while(count>0){
+                pos  = cutpos<0?temp.rfind(split):temp.find(split);
+                if(pos == -1) break;
+                temp = cutpos<0?String<T>(temp,0,pos):String<T>(temp,pos,temp.length);
+                realpos = cutpos<0?pos:realpos+pos;
+                count--;
+            }
+            
+            if(realpos == -1) return KeyValuePair<>(*this,*this);
+            auto key   = String<T>(*this,0,realpos);
+            auto value = String<T>(*this,realpos+split.length,length);
+            return KeyValuePair<>(key,value);
         }
         
         ///des copy last 0
