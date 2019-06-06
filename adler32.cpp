@@ -190,18 +190,6 @@ enum class ActionType{
     ACTION_COMMON
 };
 
-struct Diff{
-    ActionType type;
-    int pos;
-    Diff(ActionType _type,int _pos):type(_type),pos(_pos){}
-};
-
-struct Prev{
-    int x;
-    int pk;
-    Prev(int _x):x(_x){}
-};
-
 struct Point{
     int x;
     int y;
@@ -219,6 +207,20 @@ struct Point{
     }
 };
 
+struct Diff{
+    ActionType type;
+    int pos;
+    Diff(ActionType _type,int _pos):type(_type),pos(_pos){}
+};
+
+struct Prev{
+    Point pt;
+    int pk;
+    ActionType type;
+    Prev(Point _pt):pt(_pt){}
+};
+
+
 struct Snake{
     Point start;
     Point mid;
@@ -232,18 +234,18 @@ void MyersDiff(AString src,AString des){
     //index can not nagivate
     int offset = sizea+sizeb+1;
  
-    vector<Prev> list(2*(sizea+sizeb),0);
-    list[1] = 0;
+    vector<Prev> list(2*(sizea+sizeb),Point(0,0));
+    list[1] = Point(0,0);
 
     vector<decltype(list)> vlist;
 
     for(int d=0;d<=sizea+sizeb;d++){
         printf("d=%d: \n",d);
         for(int k=-d;k<=d;k+=2){
-            bool down = k==-d ||( k!= d && list[k+1+offset].x>list[k+offset-1].x);
+            bool down = k==-d ||( k!= d && list[k+1+offset].pt.x>list[k+offset-1].pt.x);
             int kprev = down?k+1:k-1;
 
-            int xStart = list[kprev+offset].x;
+            int xStart = list[kprev+offset].pt.x;
             int yStart = xStart - kprev;
 
             //middle
@@ -261,7 +263,7 @@ void MyersDiff(AString src,AString des){
                 yEnd++;
             }
 
-            list[k+offset].x = xEnd;
+            list[k+offset].pt.x = xEnd;
 
             SHOW_MESSAGE(xEnd,1);
             // SHOW_MESSAGE(snake,1);
@@ -287,15 +289,15 @@ solution:
         int k = p.x - p.y;
 
         //end point 
-        int xEnd = v[k+offset].x;
+        int xEnd = v[k+offset].pt.x;
         int yEnd = xEnd - k;
 
-        bool down = (k == -d || (k!=d && v[k-1+offset].x<v[k+1+offset].x));
+        bool down = (k == -d || (k!=d && v[k-1+offset].pt.x<v[k+1+offset].pt.x));
 
         int kPrev = down?k+1:k-1;
 
         //start point
-        int xStart = v[kPrev+offset].x;
+        int xStart = v[kPrev+offset].pt.x;
         int ystart = xStart - kPrev;
 
         //mid point
@@ -322,20 +324,20 @@ void Reverse(AString a,AString b){
 
     int offset = sizea+sizeb;
 
-    vector<Prev> list(sizea+sizeb+offset,0);
+    vector<Prev> list(sizea+sizeb+offset,Point(0,0));
     vector<decltype(list)> dlist;
-    list[-1 + offset] = -1;
+    list[-1 + offset] = Point(0,-1);
 
     int countd = 0;
     for(int d=0;d<=sizea+sizeb;d++){
-        printf("d=%d: \n",d);
+        // printf("d=%d: \n",d);
         for(int k=-d;k<=d;k+=2){
 
             //Prev .x represent y value
-            bool up = k==d ||(k!=-d && list[offset+k+1].x - (k+1) <list[offset+k-1].x-(k-1));
+            bool up = k==d ||(k!=-d && list[offset+k+1].pt.y - (k+1) <list[offset+k-1].pt.y-(k-1));
 
             int kPrev = up ? k-1:k+1;
-            int yStart = list[kPrev+offset].x;
+            int yStart = list[kPrev+offset].pt.y;
             int xStart = yStart - kPrev;
 
             int yMid   = up?yStart+1:yStart;
@@ -352,21 +354,28 @@ void Reverse(AString a,AString b){
                 distance++;
             }
 
-            SHOW_MESSAGE(xEnd, 1);
-            SHOW_MESSAGE(yEnd, 1);
+            // SHOW_MESSAGE(xEnd, 1);
+            // SHOW_MESSAGE(yEnd, 1);
 
-            list[k+offset] = yEnd;
+            list[k+offset] = Point(xEnd,yEnd);
             list[k+offset].pk = kPrev;
             
             if (xEnd >= sizea && yEnd >= sizeb)
             {
                 //solution
                 dlist.push_back(list);
-                for(int index=countd;index>0;index--){
+                auto pk    = ((dlist[countd])[k+offset]).pk;
+                auto pyEnd = ((dlist[countd])[k + offset]).pt.y;
+
+                SHOW_MESSAGE(pk,1);
+                for(int index=countd-1;index>=0;index--){
                     SHOW_MESSAGE(k,1);
-                    SHOW_MESSAGE(yEnd,1);
                     k = ((dlist[index])[k+offset]).pk;
-                    yEnd = ((dlist[index])[k + offset]).x;
+                    yEnd = ((dlist[index])[k + offset]).pt.y;
+                    xEnd = ((dlist[index])[k + offset]).pt.x;
+                    if(k<pk) printf("+ %c\n",b[sizeb-1-yEnd]);
+                    if(k>pk) printf("- %c\n",a[sizea-1-xEnd]);
+                    pk = k;
                 }
                 return;
             }
@@ -375,37 +384,6 @@ void Reverse(AString a,AString b){
         dlist.push_back(list);
     }
 
-    
-    //solve
-    // vector<Snake> sl;
-
-    // Point pt = Point(sizea,sizeb);
-    // for(int d = dlist.size()-1;pt.x>0 || pt.y>0;d--){
-    //     int k = pt.y-pt.x;
-    //     auto v = dlist[d];
-    //     bool up = k==d ||(k!=-d && v[offset+k-1].x-(k-1) > v[offset+k+1].x-(k+1));
-
-    //     int yEnd = v[k+offset].x;
-    //     int xEnd = yEnd - k;
-
-    //     int kPrev   = up?k-1:k+1;
-
-    //     int yStart = v[kPrev + offset].x;
-    //     int xStart = yStart - kPrev;
-
-    //     int yMiddle = up?yStart + 1:yStart; 
-    //     int xMiddle = yMiddle - k;
-
-    //     sl.push_back(Snake(Point(xStart,yStart),Point(xMiddle,yMiddle),Point(xEnd,yEnd)));
-
-    //     pt.x = xStart;
-    //     pt.y = yStart;
-    // }
-
-    // for_each(sl.rbegin(), sl.rend(), [](Snake &item) {
-    //     SHOW_MESSAGE(item.start, 1);
-    //     SHOW_MESSAGE(item.mid, 1); 
-    // }); 
 }
 
 int main(int argc, char const *argv[])
