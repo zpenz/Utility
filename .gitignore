@@ -8,8 +8,10 @@ FrpcInfo/*
 XkAgent/*
 ruan/*
 lua/*
-.vecode/*
+.vscode/*
 *.ipch
 *.bin
 *.php
 *.txt
+*.dSYM
+
