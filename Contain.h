@@ -12,13 +12,11 @@ namespace Contain{
         shared_ptr<Node> child;
         unique_ptr<T> pData;
         
-        inline
-        LinkNode(T && data){
+        LinkNode( T && data){
             SHOW_MESSAGE("construct",1);
             pData = make_unique<T>(data);
         }
         
-        inline
         LinkNode(){ 
             pData  = nullptr;
             parent = nullptr;
@@ -59,6 +57,7 @@ namespace Contain{
         }
         
         bool operator==(const Node& node) const{
+            if(pData == nullptr) return false;
             if(*pData == *node.pData)
                 return true;
             return false;
@@ -93,11 +92,11 @@ namespace Contain{
             return true;
         }
 
-        bool Delete(Nodetype & node){
+        bool Delete(Nodetype && node){
             if(size==0 ) return false;
 
             auto temp = head->child;
-            while(temp){
+            while(temp && temp!=last){
                 if(node == *temp){
                     temp->child->parent = temp->parent;
                     temp->parent->child = temp->child;

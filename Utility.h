@@ -13,6 +13,11 @@ namespace stype{
 namespace utility{
     using namespace std;
 
+    template<typename ... T>
+    void Print(T ... param){
+        
+    }
+
     #define SHOW_MESSAGE(message,showline)\
         if(!showline){cout<<message<<"\n";}\
         else{cout<<"[INFO] "<<message<<"                          "<<"(in File:"<<__FILE__<<" Func:"<<__FUNCTION__<<" Line:"<<__LINE__<<")\n";}
