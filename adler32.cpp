@@ -219,7 +219,7 @@ struct Prev{
     int k;
     ActionType type;
     Prev* last;
-    Prev(Point _pt):pt(_pt){ last == nullptr;}
+    Prev(Point _pt):pt(_pt){ last = nullptr;}
 };
 
 
@@ -333,6 +333,7 @@ void Reverse(AString a,AString b){
     bool solution = false;
 
     int countd = 0;
+
     for(int d=0;d<=sizea+sizeb && !solution;d++){
         for(int k=-d;k<=d;k+=2){
             bool up = k==d ||(k!=-d && list[offset+k+1].pt.y-k-1 > list[offset+k-1].pt.y-k+1);
@@ -364,32 +365,38 @@ void Reverse(AString a,AString b){
             if (xEnd >= sizea && yEnd >= sizeb)
             {
                 solution = true;
-                //solution
-                // dlist.push_back(list);
-                // auto pk    = ((dlist[countd])[k+offset]).pk;
-                // auto pyEnd = ((dlist[countd])[k + offset]).pt.y;
 
-                // int pk = k;
-                // int pyEnd = yEnd;
+                dlist.push_back(list);
+                countd++;
 
-                // for(int index=countd-1;index>=0;index--){
-                    // k = ((dlist[index])[pk+offset]).pk;
+                int pk = k;
+                int pyEnd = yEnd;
 
-                    // yEnd = ((dlist[index])[pk + offset]).pt.y;
-                    // xEnd = ((dlist[index])[pk + offset]).pt.x;
+                // SHOW_MESSAGE(pk,1);
+                for(int index=countd-1;index>=0;index--){
+                    k = ((dlist[index])[pk+offset]).pk;
 
-                    // for(int index=yEnd+1;index<pyEnd;index++){
-                    //     printf("  %c\n",b[sizeb-1-index]);
-                    // }
+                    yEnd = ((dlist[index])[k + offset]).pt.y;
+                    xEnd = ((dlist[index])[k + offset]).pt.x;
 
-                    // if(k<pk) printf("+ %c\n",b[sizeb-1-yEnd]);
-                    // if(k>pk) printf("- %c\n",a[sizea-1-xEnd]);
+                    // SHOW_MESSAGE(((dlist[index])[k + offset]).pt,1);
 
-                    // pk = k;
-                    // pyEnd = yEnd;
-                // }
+                    for (int y = pyEnd-1; y > yEnd; y--)
+                    {
+                        printf("  %c\n", b[sizeb - 1 - y]);
+                    }
 
-                // return;
+                    if(xEnd<0 || yEnd<0) break;
+
+                    if(k<pk ) printf("+ %c\n",b[sizeb-1-yEnd]);
+                    if(k>pk) printf("- %c\n",a[sizea-1-xEnd]);
+
+                    // SHOW_MESSAGE(k,1);
+                    pk = k;
+                    pyEnd = yEnd;
+                }
+
+                return;
             }
         }
         countd++;
@@ -399,7 +406,7 @@ void Reverse(AString a,AString b){
 
 int main(int argc, char const *argv[])
 {
-    // Reverse("abcabba", "cbabac");
-    Reverse("abc", "aabcc");
+    Reverse("abcabba", "cbabac");
+    // Reverse("abcd", "aabccf");
     return 0;
 }
