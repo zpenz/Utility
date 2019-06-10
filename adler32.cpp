@@ -216,8 +216,10 @@ struct Diff{
 struct Prev{
     Point pt;
     int pk;
+    int k;
     ActionType type;
-    Prev(Point _pt):pt(_pt){}
+    Prev* last;
+    Prev(Point _pt):pt(_pt){ last == nullptr;}
 };
 
 
@@ -322,26 +324,25 @@ void Reverse(AString a,AString b){
     int sizea = a._length();
     int sizeb = b._length();
 
-    int offset = sizea+sizeb;
+    int offset = sizeb;
 
     vector<Prev> list(sizea+sizeb+offset,Point(0,0));
     vector<decltype(list)> dlist;
     list[-1 + offset] = Point(0,-1);
 
-    int countd = 0;
-    for(int d=0;d<=sizea+sizeb;d++){
-        // printf("d=%d: \n",d);
-        for(int k=-d;k<=d;k+=2){
+    bool solution = false;
 
-            //Prev .x represent y value
-            bool up = k==d ||(k!=-d && list[offset+k+1].pt.y - (k+1) <list[offset+k-1].pt.y-(k-1));
+    int countd = 0;
+    for(int d=0;d<=sizea+sizeb && !solution;d++){
+        for(int k=-d;k<=d;k+=2){
+            bool up = k==d ||(k!=-d && list[offset+k+1].pt.y-k-1 > list[offset+k-1].pt.y-k+1);
 
             int kPrev = up ? k-1:k+1;
             int yStart = list[kPrev+offset].pt.y;
             int xStart = yStart - kPrev;
 
             int yMid   = up?yStart+1:yStart;
-            int xMid   = yMid - k;
+            int xMid   = up?xStart:xStart+1;
 
             int yEnd   = yMid;
             int xEnd   = xMid;
@@ -354,40 +355,51 @@ void Reverse(AString a,AString b){
                 distance++;
             }
 
-            // SHOW_MESSAGE(xEnd, 1);
-            // SHOW_MESSAGE(yEnd, 1);
-
             list[k+offset] = Point(xEnd,yEnd);
             list[k+offset].pk = kPrev;
-            
+
+            SHOW_MESSAGE(xEnd, 1);
+            SHOW_MESSAGE(yEnd, 1);
+
             if (xEnd >= sizea && yEnd >= sizeb)
             {
+                solution = true;
                 //solution
-                dlist.push_back(list);
-                auto pk    = ((dlist[countd])[k+offset]).pk;
-                auto pyEnd = ((dlist[countd])[k + offset]).pt.y;
+                // dlist.push_back(list);
+                // auto pk    = ((dlist[countd])[k+offset]).pk;
+                // auto pyEnd = ((dlist[countd])[k + offset]).pt.y;
 
-                SHOW_MESSAGE(pk,1);
-                for(int index=countd-1;index>=0;index--){
-                    SHOW_MESSAGE(k,1);
-                    k = ((dlist[index])[k+offset]).pk;
-                    yEnd = ((dlist[index])[k + offset]).pt.y;
-                    xEnd = ((dlist[index])[k + offset]).pt.x;
-                    if(k<pk) printf("+ %c\n",b[sizeb-1-yEnd]);
-                    if(k>pk) printf("- %c\n",a[sizea-1-xEnd]);
-                    pk = k;
-                }
-                return;
+                // int pk = k;
+                // int pyEnd = yEnd;
+
+                // for(int index=countd-1;index>=0;index--){
+                    // k = ((dlist[index])[pk+offset]).pk;
+
+                    // yEnd = ((dlist[index])[pk + offset]).pt.y;
+                    // xEnd = ((dlist[index])[pk + offset]).pt.x;
+
+                    // for(int index=yEnd+1;index<pyEnd;index++){
+                    //     printf("  %c\n",b[sizeb-1-index]);
+                    // }
+
+                    // if(k<pk) printf("+ %c\n",b[sizeb-1-yEnd]);
+                    // if(k>pk) printf("- %c\n",a[sizea-1-xEnd]);
+
+                    // pk = k;
+                    // pyEnd = yEnd;
+                // }
+
+                // return;
             }
         }
         countd++;
         dlist.push_back(list);
     }
-
 }
 
 int main(int argc, char const *argv[])
 {
-    Reverse("abcabba", "cbabac");
+    // Reverse("abcabba", "cbabac");
+    Reverse("abc", "aabcc");
     return 0;
 }
