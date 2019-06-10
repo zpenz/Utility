@@ -13,10 +13,10 @@ namespace stype{
 namespace utility{
     using namespace std;
 
-    template<typename ... T>
-    void Print(T ... param){
+    // template<typename ... T>
+    // void Print(T ... param){
         
-    }
+    // }
 
     #define SHOW_MESSAGE(message,showline)\
         if(!showline){cout<<message<<"\n";}\

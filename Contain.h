@@ -12,9 +12,9 @@ namespace Contain{
         shared_ptr<Node> child;
         unique_ptr<T> pData;
         
-        LinkNode( T && data){
+        LinkNode(const T & data){
             SHOW_MESSAGE("construct",1);
-            pData = make_unique<T>(data);
+            pData = make_unique<T>(move(data));
         }
         
         LinkNode(){ 
@@ -76,23 +76,27 @@ namespace Contain{
         shared_ptr<Nodetype> last;
         Nodetype* cur;
 
-        bool Add(Nodetype && node) {
-            auto temp = make_shared<Nodetype>(move(node));
+        bool Add(T && value) {
+            auto temp = make_shared<Nodetype>(move(value));
             if(!cur){
                 head->child = temp;
                 cur = head->child.get();
                 head->child->parent = head;
+                head->child->child = last;
             }else{
-                cur->child = temp;
+                temp->child  = cur->child;
+                cur->child->parent = temp;
+                temp->parent = cur->parent->child;
+                cur->child   = temp;
                 cur = temp.get();
-                temp->parent = cur->parent;
             }
             last->parent = temp;
             size++;
             return true;
         }
 
-        bool Delete(Nodetype && node){
+        bool Delete(T&& value){
+            Nodetype node = value;
             if(size==0 ) return false;
 
             auto temp = head->child;

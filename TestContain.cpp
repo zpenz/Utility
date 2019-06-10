@@ -1,5 +1,6 @@
 #include "Contain.h"
 #include "Iterator.hpp"
+#include "pString.hpp"
 #include <vector>
 
 int main(int argc, char const *argv[])
@@ -7,11 +8,11 @@ int main(int argc, char const *argv[])
     using namespace Contain;
     using namespace Iterator;
 
-    Linker<int> list;
-    list.Add(10);
-    list.Add(13);
+    Linker<AString> list;
+    list.Add("cd");
+    list.Add("cc");
 
-    list.Delete(10);
+    list.Delete("ccd");
 
     SHOW_MESSAGE(list.size,1);
     return 0;
