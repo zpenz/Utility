@@ -339,68 +339,69 @@ void Reverse(AString a,AString b){
     for(int d = 0;d<sizea+sizeb && !solution;d++)
     {
         for(int k=-d+delta;k<=d+delta;k+=2){
-        bool up = (k==d+delta) ||(k!=-d+delta && list[offset+k+1].pt.x > list[offset+k-1].pt.x);
+            bool up = (k==d+delta) ||(k!=-d+delta && list[offset+k+1].pt.x > list[offset+k-1].pt.x);
 
-        int kPrev = up ? k-1:k+1;
-        // SHOW_MESSAGE(k, 1);
-        int xStart = list[kPrev+offset].pt.x;
-        int yStart = xStart - kPrev;
+            int kPrev = up ? k-1:k+1;
 
-        SHOW_MESSAGE(Point(xStart,yStart), 1);
+            int xStart = list[kPrev+offset].pt.x;
+            int yStart = xStart - kPrev;
+            SHOW_MESSAGE(Point(xStart,yStart), 1);
 
-        int xEnd   = up?xStart:xStart -1;
-        int yEnd   = xEnd - k;
+            int xEnd   = up?xStart:xStart -1;
+            int yEnd   = xEnd - k;
 
-        int distance = 0;
-        while (xEnd>0 && yEnd>0 && a[xEnd-1] == b[yEnd-1])
-        {
-            yEnd--;
-            xEnd--;
-            distance++;
-        }
-
-        list[k+offset] = Point(xEnd,yEnd);
-        list[k+offset].pk = kPrev;
-
-        SHOW_MESSAGE(Point(xEnd,yEnd), 1);
-
-        if (xEnd <=0 && yEnd <= 0)
-        {
-            // solution = true;
-
-            // dlist.push_back(list);
-            // countd++;
-
-            // int pk = k;
-            // int pyEnd = yEnd;
-
-            // // SHOW_MESSAGE(pk,1);
-            // for(int index=countd-1;index>=0;index--){
-            //     k = ((dlist[index])[pk+offset]).pk;
-
-            //     yEnd = ((dlist[index])[k + offset]).pt.y;
-            //     xEnd = ((dlist[index])[k + offset]).pt.x;
-
-            //     // SHOW_MESSAGE(((dlist[index])[k + offset]).pt,1);
-
-            //     for (int y = pyEnd-1; y > yEnd; y--)
-            //     {
-            //         printf("  %c\n", b[sizeb - 1 - y]);
-            //     }
-
-            //     if(xEnd<0 || yEnd<0) break;
-
-            //     if(k<pk ) printf("+ %c\n",b[sizeb-1-yEnd]);
-            //     if(k>pk) printf("- %c\n",a[sizea-1-xEnd]);
-
-            //     // SHOW_MESSAGE(k,1);
-            //     pk = k;
-            //     pyEnd = yEnd;
-            solution = true;
-            return;
+            int distance = 0;
+            while (xEnd>0 && yEnd>0 && a[xEnd-1] == b[yEnd-1])
+            {
+                yEnd--;
+                xEnd--;
+                distance++;
             }
-            
+
+            list[k+offset] = Point(xEnd,yEnd);
+            list[k+offset].pk = kPrev;
+
+            SHOW_MESSAGE(Point(xEnd,yEnd), 1);
+            SHOW_MESSAGE(k, 1);
+            SHOW_MESSAGE("\n", 0);
+
+            if (xEnd <=0 && yEnd <= 0)
+            {
+                dlist.push_back(list);
+                countd++;
+
+                int pk = k;
+                int pyEnd = yEnd;
+
+                // SHOW_MESSAGE(pk,1);
+                for(int index=countd-1;index>=0;index--){
+                    k = ((dlist[index])[pk+offset]).pk;
+                    SHOW_MESSAGE(k,1);
+
+                    yEnd = ((dlist[index])[k + offset]).pt.y;
+                    xEnd = ((dlist[index])[k + offset]).pt.x;
+
+                    // SHOW_MESSAGE(((dlist[index])[k + offset]).pt,1);
+                    for (int y = pyEnd-1; y < yEnd; y++)
+                    {
+                        printf("  %c\n", b[y-1]);
+                    }
+
+                    if(xEnd>=sizea-1 || yEnd>=sizeb-1) break;
+
+                    if(k<pk ) printf("+ %c\n",b[yEnd-1]);
+                    if(k>pk) printf("- %c\n",a[xEnd-1]);
+
+                    pk = k;
+                    pyEnd = yEnd;
+
+                    // return;
+                }
+            }
+        
         }
+        dlist.push_back(list);
+        countd++;
     }
 
 }
