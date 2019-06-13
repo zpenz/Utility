@@ -328,7 +328,7 @@ void Reverse(AString a,AString b){
 
     vector<Prev> list(sizea+sizeb+offset,Point(0,0));
     vector<decltype(list)> dlist;
-    list[offset] = Point(sizea,sizeb+1);
+    list[sizea-sizeb-1+offset] = Point(sizea,sizeb+1);
 
     bool solution = false;
 
@@ -372,31 +372,33 @@ void Reverse(AString a,AString b){
 
                 int pk = k;
                 int pyEnd = yEnd;
+                int pxEnd = xEnd;
 
                 // SHOW_MESSAGE(pk,1);
                 for(int index=countd-1;index>=0;index--){
                     k = ((dlist[index])[pk+offset]).pk;
-                    SHOW_MESSAGE(k,1);
 
                     yEnd = ((dlist[index])[k + offset]).pt.y;
                     xEnd = ((dlist[index])[k + offset]).pt.x;
 
-                    // SHOW_MESSAGE(((dlist[index])[k + offset]).pt,1);
-                    for (int y = pyEnd-1; y < yEnd; y++)
-                    {
-                        printf("  %c\n", b[y-1]);
+                    if(xEnd>pxEnd && yEnd>pyEnd){
+                        for (int index = pyEnd+1; index <= yEnd; index++)
+                        {
+                            if(k<pk && index==yEnd) break;
+                            printf("  %c\n", b[index-1]);
+                        }
                     }
-
-                    if(xEnd>=sizea-1 || yEnd>=sizeb-1) break;
 
                     if(k<pk ) printf("+ %c\n",b[yEnd-1]);
                     if(k>pk) printf("- %c\n",a[xEnd-1]);
 
                     pk = k;
                     pyEnd = yEnd;
+                    pxEnd = xEnd;
 
-                    // return;
+                    if(xEnd==sizea && yEnd==sizeb) break;
                 }
+                return;
             }
         
         }
@@ -408,7 +410,7 @@ void Reverse(AString a,AString b){
 
 int main(int argc, char const *argv[])
 {
-    Reverse("abcabba", "cbabac");
-    // Reverse("abcd", "aabccf");
+    // Reverse("abcabba", "cbabac");
+    Reverse("abcd", "aabccf");
     return 0;
 }
