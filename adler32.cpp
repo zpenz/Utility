@@ -323,6 +323,7 @@ solution:
 void Reverse(AString a,AString b){
     int sizea = a._length();
     int sizeb = b._length();
+    if(sizea ==0||sizeb==0) return; 
 
     int offset = sizeb+sizea+1;
 
@@ -411,6 +412,6 @@ void Reverse(AString a,AString b){
 int main(int argc, char const *argv[])
 {
     // Reverse("abcabba", "cbabac");
-    Reverse("abcd", "aabccf");
+    Reverse("kfdskfjd", "skjfalkfdskfjdsal");
     return 0;
 }
