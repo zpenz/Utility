@@ -1,3 +1,4 @@
+#pragma once
 #include "Utility.h"
 
 namespace Contain{
@@ -145,10 +146,7 @@ namespace Contain{
         LinkNode<T> operator[](int pos){
             CONDITION_MESSAGE(pos<0 || pos>size-1,"invaild pos");
             LinkNode<T> temp = *(head->child);
-            while(pos--){
-                // temp = *(temp.child);
-                temp++;
-            }
+            while(pos--) temp++;
             return temp;
         }
     };

@@ -63,7 +63,12 @@
         ],
         "clocale": "cpp",
         "map": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "array": "cpp",
+        "*.tcc": "cpp",
+        "deque": "cpp",
+        "unordered_map": "cpp",
+        "sstream": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false
 }

@@ -1,4 +1,4 @@
-
+#pragma once
 #include <iostream>
 #include <memory>
 
@@ -23,5 +23,19 @@ namespace utility{
 
     #define SAFE_CLOSE(subject)\
         if(subject){ fclose(subject);}
- 
+
+    template<typename T>
+    void show_message(T param){
+        cout<<param<<"                          "<<"(in File:"<<__FILE__<<" Func:"<<__FUNCTION__<<" Line:"<<__LINE__<<")\n";
+    }
+
+    template<typename T,typename ...Params>
+    void show_message(T param,Params ...){
+        cout<<param;
+        show_message(Params...);
+    }
+    
+    struct pobject{
+        virtual ~pobject(){};
+    };
 }

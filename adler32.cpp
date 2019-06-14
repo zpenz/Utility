@@ -412,6 +412,6 @@ int main(int argc, char const *argv[])
 {
     // Reverse("abcabba", "cbabac");
     Reverse("kfdskfjd", "skjfalkfdskfjdsal");
-    FileInsert();
+    FileMarge("1.txt",0,)
     return 0;
 }
