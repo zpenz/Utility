@@ -406,12 +406,12 @@ void Reverse(AString a,AString b){
         dlist.push_back(list);
         countd++;
     }
-
 }
 
 int main(int argc, char const *argv[])
 {
     // Reverse("abcabba", "cbabac");
     Reverse("kfdskfjd", "skjfalkfdskfjdsal");
+    FileInsert();
     return 0;
 }

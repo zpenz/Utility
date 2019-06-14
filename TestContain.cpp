@@ -14,6 +14,7 @@ int main(int argc, char const *argv[])
 
     list.Delete("ccd");
 
+    SHOW_MESSAGE(*list[2].pData,1);
     SHOW_MESSAGE(list.size,1);
     return 0;
 }

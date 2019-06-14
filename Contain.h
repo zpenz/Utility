@@ -31,8 +31,8 @@ namespace Contain{
         }
 
         LinkNode(LinkNode<T> & node){
-            parent = make_shared<Node>(move(node.parent));
-            child  = make_shared<Node>(move(node.child));
+            parent = node.parent;
+            child  = node.child;
             pData  = make_unique<T>(*node.pData);
             SHOW_MESSAGE("copy construct",1);
         }
@@ -45,9 +45,9 @@ namespace Contain{
         }
 
         LinkNode<T>& operator=(const LinkNode<T>& NodeMove){
-            parent = make_shared<Node>(move(NodeMove.parent));
-            child  = make_shared<Node>(move(NodeMove.child));
-            pData  = make_unique<T>(NodeMove.pData);
+            parent = NodeMove.parent;
+            child  = NodeMove.child;
+            pData  = make_unique<T>(*NodeMove.pData);
             return *this;
         }
 
@@ -64,6 +64,17 @@ namespace Contain{
         }
         bool operator!=(const Node& node) const{
             return !(node==*this);
+        }
+
+        LinkNode<T>& operator ++(){
+            CONDITION_MESSAGE(this->child == nullptr,"child nullptr"); 
+            if(this->child == nullptr) return *this;
+            this = *(this->child);
+            return *this;
+        }
+
+        LinkNode<T> operator --(){
+            return *(this->parent);
         }
         
     };
@@ -131,6 +142,15 @@ namespace Contain{
         }
 
         ~Linker() = default;
+
+        LinkNode<T> operator[](int pos){
+            CONDITION_MESSAGE(pos<0 || pos>size-1,"invaild pos");
+            LinkNode<T> temp = *(head->child);
+            while(pos--){
+                temp = *(temp.child);
+            }
+            return temp;
+        }
     };
 
 

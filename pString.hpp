@@ -177,15 +177,19 @@ using namespace utility;
         }
 
         //COPY
-        String(const String<T>&src){
+        String(const String<T>& src){
             length = src.length;
             size = src.size;
-            // buffer = src.buffer;
             buffer = shared_ptr<T>(new T[length+1],default_delete<T[]>());
             memcpy(buffer.get(),src.buffer.get(),(length)*sizeof(T));
             (buffer.get())[length] = 0;
-            // buffer = make_shared<T>(length);
-            // memcpy(buffer.get(),src.buffer.get(),size);
+        }
+
+        //MOVE
+        String(const String<T>&& src){
+            length = src.length;
+            size = src.size;
+            buffer = move(src.buffer);
         }
 
         ~String(){
