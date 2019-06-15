@@ -1,24 +1,13 @@
 #include "Contain.h"
 #include "Iterator.hpp"
 #include "pString.hpp"
-
-//end
-template<typename T>
-void Test(T arg){
-    std::cout<<arg;
-}
-
-template<typename T,typename ... type>
-void Test(T arg,type ... params)
-{
-    std::cout<<arg;
-    Test(params ...);
-}
+#include "json.hpp"
 
 int main(int argc, char const *argv[])
 {
     using namespace Contain;
     using namespace Iterator;
+    using namespace Utility;
 
     Linker<AString> list;
     list.Add("cd");
@@ -26,10 +15,16 @@ int main(int argc, char const *argv[])
 
     list.Delete("ccd");
 
-    SHOW_MESSAGE(*list[1].pData, 1);
+    SHOW_MESSAGE(list[1], 1);
     SHOW_MESSAGE(list.size, 1);
 
-    Test(1,"hello world!","zz you","xixi");
+    show_message(1,"hello world!","zz you","xixi");
 
+    // auto a = Utility::is_string<pobject<AString> >::value;
+
+    JObject<> obj;
+    obj.Add<int>(KeyValue<int>("",1));
+    auto a = obj.Serial();
+    // show_message(a); 
     return 0;
 }

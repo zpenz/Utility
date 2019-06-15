@@ -53,7 +53,7 @@ namespace Contain{
         }
 
         ~LinkNode(){
-            if(pData) {SHOW_MESSAGE(*pData,1);}
+            // if(pData) {SHOW_MESSAGE(*pData,1);} //if can log..
             SHOW_MESSAGE("destructor..",1);
         }
         
@@ -143,11 +143,11 @@ namespace Contain{
 
         ~Linker() = default;
 
-        LinkNode<T> operator[](int pos){
+        T& operator[](int pos){
             CONDITION_MESSAGE(pos<0 || pos>size-1,"invaild pos");
             LinkNode<T> temp = *(head->child);
             while(pos--) temp++;
-            return temp;
+            return *(temp.pData);
         }
     };
 }

@@ -30,12 +30,17 @@ namespace utility{
     }
 
     template<typename T,typename ...Params>
-    void show_message(T param,Params ...){
+    void show_message(T param,Params... args){
         cout<<param;
-        show_message(Params...);
+        show_message(args ...);
     }
     
-    struct pobject{
+    struct object{};
+
+    template<typename T = object>
+    struct pobject:object{
+        static T __type;
         virtual ~pobject(){};
     };
+
 }
