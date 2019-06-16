@@ -56,11 +56,12 @@ namespace Utility
             for(int index=0;index<list.size;index++){
                 // auto item = static_cast<pobject<> >(list[index]);
                 // auto pair = static_cast<KeyValue<decltype(item.__type)> >(list[index]);
-                auto item = (pobject<double> *)(&list[index]);
+                auto item = (pobject<int> *)(&list[index]);
                 show_message("item_type:",typeid(decltype(item->__type)).name());
                 auto pair = (KeyValue<decltype(item->__type)> *)(&list[index]);
                 temp+="\"";
                 temp+=pair->key;
+                show_message(list.size);
                 temp+="\":";
                 if(is_string<decltype(item->__type)>::value){
                     // temp+=AString(static_cast<decltype(item->__type)>(pair->value));

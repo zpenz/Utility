@@ -35,7 +35,9 @@ namespace utility{
         show_message(args ...);
     }
     
-    struct object{};
+    struct object{
+        virtual ~object(){};
+    };
 
     template<typename T = object>
     struct pobject:object{

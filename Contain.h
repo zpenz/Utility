@@ -145,9 +145,9 @@ namespace Contain{
 
         T& operator[](int pos){
             CONDITION_MESSAGE(pos<0 || pos>size-1,"invaild pos");
-            LinkNode<T> temp = *(head->child);
-            while(pos--) temp++;
-            return *(temp.pData);
+            LinkNode<T>* temp = head->child.get();
+            while(pos--) (*temp)++;
+            return *(temp->pData);
         }
     };
 }
