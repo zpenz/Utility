@@ -15,5 +15,7 @@ lua/*
 *.txt
 *.dSYM
 *Mac mini*
-*think*
+think
+think.cpp
+
 
