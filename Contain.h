@@ -90,7 +90,8 @@ namespace Contain{
         shared_ptr<Nodetype> last;
         Nodetype* cur;
 
-        bool Add(const T & value) {
+        template<typename U>
+        bool Add(U && value) {
             auto temp = make_shared<Nodetype>(move(value));
             if(!cur){
                 head->child = temp;
@@ -106,6 +107,13 @@ namespace Contain{
             }
             last->parent = temp;
             size++;
+            return true;
+        }
+
+        template<typename U,typename ...V>
+        bool Add(U u1,V ...v1){
+            Add(u1);
+            Add(v1...);
             return true;
         }
 
@@ -128,17 +136,21 @@ namespace Contain{
             return false;
         }
 
-        inline
-        Linker(const Nodetype& node){
+        Linker(const T node){
             Linker();
             Add(node);
         }
 
-        inline
+        template<class U,class ...V>
+        Linker(const U node,V...v){
+            Add(node);
+            Linker(v...);
+        }
+
         Linker(){
             size = 0;
-            last = make_unique<Nodetype>();
-            head = make_unique<Nodetype>();
+            last = make_shared<Nodetype>();
+            head = make_shared<Nodetype>();
             head->child  = last;
             last->parent = head;
             cur = nullptr;
@@ -149,7 +161,6 @@ namespace Contain{
         T& operator[](int pos){
             CONDITION_MESSAGE(pos<0 || pos>size-1,"invaild pos");
             LinkNode<T>* temp = head->child.get();
-            // while(pos--) (*temp)++; 
             while(pos--) temp = temp->child.get();
             return *(temp->pData);
         }

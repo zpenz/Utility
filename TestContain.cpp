@@ -11,7 +11,7 @@ int main(int argc, char const *argv[])
 
     Linker<AString> list;
     list.Add("cd");
-    list.Add("cc");
+    list.Add("cc1");
 
     SHOW_MESSAGE(list[0], 1);
     SHOW_MESSAGE(list[1], 1);
@@ -20,7 +20,6 @@ int main(int argc, char const *argv[])
     SHOW_MESSAGE(list.size, 1);
 
     auto a = Utility::is_string<pobject<AString> >::value;
-
 
     Linker<KeyValue> array;
     array.Add(KeyValue("array",1));
@@ -32,7 +31,10 @@ int main(int argc, char const *argv[])
     array2.Add(KeyValue("array5",array));
 
     Linker<Linker<KeyValue> > array3;
-    array3.Add(array2);
+    array3.Add(array,array2);
+    // array3.Add();
+    Linker<Linker<KeyValue> > array4(Linker<KeyValue>(KeyValue("","")));
+    // array4.Add(Linker<KeyValue>(KeyValue("","")));
 
     JObject obj;
     obj.Add("where",1,"iama","solizia","array",array,"array2",array2,"error_code",100,"error_code2",101,"list",array3);

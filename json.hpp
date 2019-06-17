@@ -34,17 +34,20 @@ namespace Utility
             __tvalue = typeid(PValue).name();
             value = _value;
             blist = false;
+            barraylist = false;
         }
 
         KeyValue(JString _key,Linker<KeyValue> _value):key(_key){
             __tvalue = typeid(Linker<KeyValue>).name();
             list  = _value;
             blist = true;
+            barraylist = false;
         }
 
         KeyValue(JString _key,Linker<Linker<KeyValue> > _value):key(_key){
             __tvalue = typeid(Linker<Linker<KeyValue> >).name();
             arraylist  = _value;
+            blist = false;
             barraylist = true;
         }
 
