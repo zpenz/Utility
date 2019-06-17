@@ -90,7 +90,7 @@ namespace Contain{
         shared_ptr<Nodetype> last;
         Nodetype* cur;
 
-        bool Add(T && value) {
+        bool Add(const T & value) {
             auto temp = make_shared<Nodetype>(move(value));
             if(!cur){
                 head->child = temp;
@@ -129,7 +129,7 @@ namespace Contain{
         }
 
         inline
-        Linker(Nodetype& node){
+        Linker(const Nodetype& node){
             Linker();
             Add(node);
         }

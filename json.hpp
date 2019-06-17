@@ -23,8 +23,10 @@ namespace Utility
         JString value;
         AString __tvalue;
         Linker<KeyValue> list;
+        Linker<Linker<KeyValue> > arraylist;
         bool bstr;
         bool blist;
+        bool barraylist;
 
         template<typename PValue>
         KeyValue(JString _key,PValue _value):key(_key){
@@ -38,6 +40,30 @@ namespace Utility
             __tvalue = typeid(Linker<KeyValue>).name();
             list  = _value;
             blist = true;
+        }
+
+        KeyValue(JString _key,Linker<Linker<KeyValue> > _value):key(_key){
+            __tvalue = typeid(Linker<Linker<KeyValue> >).name();
+            arraylist  = _value;
+            barraylist = true;
+        }
+
+        JString SerialArrayList(){
+            JString temp = "";
+            for(int index=0;index<arraylist.size;index++){
+                auto item = arraylist[index];
+                for(int indexY =0;indexY<item.size;indexY++){
+                    temp+="{";
+                    auto internalItem = item[indexY];
+                    temp+=internalItem.Serial();
+                    temp+="}";
+                    if(indexY!=item.size-1)
+                    temp+=",";
+                }
+                if(index!=arraylist.size-1)
+                temp+=",";
+            }
+            return temp;
         }
 
         JString SerialList(){
@@ -56,7 +82,12 @@ namespace Utility
             JString temp = "\"";
             temp+=key;
             temp+="\":";
-            if(blist){
+            if(barraylist){
+                temp+="[";
+                temp+=SerialArrayList();
+                temp+="]";
+            }
+            else if(blist){
                 temp+="[";
                 temp+=SerialList();
                 temp+="]";

@@ -31,8 +31,11 @@ int main(int argc, char const *argv[])
     array2.Add(KeyValue("array4",array));
     array2.Add(KeyValue("array5",array));
 
+    Linker<Linker<KeyValue> > array3;
+    array3.Add(array2);
+
     JObject obj;
-    obj.Add("where",1,"iama","solizia","array",array,"array2",array2,"error_code",100,"error_code2",101);
+    obj.Add("where",1,"iama","solizia","array",array,"array2",array2,"error_code",100,"error_code2",101,"list",array3);
     auto ret = obj.Serial();
     show_message(ret.c_str()); 
     return 0;
