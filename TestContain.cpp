@@ -13,20 +13,29 @@ int main(int argc, char const *argv[])
     list.Add("cd");
     list.Add("cc");
 
-    // list.Delete("ccd");
-
+    SHOW_MESSAGE(list[0], 1);
     SHOW_MESSAGE(list[1], 1);
     list[1] = "ooo";
     SHOW_MESSAGE(list[1],1);
     SHOW_MESSAGE(list.size, 1);
 
-    show_message(1,"hello world!","zz you","xixi");
-
     auto a = Utility::is_string<pobject<AString> >::value;
 
-    JObject<> obj;
-    obj.Add<int>(KeyValue<int>("where",1));
+    JObject obj;
+    Linker<KeyValue> array;
+    array.Add(KeyValue("array",1));
+    array.Add(KeyValue("array","ooo"));
+    Linker<KeyValue> array2;
+    array2.Add(KeyValue("array2","test"));
+    array2.Add(KeyValue("array2","test2"));
+    array2.Add(KeyValue("array1",array));
+    array2.Add(KeyValue("array1",array));
+
+    obj.Add(KeyValue("where",1));
+    obj.Add(KeyValue("iama","solizia"));
+    obj.Add(KeyValue("array",array));
+    obj.Add(KeyValue("array2",array2));
     auto ret = obj.Serial();
-    // show_message(ret.c_str()); 
+    show_message(ret.c_str()); 
     return 0;
 }

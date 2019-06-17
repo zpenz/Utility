@@ -70,7 +70,10 @@ namespace Contain{
         LinkNode<T>& operator ++(int i){
             CONDITION_MESSAGE(this->child == nullptr,"child nullptr"); 
             if(this->child == nullptr) return *this;
-            return i==0?*(this->child):this->operator ++(i-1);
+            LinkNode<T> * temp = this->child.get();
+            while(i-->=0)
+                temp = temp->child.get();
+            return *temp;
         }
 
         LinkNode<T> operator --(){
@@ -146,7 +149,8 @@ namespace Contain{
         T& operator[](int pos){
             CONDITION_MESSAGE(pos<0 || pos>size-1,"invaild pos");
             LinkNode<T>* temp = head->child.get();
-            while(pos--) (*temp)++;
+            // while(pos--) (*temp)++; 
+            while(pos--) temp = temp->child.get();
             return *(temp->pData);
         }
     };

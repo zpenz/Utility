@@ -1,10 +1,12 @@
-#include <type_traits>
+#pragma once
 #include "pString.hpp"
 #include "Contain.h"
 
 namespace Utility
 {
     using namespace Contain;
+
+    using JString = AString;
 
     template<class T>
     struct is_string{
@@ -16,73 +18,102 @@ namespace Utility
         enum{ value = sizeof(is_str(t))==sizeof(char)};
     };
 
-    template<typename TValue,typename TKey=AString>
-    struct KeyValue:pobject<TValue>{
-        TKey key;
-        TValue value;
-        KeyValue(TKey _key,TValue _value):key(_key),value(_value){}
+    struct KeyValue{
+        JString key;
+        JString value;
+        AString __tvalue;
+        Linker<KeyValue> list;
+        bool bstr;
+        bool blist;
+
+        template<typename PValue>
+        KeyValue(JString _key,PValue _value):key(_key){
+            bstr = is_string<PValue>::value;
+            __tvalue = typeid(PValue).name();
+            value = _value;
+            blist = false;
+        }
+
+        KeyValue(JString _key,Linker<KeyValue> _value):key(_key){
+            __tvalue = typeid(Linker<KeyValue>).name();
+            list  = _value;
+            blist = true;
+        }
+
+        JString SerialList(){
+            JString temp = "{";
+            for(int index=0;index<list.size;index++){
+                auto item = list[index];
+                temp+=item.Serial();
+                if(index!=list.size-1)
+                temp+=",";
+            }
+            temp+="}";
+            return temp;
+        }
+
+        JString Serial(){
+            JString temp = "\"";
+            temp+=key;
+            temp+="\":";
+            if(blist){
+                temp+="[";
+                temp+=SerialList();
+                temp+="]";
+            }else{
+                if(bstr){
+                    temp+="\"";
+                    temp+=value;
+                    temp+="\"";
+                }else
+                    temp+=value;
+            }
+            return temp;
+        }
     };
 
-    template<typename TKey = AString>
     class JObject{
     public:
-        Linker<object> list; 
+        Linker<KeyValue > list; 
 
-        template<class T>
-        void Add(KeyValue<T> && obj){
+        void Add(KeyValue obj){
             list.Add(move(obj));
         }
 
         template<class T>
-        void Set(TKey key,KeyValue<T> obj){
+        void Set(JString key,KeyValue obj){
             for(int index=0;index<list.size;index++){
-                if(key == list[index]){
-                    static_cast<KeyValue<T> >(list[index]).value = obj;
+                if(key == list[index].key){
+                    list[index] = obj;
                 }
             }
         }
 
         template<typename TV>
         auto Get(TV key){
-            for(int index=0;index<list.size();index++){
+            for(int index=0;index<list.size;index++){
                 if(key == list[index]){
-                    return static_cast<KeyValue<TV> >(list[index]).value;
+                    return list[index].value; 
                 }
             }
         }
 
-        TKey Serial(){
-            TKey temp = "{";
+        JString Serial(){
+            JString temp = "{";
             for(int index=0;index<list.size;index++){
-                // auto item = static_cast<pobject<> >(list[index]);
-                // auto pair = static_cast<KeyValue<decltype(item.__type)> >(list[index]);
-                auto item = (pobject<int> *)(&list[index]);
-                show_message("item_type:",typeid(decltype(item->__type)).name());
-                auto pair = (KeyValue<decltype(item->__type)> *)(&list[index]);
-                temp+="\"";
-                temp+=pair->key;
-                show_message(list.size);
-                temp+="\":";
-                if(is_string<decltype(item->__type)>::value){
-                    // temp+=AString(static_cast<decltype(item->__type)>(pair->value));
-                }else{
-                    temp+="\"";
-                    // temp+=pair->value;
-                    temp+="\"";
-                    if(index!=list.size-1)
+                auto item = list[index];
+                temp+=item.Serial();
+                if(index!=list.size-1)
                     temp+=",";
-                }
             }
             temp += "}";
             return temp;
         }
     };
 
-    template<typename TValue,typename TKey = AString>
     class JArray{
-        TKey key;
-        Linker<JObject<TValue> > list;
+        JString key;
+        Linker<JObject> list;
     };
 
-    // extern AString SerialJson();
 } 
