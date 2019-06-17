@@ -80,6 +80,17 @@ namespace Utility
             list.Add(move(obj));
         }
 
+        template<typename Key,typename Value>
+        void Add(Key key,Value value){
+            list.Add(KeyValue(key,value));
+        }
+
+        template<typename T,typename U,typename ...Ts>
+        void Add(T t1,U u1,Ts...ts){
+            list.Add(KeyValue(t1,u1));
+            Add(ts...);
+        }
+
         template<class T>
         void Set(JString key,KeyValue obj){
             for(int index=0;index<list.size;index++){

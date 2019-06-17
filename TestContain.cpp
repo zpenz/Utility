@@ -21,20 +21,18 @@ int main(int argc, char const *argv[])
 
     auto a = Utility::is_string<pobject<AString> >::value;
 
-    JObject obj;
+
     Linker<KeyValue> array;
     array.Add(KeyValue("array",1));
-    array.Add(KeyValue("array","ooo"));
+    array.Add(KeyValue("array1","ooo"));
     Linker<KeyValue> array2;
     array2.Add(KeyValue("array2","test"));
-    array2.Add(KeyValue("array2","test2"));
-    array2.Add(KeyValue("array1",array));
-    array2.Add(KeyValue("array1",array));
+    array2.Add(KeyValue("array3","test2"));
+    array2.Add(KeyValue("array4",array));
+    array2.Add(KeyValue("array5",array));
 
-    obj.Add(KeyValue("where",1));
-    obj.Add(KeyValue("iama","solizia"));
-    obj.Add(KeyValue("array",array));
-    obj.Add(KeyValue("array2",array2));
+    JObject obj;
+    obj.Add("where",1,"iama","solizia","array",array,"array2",array2,"error_code",100,"error_code2",101);
     auto ret = obj.Serial();
     show_message(ret.c_str()); 
     return 0;

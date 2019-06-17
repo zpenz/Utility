@@ -8,7 +8,6 @@
  #include <cmath>
  #include <string.h>
 
-//  using namespace Math;
 #include "Utility.h"
 using namespace utility;
 
@@ -327,7 +326,7 @@ using namespace utility;
             return TempString;
         }
 
-        const String<T> replace(const String<T>& src,const String<T>& sbj){
+        const String<T>& replace(const String<T>& src,const String<T>& sbj){
             auto pos = -1;
             while(-1!=(pos=find(src))){
                 *this = substr(0,pos)+sbj+substr(pos+src._length(),_length() -substr(0,pos)._length()-src._length());
@@ -395,7 +394,6 @@ using namespace utility;
             }
             return *this;
         }
-
 
         bool operator==(const String<T>& des)const{
             if(size!=des.size && length!=des.length) return false;
