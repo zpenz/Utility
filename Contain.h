@@ -110,12 +110,12 @@ namespace Contain{
             return true;
         }
 
-        template<typename U,typename ...V>
-        bool Add(U u1,V ...v1){
-            Add(u1);
-            Add(v1...);
-            return true;
-        }
+        // template<typename U,typename ...V>
+        // bool Add(U u1,V ...v1){
+        //     Add(u1);
+        //     Add(v1...);
+        //     return true;
+        // }
 
         bool Delete(T&& value){
             Nodetype node = value;
@@ -136,9 +136,9 @@ namespace Contain{
             return false;
         }
 
-        Linker(const T node){
+        Linker(T && node){
             Linker();
-            Add(node);
+            Add(move(node));
         }
 
         template<class U,class ...V>

@@ -31,13 +31,17 @@ int main(int argc, char const *argv[])
     array2.Add(KeyValue("array5",array));
 
     Linker<Linker<KeyValue> > array3;
-    array3.Add(array,array2);
+    // array3.Add(array,array2);
     // array3.Add();
-    Linker<Linker<KeyValue> > array4(Linker<KeyValue>(KeyValue("","")));
+
+    // Linker<KeyValue> a4(KeyValue("",""));
+    Linker<AString> list2("123");
+    // a4.Add(KeyValue("",""));
+    // Linker<Linker<KeyValue> > array4(Linker<KeyValue>(KeyValue("","")));
     // array4.Add(Linker<KeyValue>(KeyValue("","")));
 
     JObject obj;
-    obj.Add("where",1,"iama","solizia","array",array,"array2",array2,"error_code",100,"error_code2",101,"list",array3);
+    obj.Add("where",1,"iama","solizia","array",array,"array2",array2,"error_code",100,"error_code2",101);
     auto ret = obj.Serial();
     show_message(ret.c_str()); 
     return 0;
