@@ -93,6 +93,14 @@ namespace Contain{
         template<typename U>
         bool Add(U && value) {
             auto temp = make_shared<Nodetype>(move(value));
+            if(!head){
+                size = 0;
+                last = make_shared<Nodetype>();
+                head = make_shared<Nodetype>();
+                head->child  = last;
+                last->parent = head;
+                cur = nullptr;
+            }
             if(!cur){
                 head->child = temp;
                 cur = head->child.get();
@@ -136,9 +144,8 @@ namespace Contain{
             return false;
         }
 
-        Linker(T && node){
-            Linker();
-            Add(move(node));
+        Linker(const T & node){
+            Add(node);
         }
 
         template<class U,class ...V>
