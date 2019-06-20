@@ -16,7 +16,7 @@ using SOCKET = int;
 using SOCKADDR = sockaddr;
 using DWORD = unsigned int;
 
-int FormPost(const AString& url,const AString& data,long timeout){
+AString FormPost(const AString& url,const AString& data,long timeout){
     #ifdef WIN32
     WSAData wsa;
     if (::WSAStartup(MAKEWORD(1,1),&wsa) != 0)
@@ -69,6 +69,14 @@ int FormPost(const AString& url,const AString& data,long timeout){
     reader.close();
     AString footer = "\r\n--"+boundary+"--\r\n";
     ibret = send(sock,footer,footer._length(),0);
+
+    AString RequestResult = "";
+    while(1){
+        memset(tempbuf,0,sizeof(tempbuf));
+        ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
+        if(ibret ==0 ) break;
+        RequestResult+=tempbuf;
+    }
 
     #ifdef WIN32
     closesocket(sock);

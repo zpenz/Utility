@@ -2,7 +2,7 @@
 #include "Iterator.hpp"
 #include "pString.hpp"
 #include "json.hpp"
-#include <vector>
+#include "HttpUtility.hpp"
 
 int main(int argc, char const *argv[])
 {
@@ -39,5 +39,7 @@ int main(int argc, char const *argv[])
     obj.Add("where",1,"iama","solizia","array",a4,"array2","aa","error_code",100,"error_code2",101);
     auto ret = obj.Serial();
     show_message(ret.c_str()); 
+
+    FormPost("","",);
     return 0;
 }
