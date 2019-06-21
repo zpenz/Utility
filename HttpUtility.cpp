@@ -92,6 +92,7 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListe
     std::fstream reader;
 
     long length = 0;
+    long filesize = 0;
     long sendlength = 0;
     hString builder;
     for(int index=0;index<list.size;index+=2){
@@ -141,6 +142,7 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListe
                 auto size = reader.gcount();
                 ibret = send(sock,tempbuf,size,0);
                 sendlength+=ibret;
+                if(listener.OnChange!=nullptr) listener.OnChange(sendlength,length);
                 if(reader.eof()) break;
             }
             reader.close();
@@ -169,6 +171,10 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListe
         ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
         if(ibret ==0 ) break;
         RequestResult+=tempbuf;
+    }
+
+    if(listener.OnComplete !=nullptr){
+        listener.OnComplete(RequestResult);
     }
 
     show_message("recv:",RequestResult);
@@ -230,6 +236,9 @@ hString Post(const hString& url,const hString& data,long timeout,TransListener l
         ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
         if(ibret ==0 ) break;
         RequestResult+=tempbuf;
+    }
+    if(listener.OnComplete !=nullptr){
+        listener.OnComplete(RequestResult);
     }
 
     #ifdef WIN32

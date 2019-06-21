@@ -42,7 +42,7 @@ int main(int argc, char const *argv[])
 
     Linker<AString> params;
     params.Add("file");
-    params.Add("json.hpp");
+    params.Add("test/1.jpg");
 
     JObject job;
     job.Add("admin_id",1001,"sid","Hd3M1a1jII4MZeUx5fIKswfgWoFVH9l","mount_point","xkraid1560365017","begin_line",1);
