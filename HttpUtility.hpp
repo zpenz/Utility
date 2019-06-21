@@ -26,6 +26,7 @@ namespace Utility
         hString UserAgent="";
         hString XRequestedWith="";
         hString HttpVersion="HTTP/1.1";
+        hString Range="";
 
         int port = 80;
         hString ActionAddress="";
@@ -35,6 +36,17 @@ namespace Utility
         hString ToString();
     };
 
-    extern AString FormPost(const hString& url,Linker<hString> list,long timeout = 99999,std::function<void(Request& req)> OtherSetting = nullptr);  
-    extern AString Post(const hString& url,const hString& data,long timeout = 99999,std::function<void(Request& req)> OtherSetting = nullptr);   
+    struct TransListener{
+        function<void(long current,long total)> OnChange = nullptr;
+        function<void(hString)> OnComplete = nullptr;
+        function<void(hString)> OnError = nullptr;
+        TransListener(){};
+        TransListener(
+            function<void(long current,long total)> change,
+            function<void(hString)> complete,
+            function<void(hString)> error);
+    };
+
+    extern AString FormPost(const hString& url,Linker<hString> list,long timeout = 99999,TransListener listener = TransListener(),function<void(Request& req)> OtherSetting = nullptr);  
+    extern AString Post(const hString& url,const hString& data,long timeout = 99999,TransListener listener = TransListener(),function<void(Request& req)> OtherSetting = nullptr);   
 } // namespace Utility

@@ -41,10 +41,13 @@ hString Request::ToString(){
     header += Origin.Empty()?"":"Origin: "+Origin+"\r\n"; 
     header += Referer.Empty()?"":"Referer: "+Referer+"\r\n"; 
     header += UserAgent.Empty()?"":"User-Agent: "+UserAgent+"\r\n"; 
+    header += Range.Empty()?"":"Range: "+Range+"\r\n"; 
     header += XRequestedWith.Empty()?"":"X-Requested-With:"+XRequestedWith+"\r\n";
     for(int index=0;index<OtherRecord.size;index++){
         header += OtherRecord[index]._key+": "+OtherRecord[index]._value+"\r\n";
+        // if(index!=OtherRecord.size-1) header += "\r\n";
     }
+    header+="\r\n";
     return header;
 }
 
@@ -54,7 +57,7 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
     return  url.Cut("/",1);
 }
 
-hString FormPost(const hString& url,Linker<hString> list,long timeout,std::function<void(Request& req)> OtherSetting){
+hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListener listener,std::function<void(Request& req)> OtherSetting){
     if(list.size %2 !=0) return -3;
     #ifdef WIN32
     WSAData wsa;
@@ -65,28 +68,26 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,std::funct
     }
     #endif                                          
     auto sock = socket(AF_INET,SOCK_STREAM,0);
-    if(!sock) return -2;
+    if(!sock) 
+        {if(listener.OnError!=nullptr) listener.OnError("创建socket失败!"); return "";}
     hString boundary = "--xkboundary";
 
     auto urlkeyvalue = CutUrl(url);
-    show_message("key:",urlkeyvalue._key,"value:",urlkeyvalue._value);
-    show_message("cut:",urlkeyvalue._key.Cut(":")._value);
     int port = urlkeyvalue._key.Contain(":")?hString::ToL(urlkeyvalue._key.Cut(":")._value):80;
     auto address = urlkeyvalue._key.Contain(":")?urlkeyvalue._key.Cut(":")._key:urlkeyvalue._key;
     address = address.Contain("http")?address.Cut("/",3)._value:address;
-    show_message("port",port);
 
     sockaddr_in sockAddr;
     memset(&sockAddr,0,sizeof(sockAddr));
     sockAddr.sin_family = AF_INET;
-    show_message("addr ",address);
     sockAddr.sin_addr.s_addr = inet_addr(address.c_str());
     sockAddr.sin_port = htons(port);
 
     setsockopt(sock,SOL_SOCKET,SO_TIMESTAMP,&timeout,sizeof(timeout));
 
     auto ibret = connect(sock,reinterpret_cast<sockaddr*>(&sockAddr),sizeof(sockAddr));
-    if(ibret!=0) return -1;  
+    if(ibret!=0) 
+        {if(listener.OnError!=nullptr) listener.OnError("连接到服务器失败!"); return "";}
 
     std::fstream reader;
 
@@ -96,7 +97,7 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,std::funct
     for(int index=0;index<list.size;index+=2){
         if(list[index].Equal("file")){
             auto filename = list[index+1].Cut("/",-1)._value;
-            builder += "--"+boundary+"\r\nContent-Disposition: form-data; name= \"file\" filename=\""+filename+"\"\r\nContent-Type: application/octet-stream\r\n\r\n";
+            builder += "--"+boundary+"\r\nContent-Disposition: form-data; name= \"file\"; filename=\""+filename+"\"\r\nContent-Type: application/octet-stream\r\n\r\n";
             reader.open(list[index+1].c_str(),std::ios::in|std::ios::binary);
             reader.seekg(0,reader.end);
             size_t filesize = reader.tellg();
@@ -109,24 +110,26 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,std::funct
             builder += list[index+1]+"\r\n";
         }
     }
-    builder+="--"+boundary+"\r\n\r\n";
+    builder+="--"+boundary+"--\r\n\r\n";
     length+=builder._length();
     show_message(builder);
     builder = "";
 
     Request request(url);
-    if(OtherSetting!=nullptr){
-        OtherSetting(request);
-    }
-    request.ContentLength = hString(length);
+    request.ContentLength = length;
+    request.ContentType = "multipart/form-data; boundary="+boundary;
+    request.Connection = "close";
+    if(OtherSetting!=nullptr) OtherSetting(request);
+
     auto header = request.ToString();
+    show_message("header: ",header);
     ibret = send(sock,header.c_str(),header._length(),0);
 
-    char tempbuf[4096];
+    char tempbuf[4096*10];
     for(int index=0;index<list.size;index+=2){
         if(list[index].Equal("file")){
             auto filename = list[index+1].Cut("/",-1)._value;
-            builder += "--"+boundary+"\r\nContent-Disposition: form-data; name= \"file\" filename=\""+filename+"\"\r\nContent-Type: application/octet-stream\r\n\r\n";
+            builder += "--"+boundary+"\r\nContent-Disposition: form-data; name= \"file\"; filename=\""+filename+"\"\r\nContent-Type: application/octet-stream\r\n\r\n";
             ibret = send(sock,builder.c_str(),builder._length(),0); 
             sendlength+=ibret;
             builder = "";
@@ -155,7 +158,7 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,std::funct
         }
     }
 
-    hString footer = "--"+boundary+"\r\n\r\n";
+    hString footer = "--"+boundary+"--\r\n\r\n";
     ibret = send(sock,footer,footer._length(),0);
     sendlength+=ibret;
 
@@ -180,7 +183,7 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,std::funct
     return true;
 }
 
-hString Post(const hString& url,const hString& data,long timeout,std::function<void(Request& req)> OtherSetting ){
+hString Post(const hString& url,const hString& data,long timeout,TransListener listener,std::function<void(Request& req)> OtherSetting ){
     #ifdef WIN32
     WSAData wsa;
     if (::WSAStartup(MAKEWORD(1,1),&wsa) != 0)
@@ -193,17 +196,13 @@ hString Post(const hString& url,const hString& data,long timeout,std::function<v
     if(!sock) return -2;
 
     auto urlkeyvalue = CutUrl(url);
-    show_message("key:",urlkeyvalue._key,"value:",urlkeyvalue._value);
-    show_message("cut:",urlkeyvalue._key.Cut(":")._value);
     int port = urlkeyvalue._key.Contain(":")?hString::ToL(urlkeyvalue._key.Cut(":")._value):80;
     auto address = urlkeyvalue._key.Contain(":")?urlkeyvalue._key.Cut(":")._key:urlkeyvalue._key;
     address = address.Contain("http")?address.Cut("/",3)._value:address;
-    show_message("port",port);
 
     sockaddr_in sockAddr;
     memset(&sockAddr,0,sizeof(sockAddr));
     sockAddr.sin_family = AF_INET;
-    show_message("addr ",address);
     sockAddr.sin_addr.s_addr = inet_addr(address.c_str());
     sockAddr.sin_port = htons(port);
 
@@ -215,17 +214,12 @@ hString Post(const hString& url,const hString& data,long timeout,std::function<v
     hString builder = "\r\n"+data;
     long length = builder._length();
 
-    // hString header = "POST "+urlkeyvalue._value+" HTTP/1.1\r\n";
-    // header += "host: "+address+":"+hString(port)+"\r\n";
-    // header += "Content-Type: application/x-www-form-urlencoded; charset=UTF-8\r\n";
-    // header += "Content-Length: "+hString(length)+"\r\n";
-    // header += "Connection: close\r\n\r\n";
     Request request(url);
     request.ContentLength = hString(length);
     request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
+    request.Connection = "close";
     if(OtherSetting!=nullptr) OtherSetting(request);
     auto header = request.ToString();
-    show_message("header:",header);
     ibret = send(sock,header.c_str(),header._length(),0);
 
     ibret = send(sock,builder.c_str(),header._length(),0);
@@ -238,8 +232,6 @@ hString Post(const hString& url,const hString& data,long timeout,std::function<v
         RequestResult+=tempbuf;
     }
 
-    // show_message("recv:",RequestResult);
-
     #ifdef WIN32
     closesocket(sock);
     WSACleanup();
@@ -247,7 +239,7 @@ hString Post(const hString& url,const hString& data,long timeout,std::function<v
     if(sock) shutdown(sock,2);
     #endif
 
-    return RequestResult;
+    return RequestResult.substr(RequestResult.find("{"),RequestResult._length()-1);
 }
 
 }
