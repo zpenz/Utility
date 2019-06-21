@@ -40,6 +40,12 @@ int main(int argc, char const *argv[])
     auto ret = obj.Serial();
     show_message(ret.c_str()); 
 
-    FormPost("","",);
+    Linker<AString> params;
+    params.Add("admin_id"); 
+    params.Add("1001"); 
+    params.Add("sid");
+    params.Add("LXz05pwhzH2vk80A3071t02k47Yn3LK");
+    auto ret2 = FormPost("http://192.168.10.105:5555/cgi-bin/xk_user_get_name.cgi",params);
+    show_message(ret2); 
     return 0;
 }

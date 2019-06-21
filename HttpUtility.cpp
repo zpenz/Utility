@@ -16,7 +16,17 @@ using SOCKET = int;
 using SOCKADDR = sockaddr;
 using DWORD = unsigned int;
 
-AString FormPost(const AString& url,const AString& data,long timeout){
+namespace Utility
+{
+
+AString::KeyValuePair<AString> CutUrl(const AString& url){
+    if(url.StartWith("http"))
+        return url.Cut("/",3);
+    return  url.Cut("/",1);
+}
+
+AString FormPost(const AString& url,Linker<AString> list,long timeout){
+    if(list.size %2 !=0) return -3;
     #ifdef WIN32
     WSAData wsa;
     if (::WSAStartup(MAKEWORD(1,1),&wsa) != 0)
@@ -27,12 +37,22 @@ AString FormPost(const AString& url,const AString& data,long timeout){
     #endif                                          
     auto sock = socket(AF_INET,SOCK_STREAM,0);
     if(!sock) return -2;
+    AString boundary = "--xkboundary";
+
+    auto urlkeyvalue = CutUrl(url);
+    show_message("key:",urlkeyvalue._key,"value:",urlkeyvalue._value);
+    show_message("cut:",urlkeyvalue._key.Cut(":")._value);
+    int port = urlkeyvalue._key.Contain(":")?AString::ToL(urlkeyvalue._key.Cut(":")._value):80;
+    auto address = urlkeyvalue._key.Contain(":")?urlkeyvalue._key.Cut(":")._key:urlkeyvalue._key;
+    address = address.Contain("http")?address.Cut("/",3)._value:address;
+    show_message("port",port);
 
     sockaddr_in sockAddr;
     memset(&sockAddr,0,sizeof(sockAddr));
     sockAddr.sin_family = AF_INET;
-    sockAddr.sin_addr.s_addr = inet_addr(url.c_str());
-    sockAddr.sin_port = htons(80);
+    show_message("addr ",address);
+    sockAddr.sin_addr.s_addr = inet_addr(address.c_str());
+    sockAddr.sin_port = htons(port);
 
     setsockopt(sock,SOL_SOCKET,SO_TIMESTAMP,&timeout,sizeof(timeout));
 
@@ -40,36 +60,76 @@ AString FormPost(const AString& url,const AString& data,long timeout){
     if(ibret!=0) return -1;  
 
     std::fstream reader;
-    reader.open(data.c_str(),std::ios::in|std::ios::binary);
 
-    reader.seekg(0,reader.end);
-    size_t fileSize = reader.tellg();
-    reader.seekg(0,reader.beg);
-
-    AString header = "POST "+url+" HTTP/1.1\r\n";
-    header += "host: "+url+"\r\n";
-    AString boundary = "--myboundary";
-    header += "Content-Type: multipart/form-data; boundary="+boundary+"\r\n";
-    header += "Content-Length: "+AString((long)fileSize)+"\r\n";
-    header += "Connection: close\r\n\r\n";
-    header += boundary+"\r\n";
-    header += "Content-Type: application/octet-stream\r\n";
-    header += "Content-Disposition: form-data; name=\"file\";filename=\"myfile.txt\"\r\n";
-    header += "Content-Transfer-Encoding: 8bit\r\n\r\n";
-
-    ibret = send(sock,header.c_str(),header._length(),0);
-    char tempbuf[4096];
-
-    while(1){
-        reader.read(tempbuf,sizeof(tempbuf));
-        auto size = reader.gcount();
-        ibret = send(sock,tempbuf,size,0);
-        if(reader.eof()) break;
+    long length = 0;
+    long sendlength = 0;
+    AString builder;
+    for(int index=0;index<list.size;index+=2){
+        if(list[index].Equal("file")){
+            auto filename = list[index+1].Cut("/",-1)._value;
+            builder += "--"+boundary+"\r\nContent-Disposition: form-data; name= \"file\" filename=\""+filename+"\"\r\nContent-Type: application/octet-stream\r\n\r\n";
+            reader.open(list[index+1].c_str(),std::ios::in|std::ios::binary);
+            reader.seekg(0,reader.end);
+            size_t filesize = reader.tellg();
+            length  +=filesize;
+            reader.seekg(0,reader.beg);
+            reader.close();
+            builder +="\r\n";
+        }else{
+            builder += "--"+boundary+"\r\nContent-Disposition: form-data; name=\""+list[index]+"\"\r\n\r\n";
+            builder += list[index+1]+"\r\n";
+        }
     }
-    reader.close();
-    AString footer = "\r\n--"+boundary+"--\r\n";
-    ibret = send(sock,footer,footer._length(),0);
+    builder+="--"+boundary+"\r\n\r\n";
+    length+=builder._length();
+    show_message(builder);
+    builder = "";
 
+    AString header = "POST "+urlkeyvalue._value+" HTTP/1.1\r\n";
+    header += "host: "+address+":"+AString(port)+"\r\n";
+    header += "Content-Type: multipart/form-data; boundary="+boundary+"\r\n";
+    header += "Content-Length: "+AString(length)+"\r\n";
+    header += "Connection: close\r\n\r\n";
+    ibret = send(sock,header.c_str(),header._length(),0);
+
+    char tempbuf[4096];
+    for(int index=0;index<list.size;index+=2){
+        if(list[index].Equal("file")){
+            auto filename = list[index+1].Cut("/",-1)._value;
+            builder += "--"+boundary+"\r\nContent-Disposition: form-data; name= \"file\" filename=\""+filename+"\"\r\nContent-Type: application/octet-stream\r\n\r\n";
+            ibret = send(sock,builder.c_str(),builder._length(),0); 
+            sendlength+=ibret;
+            builder = "";
+
+            reader.open(list[index+1].c_str(),std::ios::in|std::ios::binary);
+            while(1){
+                memset(tempbuf,0,sizeof(tempbuf));
+                reader.read(tempbuf,sizeof(tempbuf));
+                auto size = reader.gcount();
+                ibret = send(sock,tempbuf,size,0);
+                sendlength+=ibret;
+                if(reader.eof()) break;
+            }
+            reader.close();
+
+            builder +="\r\n";
+            ibret = send(sock,builder.c_str(),builder._length(),0); 
+            sendlength+=ibret;
+            builder = "";
+        }else{
+            builder += "--"+boundary+"\r\nContent-Disposition: form-data; name=\""+list[index]+"\"\r\n\r\n";
+            builder += list[index+1]+"\r\n";
+            ibret = send(sock,builder.c_str(),builder._length(),0); 
+            sendlength+=ibret;
+            builder = "";
+        }
+    }
+
+    AString footer = "--"+boundary+"\r\n\r\n";
+    ibret = send(sock,footer,footer._length(),0);
+    sendlength+=ibret;
+
+    show_message("before recv"," content-length:",length," sendlength:",sendlength);
     AString RequestResult = "";
     while(1){
         memset(tempbuf,0,sizeof(tempbuf));
@@ -77,6 +137,8 @@ AString FormPost(const AString& url,const AString& data,long timeout){
         if(ibret ==0 ) break;
         RequestResult+=tempbuf;
     }
+
+    show_message("recv:",RequestResult);
 
     #ifdef WIN32
     closesocket(sock);
@@ -86,4 +148,6 @@ AString FormPost(const AString& url,const AString& data,long timeout){
     #endif
 
     return true;
+}
+
 }

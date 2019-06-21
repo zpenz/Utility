@@ -268,11 +268,11 @@ using namespace utility;
             return !(-1==this->find(src));
         }
 
-        bool StartWith(const String<T>& src){
+        bool StartWith(const String<T>& src)const{
             return find(src) == 0;
         }
 
-        bool EndWith(const String<T>& src){
+        bool EndWith(const String<T>& src)const{
             return rfind(src) + src.length  == length;
         }
 
