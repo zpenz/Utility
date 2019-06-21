@@ -326,6 +326,10 @@ using namespace utility;
             return TempString;
         }
 
+        long ToLong()const{
+            return ToL(*this);
+        }
+
         const String<T>& replace(const String<T>& src,const String<T>& sbj){
             auto pos = -1;
             while(-1!=(pos=find(src))){

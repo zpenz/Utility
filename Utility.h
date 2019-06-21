@@ -45,4 +45,12 @@ namespace utility{
         virtual ~pobject(){};
     };
 
+    template<typename T,typename Z>
+    struct KeyValuePair{
+        T _key;
+        Z _value;
+
+        template<class U,class P>
+        KeyValuePair(U key,P value):_key(key),_value(value){}
+    };
 }

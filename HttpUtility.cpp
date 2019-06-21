@@ -19,13 +19,42 @@ using DWORD = unsigned int;
 namespace Utility
 {
 
-AString::KeyValuePair<AString> CutUrl(const AString& url){
+Request::Request(hString url){
+    auto ret = CutUrl(url);
+    Origin = ret._key;
+    ActionAddress = ret._value;
+    Host = Origin.Contain("http")?Origin.Cut("/",3)._value:Origin;
+    port = Host.Contain(":")?Host.Cut(":")._value.ToLong():80;
+}
+
+hString Request::ToString(){
+    hString 
+    header  = "POST "+ActionAddress+" "+HttpVersion+"\r\n";
+    header += Host.Empty()?"":"Host: "+Host+"\r\n";
+    header += ContentType.Empty()?"":"Content-Type: "+ContentType+"\r\n";
+    header += ContentLength.Empty()?"":"Content-Length: "+ContentLength+"\r\n";
+    header += Connection.Empty()?"":"Connection: "+Connection+"\r\n";
+    header += Accept.Empty()?"":"Accept: "+Accept+"\r\n";
+    header += AcceptEncoding.Empty()?"":"Accept-Encoding: "+AcceptEncoding+"\r\n";
+    header += AcceptLanguage.Empty()?"":"Accept-Length: "+AcceptLanguage+"\r\n";
+    header += Cookie.Empty()?"":"Cookie: "+Cookie+"\r\n";
+    header += Origin.Empty()?"":"Origin: "+Origin+"\r\n"; 
+    header += Referer.Empty()?"":"Referer: "+Referer+"\r\n"; 
+    header += UserAgent.Empty()?"":"User-Agent: "+UserAgent+"\r\n"; 
+    header += XRequestedWith.Empty()?"":"X-Requested-With:"+XRequestedWith+"\r\n";
+    for(int index=0;index<OtherRecord.size;index++){
+        header += OtherRecord[index]._key+": "+OtherRecord[index]._value+"\r\n";
+    }
+    return header;
+}
+
+hString::KeyValuePair<hString> CutUrl(const hString& url){
     if(url.StartWith("http"))
         return url.Cut("/",3);
     return  url.Cut("/",1);
 }
 
-AString FormPost(const AString& url,Linker<AString> list,long timeout){
+hString FormPost(const hString& url,Linker<hString> list,long timeout,std::function<void(Request& req)> OtherSetting){
     if(list.size %2 !=0) return -3;
     #ifdef WIN32
     WSAData wsa;
@@ -37,12 +66,12 @@ AString FormPost(const AString& url,Linker<AString> list,long timeout){
     #endif                                          
     auto sock = socket(AF_INET,SOCK_STREAM,0);
     if(!sock) return -2;
-    AString boundary = "--xkboundary";
+    hString boundary = "--xkboundary";
 
     auto urlkeyvalue = CutUrl(url);
     show_message("key:",urlkeyvalue._key,"value:",urlkeyvalue._value);
     show_message("cut:",urlkeyvalue._key.Cut(":")._value);
-    int port = urlkeyvalue._key.Contain(":")?AString::ToL(urlkeyvalue._key.Cut(":")._value):80;
+    int port = urlkeyvalue._key.Contain(":")?hString::ToL(urlkeyvalue._key.Cut(":")._value):80;
     auto address = urlkeyvalue._key.Contain(":")?urlkeyvalue._key.Cut(":")._key:urlkeyvalue._key;
     address = address.Contain("http")?address.Cut("/",3)._value:address;
     show_message("port",port);
@@ -63,7 +92,7 @@ AString FormPost(const AString& url,Linker<AString> list,long timeout){
 
     long length = 0;
     long sendlength = 0;
-    AString builder;
+    hString builder;
     for(int index=0;index<list.size;index+=2){
         if(list[index].Equal("file")){
             auto filename = list[index+1].Cut("/",-1)._value;
@@ -85,11 +114,12 @@ AString FormPost(const AString& url,Linker<AString> list,long timeout){
     show_message(builder);
     builder = "";
 
-    AString header = "POST "+urlkeyvalue._value+" HTTP/1.1\r\n";
-    header += "host: "+address+":"+AString(port)+"\r\n";
-    header += "Content-Type: multipart/form-data; boundary="+boundary+"\r\n";
-    header += "Content-Length: "+AString(length)+"\r\n";
-    header += "Connection: close\r\n\r\n";
+    Request request(url);
+    if(OtherSetting!=nullptr){
+        OtherSetting(request);
+    }
+    request.ContentLength = hString(length);
+    auto header = request.ToString();
     ibret = send(sock,header.c_str(),header._length(),0);
 
     char tempbuf[4096];
@@ -125,12 +155,12 @@ AString FormPost(const AString& url,Linker<AString> list,long timeout){
         }
     }
 
-    AString footer = "--"+boundary+"\r\n\r\n";
+    hString footer = "--"+boundary+"\r\n\r\n";
     ibret = send(sock,footer,footer._length(),0);
     sendlength+=ibret;
 
     show_message("before recv"," content-length:",length," sendlength:",sendlength);
-    AString RequestResult = "";
+    hString RequestResult = "";
     while(1){
         memset(tempbuf,0,sizeof(tempbuf));
         ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
@@ -148,6 +178,76 @@ AString FormPost(const AString& url,Linker<AString> list,long timeout){
     #endif
 
     return true;
+}
+
+hString Post(const hString& url,const hString& data,long timeout,std::function<void(Request& req)> OtherSetting ){
+    #ifdef WIN32
+    WSAData wsa;
+    if (::WSAStartup(MAKEWORD(1,1),&wsa) != 0)
+    {
+        std::cout<<"WSAStartup error"<<std::endl;
+        return 0;
+    }
+    #endif                                          
+    auto sock = socket(AF_INET,SOCK_STREAM,0);
+    if(!sock) return -2;
+
+    auto urlkeyvalue = CutUrl(url);
+    show_message("key:",urlkeyvalue._key,"value:",urlkeyvalue._value);
+    show_message("cut:",urlkeyvalue._key.Cut(":")._value);
+    int port = urlkeyvalue._key.Contain(":")?hString::ToL(urlkeyvalue._key.Cut(":")._value):80;
+    auto address = urlkeyvalue._key.Contain(":")?urlkeyvalue._key.Cut(":")._key:urlkeyvalue._key;
+    address = address.Contain("http")?address.Cut("/",3)._value:address;
+    show_message("port",port);
+
+    sockaddr_in sockAddr;
+    memset(&sockAddr,0,sizeof(sockAddr));
+    sockAddr.sin_family = AF_INET;
+    show_message("addr ",address);
+    sockAddr.sin_addr.s_addr = inet_addr(address.c_str());
+    sockAddr.sin_port = htons(port);
+
+    setsockopt(sock,SOL_SOCKET,SO_TIMESTAMP,&timeout,sizeof(timeout));
+
+    auto ibret = connect(sock,reinterpret_cast<sockaddr*>(&sockAddr),sizeof(sockAddr));
+    if(ibret!=0) return -1;  
+
+    hString builder = "\r\n"+data;
+    long length = builder._length();
+
+    // hString header = "POST "+urlkeyvalue._value+" HTTP/1.1\r\n";
+    // header += "host: "+address+":"+hString(port)+"\r\n";
+    // header += "Content-Type: application/x-www-form-urlencoded; charset=UTF-8\r\n";
+    // header += "Content-Length: "+hString(length)+"\r\n";
+    // header += "Connection: close\r\n\r\n";
+    Request request(url);
+    request.ContentLength = hString(length);
+    request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
+    if(OtherSetting!=nullptr) OtherSetting(request);
+    auto header = request.ToString();
+    show_message("header:",header);
+    ibret = send(sock,header.c_str(),header._length(),0);
+
+    ibret = send(sock,builder.c_str(),header._length(),0);
+    hString RequestResult = "";
+    char tempbuf[4096];
+    while(1){
+        memset(tempbuf,0,sizeof(tempbuf));
+        ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
+        if(ibret ==0 ) break;
+        RequestResult+=tempbuf;
+    }
+
+    // show_message("recv:",RequestResult);
+
+    #ifdef WIN32
+    closesocket(sock);
+    WSACleanup();
+    #else
+    if(sock) shutdown(sock,2);
+    #endif
+
+    return RequestResult;
 }
 
 }

@@ -45,7 +45,10 @@ int main(int argc, char const *argv[])
     params.Add("1001"); 
     params.Add("sid");
     params.Add("LXz05pwhzH2vk80A3071t02k47Yn3LK");
-    auto ret2 = FormPost("http://192.168.10.105:5555/cgi-bin/xk_user_get_name.cgi",params);
+
+    JObject job;
+    job.Add("admin_id",1001,"sid","Hd3M1a1jII4MZeUx5fIKswfgWoFVH9l");
+    auto ret2 = Post("http://192.168.10.105:5555/cgi-bin/xk_user_get_name.cgi",job.Serial());
     show_message(ret2); 
     return 0;
 }
