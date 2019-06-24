@@ -44,7 +44,7 @@ namespace Utility
         TransListener(
             function<void(long current,long total)> change,
             function<void(hString)> complete,
-            function<void(hString)> error);
+            function<void(hString)> error):OnChange(change),OnComplete(complete),OnError(error){};
     };
 
     extern AString FormPost(const hString& url,Linker<hString> list,long timeout = 99999,TransListener listener = TransListener(),function<void(Request& req)> OtherSetting = nullptr);  

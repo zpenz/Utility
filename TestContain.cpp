@@ -48,7 +48,9 @@ int main(int argc, char const *argv[])
     job.Add("admin_id",1001,"sid","Hd3M1a1jII4MZeUx5fIKswfgWoFVH9l","mount_point","xkraid1560365017","begin_line",1);
     // auto ret2 = Post("http://192.168.10.105:5555/cgi-bin/xk_file_share_directory_get_list_by_mount_point_and_uid.cgi",job.Serial());
 
-    auto ret2 = FormPost("http://192.168.10.105:5555/cgi-bin/xk_file_upload_cover.cgi",params,99999,TransListener(),[](Request& req){
+    auto ret2 = FormPost("http://192.168.10.105:5555/cgi-bin/xk_file_upload_cover.cgi",params,99999,TransListener([](long cur,long tal){
+        show_message(cur*1.0*100/tal);
+    },nullptr,nullptr),[](Request& req){
         req.OtherRecord.Add(KV("XK_JSON","{\"admin_id\":1001,\"sid\":\"Hd3M1a1jII4MZeUx5fIKswfgWoFVH9l\",\"path_name\":\"%2Fvar%2Fshare%2Fmp%2Fxkraid1560365017%2Fysc%E6%9D%83%E9%99%90%2F\",\"file_name\":\"ppppppppppssssssss.txt\"}"));
     });
     show_message(ret2); 
