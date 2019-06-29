@@ -106,21 +106,22 @@ template<typename T>
 vector<T> LoadDiff(const AString& name){
     auto file = fopen(name.c_str(),"rb");
     vector<T> ls;
-    T buf[4096];
+    T obj;
     int size = 0;
-    while((size = fread(buf,sizeof(T),4096,file))>0){
+    while((size = fread(&obj,sizeof(T),1,file))>0){
         for(int index =0;index<size;index++)
-            ls.push_back(buf[index]);
+            ls.push_back(obj);
     }
     fclose(file);
     return ls;
 }
 
 struct diff{
-    AString AValue;
-    AString BValue;
+    long AValue;
+    long BValue;
     AString MD5Value;
-    diff(const AString& av,const AString& bv,const AString& mv):
+    diff(){};
+    diff(long av,long bv,const AString& mv):
     AValue(move(av)),BValue(move(bv)),MD5Value(move(mv)){};
     bool operator==(const diff & df){
         if(AValue != df.AValue) return false;
@@ -144,7 +145,6 @@ vector<diff> CalcFileDiff(const AString& filename){
         AValue+=static_cast<int>(buf[index]);
         BValue+=AValue;
         auto MValue = MD5::Md5(buf,CHUNK_SIZE);
-        
     }
 
     //rolling
@@ -166,7 +166,9 @@ vector<diff> CalcFileDiff(const AString& filename){
         // printf("BValue: %ld\n",BValue);
         // printf("MValue: %s\n",MValue.c_str());
 
-        data.push_back(diff(AString(AValue),AString(BValue),MValue));
+        data.push_back(diff(AValue,BValue,MValue));
+
+        show_message(MValue);
         // printf("adler32:%ld\n",BValue%65521<<16|AValue%65521);
         // SHOW_MESSAGE("push",1);
     }
@@ -176,8 +178,8 @@ vector<diff> CalcFileDiff(const AString& filename){
 
 void SaveDiff(const AString& name,vector<diff> ls){
     auto file = fopen(name.c_str(),"w+");
-    for_each(ls.begin(),ls.end(),[&](FileData & item){
-        fwrite(&item,sizeof(FileData),1,file);
+    for_each(ls.begin(),ls.end(),[&](diff & item){
+        fwrite(&item,sizeof(diff),1,file);
     });
     fclose(file);
 }
@@ -210,12 +212,6 @@ struct Point{
         }
         return in;
     }
-};
-
-struct Diff{
-    ActionType type;
-    int pos;
-    Diff(ActionType _type,int _pos):type(_type),pos(_pos){}
 };
 
 struct Prev{
@@ -416,26 +412,35 @@ void Reverse(Type a,Type b,long alength,long blength){
 
 int main(int argc, char const *argv[])
 {
-    vector<AString> fileString = vector<AString>();
-    vector<AString> file2String = vector<AString>();
+    //File Diff
+    // vector<AString> fileString = vector<AString>();
+    // vector<AString> file2String = vector<AString>();
 
-    fstream f1("2.txt",f1.binary|f1.in);
-    fstream f2("3.txt",f1.binary|f1.in);
+    // fstream f1("2.txt",f1.binary|f1.in);
+    // fstream f2("3.txt",f1.binary|f1.in);
 
-    char buf[4096];
-    while(!f1.eof()){
-        memset(buf,0,sizeof(buf));
-        f1.getline(buf,sizeof(buf));
-        fileString.push_back(buf);
-    }
+    // char buf[4096];
+    // while(!f1.eof()){
+    //     memset(buf,0,sizeof(buf));
+    //     f1.getline(buf,sizeof(buf));
+    //     fileString.push_back(buf);
+    // }
 
-    while(!f2.eof()){
-        memset(buf,0,sizeof(buf));
-        f2.getline(buf,sizeof(buf));
-        // show_message(buf);
-        file2String.push_back(buf);
-    }
+    // while(!f2.eof()){
+    //     memset(buf,0,sizeof(buf));
+    //     f2.getline(buf,sizeof(buf));
+    //     // show_message(buf);
+    //     file2String.push_back(buf);
+    // }
 
-    Reverse(fileString, file2String,fileString.size(),file2String.size());
+    // Reverse(fileString, file2String,fileString.size(),file2String.size());
+
+    auto ret = CalcFileDiff("adler32.cpp");
+    SaveDiff("adler32.diff",ret);
+
+    auto loadRet = LoadDiff<diff>("adler32.diff");
+    // for_each(loadRet.begin(),loadRet.end(),[](diff & df){
+    //     show_message(df.AValue," ",df.BValue," ",df.MD5Value);
+    // });
     return 0;
 }
