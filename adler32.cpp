@@ -102,14 +102,6 @@ void SaveDiff(const AString& name,vector<T> ls){
     fclose(file);
 }
 
-void SaveDiff(const AString& name,vector<FileData> ls){
-    auto file = fopen(name.c_str(),"w+");
-    for_each(ls.begin(),ls.end(),[&](FileData & item){
-        fwrite(&item,sizeof(FileData),1,file);
-    });
-    fclose(file);
-}
-
 template<typename T>
 vector<T> LoadDiff(const AString& name){
     auto file = fopen(name.c_str(),"rb");
@@ -124,11 +116,21 @@ vector<T> LoadDiff(const AString& name){
     return ls;
 }
 
-FileData CalcFileDiff(const AString& filename){
-    FileData data;
-    data.ls.clear();
+struct diff{
+    AString AValue;
+    AString BValue;
+    AString MD5Value;
+    diff(const AString& av,const AString& bv,const AString& mv):
+    AValue(move(av)),BValue(move(bv)),MD5Value(move(mv)){};
+    bool operator==(const diff & df){
+        if(AValue != df.AValue) return false;
+        if(BValue != df.BValue) return false;
+        return MD5Value == df.MD5Value;
+    }
+};
 
-    data.filename = filename.c_str();
+vector<diff> CalcFileDiff(const AString& filename){
+    vector<diff> data;
 
     auto file = fopen(filename.c_str(),"rb+");
        
@@ -164,17 +166,20 @@ FileData CalcFileDiff(const AString& filename){
         // printf("BValue: %ld\n",BValue);
         // printf("MValue: %s\n",MValue.c_str());
 
-        data.ls.push_back(ChunkData(AValue,BValue,MValue.c_str()));
+        data.push_back(diff(AString(AValue),AString(BValue),MValue));
         // printf("adler32:%ld\n",BValue%65521<<16|AValue%65521);
         // SHOW_MESSAGE("push",1);
     }
-    
-    // for_each(data.ls.begin(),data.ls.end(),[](ChunkData & item){
-    //     printf("AValue: %ld\n",item.AValue);
-    // });
-
     fclose(file);
     return data;
+}
+
+void SaveDiff(const AString& name,vector<diff> ls){
+    auto file = fopen(name.c_str(),"w+");
+    for_each(ls.begin(),ls.end(),[&](FileData & item){
+        fwrite(&item,sizeof(FileData),1,file);
+    });
+    fclose(file);
 }
 
 struct range{
@@ -215,13 +220,12 @@ struct Diff{
 
 struct Prev{
     Point pt;
-    int pk;
-    int k;
+    long pk;
+    long k;
     ActionType type;
     Prev* last;
     Prev(Point _pt):pt(_pt){ last = nullptr;}
 };
-
 
 struct Snake{
     Point start;
@@ -230,6 +234,8 @@ struct Snake{
     Snake(Point _start,Point _mid,Point _end):start(_start),mid(_mid),end(_end){};
 };
 
+//
+#pragma region OrderSolve
 void MyersDiff(AString src,AString des){
     int sizea  = src._length();
     int sizeb  = des._length();
@@ -319,39 +325,40 @@ solution:
         SHOW_MESSAGE(item.end,1);
     });
 }
+#pragma endregion
 
-void Reverse(AString a,AString b){
-    int sizea = a._length();
-    int sizeb = b._length();
+
+template<typename Type = AString>
+void Reverse(Type a,Type b,long alength,long blength){
+    long sizea = alength;
+    long sizeb = blength;
     if(sizea ==0||sizeb==0) return; 
 
-    int offset = sizeb+sizea+1;
+    long offset = sizeb+sizea+1;
 
     vector<Prev> list(sizea+sizeb+offset,Point(0,0));
     vector<decltype(list)> dlist;
     list[sizea-sizeb-1+offset] = Point(sizea,sizeb+1);
 
     bool solution = false;
+    long countd = 0;
+    long delta = sizea-sizeb;
 
-    int countd = 0;
-
-    int delta = sizea-sizeb;
-
-    for(int d = 0;d<sizea+sizeb && !solution;d++)
+    for(long d = 0;d<sizea+sizeb && !solution;d++)
     {
-        for(int k=-d+delta;k<=d+delta;k+=2){
+        for(long k=-d+delta;k<=d+delta;k+=2){
             bool up = (k==d+delta) ||(k!=-d+delta && list[offset+k+1].pt.x > list[offset+k-1].pt.x);
 
-            int kPrev = up ? k-1:k+1;
+            long kPrev = up ? k-1:k+1;
 
-            int xStart = list[kPrev+offset].pt.x;
-            int yStart = xStart - kPrev;
-            SHOW_MESSAGE(Point(xStart,yStart), 1);
+            long xStart = list[kPrev+offset].pt.x;
+            long yStart = xStart - kPrev;
+            // SHOW_MESSAGE(Point(xStart,yStart), 1);
 
-            int xEnd   = up?xStart:xStart -1;
-            int yEnd   = xEnd - k;
+            long xEnd   = up?xStart:xStart -1;
+            long yEnd   = xEnd - k;
 
-            int distance = 0;
+            long distance = 0;
             while (xEnd>0 && yEnd>0 && a[xEnd-1] == b[yEnd-1])
             {
                 yEnd--;
@@ -362,36 +369,36 @@ void Reverse(AString a,AString b){
             list[k+offset] = Point(xEnd,yEnd);
             list[k+offset].pk = kPrev;
 
-            SHOW_MESSAGE(Point(xEnd,yEnd), 1);
-            SHOW_MESSAGE(k, 1);
-            SHOW_MESSAGE("\n", 0);
+            // SHOW_MESSAGE(Point(xEnd,yEnd), 1);
+            // SHOW_MESSAGE(k, 1);
+            // SHOW_MESSAGE("\n", 0);
 
             if (xEnd <=0 && yEnd <= 0)
             {
                 dlist.push_back(list);
                 countd++;
 
-                int pk = k;
-                int pyEnd = yEnd;
-                int pxEnd = xEnd;
+                long pk = k;
+                long pyEnd = yEnd;
+                long pxEnd = xEnd;
 
                 // SHOW_MESSAGE(pk,1);
-                for(int index=countd-1;index>=0;index--){
+                for(long index=countd-1;index>=0;index--){
                     k = ((dlist[index])[pk+offset]).pk;
 
                     yEnd = ((dlist[index])[k + offset]).pt.y;
                     xEnd = ((dlist[index])[k + offset]).pt.x;
 
                     if(xEnd>pxEnd && yEnd>pyEnd){
-                        for (int index = pyEnd+1; index <= yEnd; index++)
+                        for (long index = pyEnd+1; index <= yEnd; index++)
                         {
                             if(k<pk && index==yEnd) break;
-                            printf("  %c\n", b[index-1]);
+                            show_message("  ",b[index-1]);
                         }
                     }
 
-                    if(k<pk ) printf("+ %c\n",b[yEnd-1]);
-                    if(k>pk) printf("- %c\n",a[xEnd-1]);
+                    if(k<pk )  show_message("+ ",b[yEnd-1]);
+                    if(k>pk) show_message("- ",a[xEnd-1]);
 
                     pk = k;
                     pyEnd = yEnd;
@@ -401,7 +408,6 @@ void Reverse(AString a,AString b){
                 }
                 return;
             }
-        
         }
         dlist.push_back(list);
         countd++;
@@ -410,8 +416,26 @@ void Reverse(AString a,AString b){
 
 int main(int argc, char const *argv[])
 {
-    // Reverse("abcabba", "cbabac");
-    Reverse("kfdskfjd", "skjfalkfdskfjdsal");
-    FileMarge("1.txt",0,)
+    vector<AString> fileString = vector<AString>();
+    vector<AString> file2String = vector<AString>();
+
+    fstream f1("2.txt",f1.binary|f1.in);
+    fstream f2("3.txt",f1.binary|f1.in);
+
+    char buf[4096];
+    while(!f1.eof()){
+        memset(buf,0,sizeof(buf));
+        f1.getline(buf,sizeof(buf));
+        fileString.push_back(buf);
+    }
+
+    while(!f2.eof()){
+        memset(buf,0,sizeof(buf));
+        f2.getline(buf,sizeof(buf));
+        // show_message(buf);
+        file2String.push_back(buf);
+    }
+
+    Reverse(fileString, file2String,fileString.size(),file2String.size());
     return 0;
 }
