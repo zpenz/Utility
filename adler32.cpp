@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 
-#define CHUNK_SIZE 4096
+#define CHUNK_SIZE 50
 
 void FileDelete(const AString& strName,int pos,int length){
     auto file = fopen(strName.c_str(),"rb+");
@@ -119,10 +119,14 @@ vector<T> LoadDiff(const AString& name){
 struct diff{
     long AValue;
     long BValue;
-    AString MD5Value;
+    char MD5Value[CHUNK_SIZE];
     diff(){};
-    diff(long av,long bv,const AString& mv):
-    AValue(move(av)),BValue(move(bv)),MD5Value(move(mv)){};
+    diff(long av,long bv,const char* mv):
+    AValue(move(av)),BValue(move(bv)){
+        memcpy(MD5Value,mv,CHUNK_SIZE);
+        // log("mv: ",MD5Value);
+        // show_message("mv",mv);
+    };
     bool operator==(const diff & df){
         if(AValue != df.AValue) return false;
         if(BValue != df.BValue) return false;
@@ -162,13 +166,11 @@ vector<diff> CalcFileDiff(const AString& filename){
         BValue -= CHUNK_SIZE*headValue;
         BValue += AValue;
 
-        // printf("AValue: %ld\n",AValue);
-        // printf("BValue: %ld\n",BValue);
-        // printf("MValue: %s\n",MValue.c_str());
+        diff df = diff(AValue,BValue,MValue.c_str());
+        data.push_back(df);
 
-        data.push_back(diff(AValue,BValue,MValue));
-
-        show_message(MValue);
+        // show_message(MValue);
+        // show_message(df.MD5Value);
         // printf("adler32:%ld\n",BValue%65521<<16|AValue%65521);
         // SHOW_MESSAGE("push",1);
     }
@@ -179,7 +181,7 @@ vector<diff> CalcFileDiff(const AString& filename){
 void SaveDiff(const AString& name,vector<diff> ls){
     auto file = fopen(name.c_str(),"w+");
     for_each(ls.begin(),ls.end(),[&](diff & item){
-        fwrite(&item,sizeof(diff),1,file);
+        fwrite(&item,sizeof(item),1,file);
     });
     fclose(file);
 }
@@ -191,6 +193,7 @@ struct range{
     range(){}
 };
 
+#pragma region --mark DIFF
 enum class ActionType{
     ACTION_INSERT,
     ACTION_DELETE,
@@ -389,12 +392,15 @@ void Reverse(Type a,Type b,long alength,long blength){
                         for (long index = pyEnd+1; index <= yEnd; index++)
                         {
                             if(k<pk && index==yEnd) break;
-                            show_message("  ",b[index-1]);
+                            // show_message("  ",b[index-1]);
+                            log(" ",index-1);
                         }
                     }
 
-                    if(k<pk )  show_message("+ ",b[yEnd-1]);
-                    if(k>pk) show_message("- ",a[xEnd-1]);
+                    // if(k<pk )  show_message("+ ",b[yEnd-1]);
+                    if(k<pk )  log("+ ","b ",yEnd-1);
+                    // if(k>pk) show_message("- ",a[xEnd-1]);
+                    if(k>pk) log("- ","a ",xEnd-1);
 
                     pk = k;
                     pyEnd = yEnd;
@@ -409,6 +415,7 @@ void Reverse(Type a,Type b,long alength,long blength){
         countd++;
     }
 }
+#pragma endregion
 
 int main(int argc, char const *argv[])
 {
@@ -419,7 +426,7 @@ int main(int argc, char const *argv[])
     // fstream f1("2.txt",f1.binary|f1.in);
     // fstream f2("3.txt",f1.binary|f1.in);
 
-    // char buf[4096];
+    // char buf[CHUNK_SIZE];
     // while(!f1.eof()){
     //     memset(buf,0,sizeof(buf));
     //     f1.getline(buf,sizeof(buf));
@@ -435,12 +442,18 @@ int main(int argc, char const *argv[])
 
     // Reverse(fileString, file2String,fileString.size(),file2String.size());
 
-    auto ret = CalcFileDiff("adler32.cpp");
-    SaveDiff("adler32.diff",ret);
+    auto ret1 = CalcFileDiff("2.txt");
+    show_message("diff size:",ret1.size());
+    SaveDiff("2.txt.diff",ret1);
 
-    auto loadRet = LoadDiff<diff>("adler32.diff");
+    auto ret2 = CalcFileDiff("3.txt");
+    show_message("diff size:",ret2.size());
+    SaveDiff("3.txt.diff",ret2);
+
+    Reverse(ret1,ret2,ret1.size(),ret2.size());
+    // auto loadRet = LoadDiff<diff>("adler32.diff");
     // for_each(loadRet.begin(),loadRet.end(),[](diff & df){
-    //     show_message(df.AValue," ",df.BValue," ",df.MD5Value);
+    //     log("avalue: ",df.AValue," bvalue: ",df.BValue," md5: ",df.MD5Value);
     // });
     return 0;
 }

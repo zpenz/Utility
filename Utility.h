@@ -24,9 +24,13 @@ namespace utility{
     #define SAFE_CLOSE(subject)\
         if(subject){ fclose(subject);}
 
+    #define log(params...)\
+        show_message(params);\
+        cout<<"                          "<<"(in File:"<<__FILE__<<" Func:"<<__FUNCTION__<<" Line:"<<__LINE__<<")\n";
+
     template<typename T>
     void show_message(T param){
-        cout<<param<<"                          "<<"(in File:"<<__FILE__<<" Func:"<<__FUNCTION__<<" Line:"<<__LINE__<<")\n";
+        cout<<param;
     }
 
     template<typename T,typename ...Params>
