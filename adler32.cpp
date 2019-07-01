@@ -393,7 +393,7 @@ void Reverse(Type a,Type b,long alength,long blength){
                         {
                             if(k<pk && index==yEnd) break;
                             // show_message("  ",b[index-1]);
-                            log(" ",index-1);
+                            log("  ",index-1);
                         }
                     }
 
@@ -442,16 +442,17 @@ int main(int argc, char const *argv[])
 
     // Reverse(fileString, file2String,fileString.size(),file2String.size());
 
-    auto ret1 = CalcFileDiff("2.txt");
-    show_message("diff size:",ret1.size());
-    SaveDiff("2.txt.diff",ret1);
+    auto ret1 = CalcFileDiff(argv[1]);
+    log("diff size:",ret1.size());
+    // SaveDiff(AString(argv[1])+".diff",ret1);
 
-    auto ret2 = CalcFileDiff("3.txt");
-    show_message("diff size:",ret2.size());
-    SaveDiff("3.txt.diff",ret2);
+    auto ret2 = CalcFileDiff(argv[2]);
+    log("diff size:",ret2.size());
+    // SaveDiff("3.txt.diff",ret2);
 
     Reverse(ret1,ret2,ret1.size(),ret2.size());
-    // auto loadRet = LoadDiff<diff>("adler32.diff");
+
+    // auto loadRet = LoadDiff<diff>(argv[1]);
     // for_each(loadRet.begin(),loadRet.end(),[](diff & df){
     //     log("avalue: ",df.AValue," bvalue: ",df.BValue," md5: ",df.MD5Value);
     // });
