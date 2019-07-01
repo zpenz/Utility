@@ -372,7 +372,8 @@ void Reverse(Type a,Type b,long alength,long blength){
             // SHOW_MESSAGE(k, 1);
             // SHOW_MESSAGE("\n", 0);
 
-            if (xEnd <=0 && yEnd <= 0)
+            // log("xEnd ",xEnd," yEnd ",yEnd);
+            if (xEnd <=0 || yEnd <= 0)
             {
                 dlist.push_back(list);
                 countd++;
@@ -381,7 +382,6 @@ void Reverse(Type a,Type b,long alength,long blength){
                 long pyEnd = yEnd;
                 long pxEnd = xEnd;
 
-                // SHOW_MESSAGE(pk,1);
                 for(long index=countd-1;index>=0;index--){
                     k = ((dlist[index])[pk+offset]).pk;
 
@@ -419,7 +419,7 @@ void Reverse(Type a,Type b,long alength,long blength){
 
 int main(int argc, char const *argv[])
 {
-    //File Diff
+    // // File Diff
     // vector<AString> fileString = vector<AString>();
     // vector<AString> file2String = vector<AString>();
 
@@ -451,6 +451,7 @@ int main(int argc, char const *argv[])
     // SaveDiff("3.txt.diff",ret2);
 
     Reverse(ret1,ret2,ret1.size(),ret2.size());
+    // Reverse(AString("abaac"),AString("baacb"),5,5);
 
     // auto loadRet = LoadDiff<diff>(argv[1]);
     // for_each(loadRet.begin(),loadRet.end(),[](diff & df){
