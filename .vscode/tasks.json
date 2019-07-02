@@ -11,8 +11,9 @@
                 "-g",
                 "-std=c++14",
                 "${file}",
+                "${workspaceRoot}/md5.cpp",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileBasenameNoExtension}",
             ],
             "options": {
                 "cwd": "/usr/bin"

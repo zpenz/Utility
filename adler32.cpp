@@ -130,7 +130,17 @@ struct diff{
     bool operator==(const diff & df){
         if(AValue != df.AValue) return false;
         if(BValue != df.BValue) return false;
-        return MD5Value == df.MD5Value;
+        return strcmp(MD5Value,df.MD5Value) == 0;
+    }
+
+    friend ostream& operator<<(ostream &of,diff  df){
+        of<<"avalue : "<<df.AValue<<" bvalue : "<<df.BValue<<" md5 : "<<df.MD5Value<<"\n";
+        return of;
+    }
+
+    friend istream& operator>>(istream &in,diff df){
+        in>>df.AValue>>df.BValue>>df.MD5Value;
+        return in;
     }
 };
 
@@ -392,15 +402,15 @@ void Reverse(Type a,Type b,long alength,long blength){
                         for (long index = pyEnd+1; index <= yEnd; index++)
                         {
                             if(k<pk && index==yEnd) break;
-                            // show_message("  ",b[index-1]);
-                            log("  ",index-1);
+                            show_message("  ",b[index-1]);
+                            // log("  ",index-1);
                         }
                     }
 
-                    // if(k<pk )  show_message("+ ",b[yEnd-1]);
-                    if(k<pk )  log("+ ","b ",yEnd-1);
-                    // if(k>pk) show_message("- ",a[xEnd-1]);
-                    if(k>pk) log("- ","a ",xEnd-1);
+                    if(k<pk )  show_message("+ ",b[yEnd-1]);
+                    // if(k<pk )  log("+ ","b ",yEnd-1);
+                    if(k>pk) show_message("- ",a[xEnd-1]);
+                    // if(k>pk) log("- ","a ",xEnd-1);
 
                     pk = k;
                     pyEnd = yEnd;
