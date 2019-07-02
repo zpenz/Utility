@@ -263,9 +263,19 @@ namespace MD5{
         return bytesToHexString(_digest,16).c_str();
     }
 
+    AString Md516(const void* input,int length){
+        return Md5(input,length).substr(8,16);
+    }
+
     AString Md5(const AString& str){
         return Md5(str.c_str(),str._length());
     }
+
+    AString Md516(const AString& str){
+        return Md5(str).substr(8,16);
+    }
+
+
 }
 
 
