@@ -148,7 +148,7 @@ vector<diff> CalcFileDiff(const AString& filename){
     vector<diff> data;
 
     auto file = fopen(filename.c_str(),"rb+");
-       
+    
     char buf[CHUNK_SIZE];
     long AValue = 0;
     long BValue = 0;
@@ -168,7 +168,7 @@ vector<diff> CalcFileDiff(const AString& filename){
         for(int index = 0;index<CHUNK_SIZE;index++){
             buf[index] = buf[index+1];
         }
-        buf[CHUNK_SIZE-1] = temp; 
+        buf[CHUNK_SIZE-1] = temp;
         auto MValue = MD5::Md5(buf,CHUNK_SIZE);
 
         AValue -= headValue;
@@ -178,11 +178,6 @@ vector<diff> CalcFileDiff(const AString& filename){
 
         diff df = diff(AValue,BValue,MValue.c_str());
         data.push_back(df);
-
-        // show_message(MValue);
-        // show_message(df.MD5Value);
-        // printf("adler32:%ld\n",BValue%65521<<16|AValue%65521);
-        // SHOW_MESSAGE("push",1);
     }
     fclose(file);
     return data;
@@ -336,12 +331,21 @@ solution:
 }
 #pragma endregion
 
+struct Action{
+    enum class TargetType { TargetLocal,TargetRemote};
+    enum class ActionType { Normal,Insert,Delete};
+    TargetType tt;
+    ActionType at;
+    long       pos;
+    Action(TargetType _tt,ActionType _at,long _pos):tt(_tt),at(_at),pos(_pos){}
+};
 
 template<typename Type = AString>
-void Reverse(Type a,Type b,long alength,long blength){
+vector<Action> Reverse(Type a,Type b,long alength,long blength){
     long sizea = alength;
     long sizeb = blength;
-    if(sizea ==0||sizeb==0) return; 
+    vector<Action> alist = vector<Action>();
+    if(sizea ==0||sizeb==0) return alist; 
 
     long offset = sizeb+sizea+1;
 
@@ -362,7 +366,6 @@ void Reverse(Type a,Type b,long alength,long blength){
 
             long xStart = list[kPrev+offset].pt.x;
             long yStart = xStart - kPrev;
-            // SHOW_MESSAGE(Point(xStart,yStart), 1);
 
             long xEnd   = up?xStart:xStart -1;
             long yEnd   = xEnd - k;
@@ -378,12 +381,7 @@ void Reverse(Type a,Type b,long alength,long blength){
             list[k+offset] = Point(xEnd,yEnd);
             list[k+offset].pk = kPrev;
 
-            // SHOW_MESSAGE(Point(xEnd,yEnd), 1);
-            // SHOW_MESSAGE(k, 1);
-            // SHOW_MESSAGE("\n", 0);
-
-            // log("xEnd ",xEnd," yEnd ",yEnd);
-            if (xEnd <=0 || yEnd <= 0)
+            if (xEnd <=0 && yEnd <= 0)
             {
                 dlist.push_back(list);
                 countd++;
@@ -402,14 +400,24 @@ void Reverse(Type a,Type b,long alength,long blength){
                         for (long index = pyEnd+1; index <= yEnd; index++)
                         {
                             if(k<pk && index==yEnd) break;
-                            show_message("  ",b[index-1]);
+                            log("  ",b[index-1]);
+                            alist.push_back(Action(Action::TargetType::TargetRemote,
+                            Action::ActionType::Normal,index-1));
                             // log("  ",index-1);
                         }
                     }
 
-                    if(k<pk )  show_message("+ ",b[yEnd-1]);
+                    if(k<pk )  {
+                        log("+ ",b[yEnd-1]);
+                        alist.push_back(Action(Action::TargetType::TargetRemote,
+                            Action::ActionType::Insert,yEnd-1));
+                    }
                     // if(k<pk )  log("+ ","b ",yEnd-1);
-                    if(k>pk) show_message("- ",a[xEnd-1]);
+                    if(k>pk) {
+                        log("- ",a[xEnd-1]);
+                        alist.push_back(Action(Action::TargetType::TargetLocal,
+                            Action::ActionType::Delete,xEnd-1));
+                    }
                     // if(k>pk) log("- ","a ",xEnd-1);
 
                     pk = k;
@@ -418,18 +426,19 @@ void Reverse(Type a,Type b,long alength,long blength){
 
                     if(xEnd==sizea && yEnd==sizeb) break;
                 }
-                return;
+                return move(alist);
             }
         }
         dlist.push_back(list);
         countd++;
     }
+    return move(alist);
 }
 #pragma endregion
 
 int main(int argc, char const *argv[])
 {
-    // // File Diff
+    // File Diff
     // vector<AString> fileString = vector<AString>();
     // vector<AString> file2String = vector<AString>();
 
@@ -454,18 +463,43 @@ int main(int argc, char const *argv[])
 
     auto ret1 = CalcFileDiff(argv[1]);
     log("diff size:",ret1.size());
-    // SaveDiff(AString(argv[1])+".diff",ret1);
 
     auto ret2 = CalcFileDiff(argv[2]);
     log("diff size:",ret2.size());
-    // SaveDiff("3.txt.diff",ret2);
 
-    Reverse(ret1,ret2,ret1.size(),ret2.size());
-    // Reverse(AString("abaac"),AString("baacb"),5,5);
+    auto oplist = Reverse(ret1,ret2,ret1.size(),ret2.size());
 
-    // auto loadRet = LoadDiff<diff>(argv[1]);
-    // for_each(loadRet.begin(),loadRet.end(),[](diff & df){
-    //     log("avalue: ",df.AValue," bvalue: ",df.BValue," md5: ",df.MD5Value);
-    // });
+    fstream fs = fstream(AString(argv[1])+".marge",fstream::in | fstream::out | fstream::trunc);
+
+    ifstream f1 = ifstream(argv[1],f1.binary|f1.in);
+    ifstream f2 = ifstream(argv[2],f1.binary|f1.in);
+
+    log("opsize ",oplist.size());
+    for(int index = 0;index<oplist.size();index++){
+        auto item = oplist[index];
+
+        if(item.at == Action::ActionType::Normal){
+            log("normal");
+            char cha;
+            f1.seekg(item.pos);
+            f1.read(&cha,1);
+            fs.write(&cha,1);
+        }else if (item.at == Action::ActionType::Delete)
+        {
+            continue;
+        }
+        else if (item.at == Action::ActionType::Insert){
+            f2.seekg(item.pos);
+            char ta;
+            log("insert ",ta);
+            f2.read(&ta,1);
+            fs.write(&ta,1);
+        }
+    }
+
+    f1.close();
+    f2.close();
+    fs.close();
+
     return 0;
 }
