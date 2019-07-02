@@ -94,14 +94,7 @@ struct FileData{
     }
 };
 
-template<typename T>
-void SaveDiff(const AString& name,vector<T> ls){
-    auto file = fopen(name.c_str(),"w+");
-    for_each(ls.begin(),ls.end(),[&](T& item){
-        fwrite(&item,sizeof(T),1,file);
-    });
-    fclose(file);
-}
+
 
 template<typename T>
 vector<T> LoadDiff(const AString& name){
@@ -145,6 +138,17 @@ struct diff{
         return in;
     }
 };
+
+void SaveDiff(const AString& name,vector<diff> ls){
+    auto file = fopen(name.c_str(),"w+");
+    for_each(ls.begin(),ls.end(),[&](diff& item){
+        // fwrite(&item,sizeof(diff),1,file);
+        fwrite(&item.AValue,sizeof(item.AValue),1,file);
+        fwrite(&item.AValue,sizeof(item.AValue),1,file);
+        fwrite(&item.MD5Value,sizeof(item.MD5Value),1,file);
+    });
+    fclose(file);
+}
 
 vector<diff> CalcFileSlideDiff(const AString& filename){
     vector<diff> data;
@@ -234,13 +238,7 @@ vector<diff> CalcFileDiff(const AString& filename){
     return data;
 }
 
-void SaveDiff(const AString& name,vector<diff> ls){
-    auto file = fopen(name.c_str(),"w+");
-    for_each(ls.begin(),ls.end(),[&](diff & item){
-        fwrite(&item,sizeof(item),1,file);
-    });
-    fclose(file);
-}
+
 
 struct range{
     int start;
@@ -558,12 +556,12 @@ int main(int argc, char const *argv[])
     // fs.close();
 
     //Save
-    // SaveDiff(AString(argv[1])+".diff",CalcFileSlideDiff(argv[1]));
+    SaveDiff(AString(argv[1])+".diff",CalcFileSlideDiff(argv[1]));
 
-    auto ret = LoadDiff<diff>(argv[1]);
+    // auto ret = LoadDiff<diff>(argv[1]);
 
-    for_each(ret.begin(),ret.end(),[](diff & item){
-        log("AValue ",item.AValue,"  BValue ",item.BValue," MValue ",item.MD5Value);
-    });
+    // for_each(ret.begin(),ret.end(),[](diff & item){
+    //     log("AValue ",item.AValue,"  BValue ",item.BValue," MValue ",item.MD5Value);
+    // });
     return 0;
 }
