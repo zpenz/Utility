@@ -113,30 +113,29 @@ vector<T> LoadDiff(const AString& name){
 }
 
 struct diff{
-    long AValue;
-    long BValue;
+    int rvalue;
+    int index;
     char MD5Value[MD5_SIZE];
     diff(){};
-    diff(long av,long bv,const char* mv):
-    AValue(move(av)),BValue(move(bv)){
+    diff(long av,long bv,const char* mv)
+    {
+        rvalue = bv<<16|av;
         memset(MD5Value,0,sizeof(MD5Value));
         memcpy(MD5Value,mv,MD5_SIZE);
-        // log("mv: ",MD5Value);
-        // show_message("mv",mv);
     };
+
     bool operator==(const diff & df){
-        if(AValue != df.AValue) return false;
-        if(BValue != df.BValue) return false;
+        if(rvalue != df.rvalue) return false;
         return strcmp(MD5Value,df.MD5Value) == 0;
     }
 
     friend ostream& operator<<(ostream &of,diff  df){
-        of<<"avalue : "<<df.AValue<<" bvalue : "<<df.BValue<<" md5 : "<<df.MD5Value<<"\n";
+        of<<"rvalue : "<<df.rvalue<<" md5 : "<<df.MD5Value<<"\n";
         return of;
     }
 
     friend istream& operator>>(istream &in,diff df){
-        in>>df.AValue>>df.BValue>>df.MD5Value;
+        in>>df.rvalue>>df.MD5Value;
         return in;
     }
 };
@@ -145,8 +144,7 @@ void SaveDiff(const AString& name,vector<diff> ls){
     auto file = fopen(name.c_str(),"w+");
     for_each(ls.begin(),ls.end(),[&](diff& item){
         // fwrite(&item,sizeof(diff),1,file);
-        fwrite(&item.AValue,sizeof(item.AValue),1,file);
-        fwrite(&item.AValue,sizeof(item.AValue),1,file);
+        fwrite(&item.rvalue,sizeof(item.rvalue),1,file);
         fwrite(&item.MD5Value,sizeof(item.MD5Value),1,file);
     });
     fclose(file);
@@ -157,22 +155,25 @@ vector<diff> CalcFileSlideDiff(const AString& filename){
     auto file = fopen(filename.c_str(),"rb+");
     char buf[CHUNK_SIZE];
 
-    long size = 0;
-    long BValue = 0;
+    int size = 0;
+    int pos = 0;
+
     while(( size = fread(buf,sizeof(char),sizeof(buf),file))>0){
         auto MValue = MD5::Md516(buf,size);
-        long AValue = 1;
-        BValue = 0;
+        long AValue = 1,BValue = 0;
         for(int index=0;index<size;index++){
             AValue = (AValue + static_cast<int>(buf[index]))%MOD_DIGEST;
             BValue = (BValue + AValue)%MOD_DIGEST;
         }
 
         diff df = diff(AValue,BValue,MValue.c_str());
+        df.index = pos;
+        pos+=size;
         log(MValue);
         data.push_back(df);
     }
     log("diff size: ",data.size());
+    fclose(file);
     return data;
 }
 
@@ -180,50 +181,25 @@ vector<diff> CalcFileDiff(const AString& filename){
     vector<diff> data;
 
     auto file = fopen(filename.c_str(),"rb+");
-    
     char buf[CHUNK_SIZE];
 
+    int pos = 0;
     int size = 0;
-    int headValue = 0;
-    int start = 0;
-
-    fseek(file,0,SEEK_END);
-    int length = ftell(file);
-    fseek(file,0,SEEK_SET);
-
-    size = fread(buf,sizeof(char),sizeof(buf),file);
-
-    long AValue = 1;
-    long BValue = 0;
-    for(int index = 0;index<size;index++){
-        AValue = (AValue+static_cast<int>(buf[index]))%MOD_DIGEST;
-        BValue = (BValue+AValue)%MOD_DIGEST;
-    }
-    auto MValue = MD5::Md516(buf,size);
-    log(MValue);
-    diff df = diff(AValue,BValue,MValue.c_str());
-    data.push_back(df);
-
-    //rolling
-    start++;
-    int lastsize = size;
-    fseek(file,start,SEEK_SET);
-    headValue = buf[0];
+    int startpos = 0;
 
     while((size = fread(buf,sizeof(char),sizeof(buf),file))==CHUNK_SIZE){
         auto MValue = MD5::Md516(buf,size);
-        AValue = 1,BValue = 0; 
+        long AValue = 1, BValue = 0; 
         for(int index=0;index<size;index++){
             AValue = (AValue+static_cast<int>(buf[index]))%MOD_DIGEST;
             BValue = (BValue + AValue)%MOD_DIGEST;
         }
 
         diff df = diff(AValue,BValue,MValue.c_str());
+        df.index = pos++;
         data.push_back(df);
 
-        fseek(file,++start,SEEK_SET);
-        lastsize = size;
-        headValue = buf[0];
+        fseek(file,++startpos,SEEK_SET);
         memset(buf,0,sizeof(buf));
     }
     fclose(file);
@@ -550,20 +526,23 @@ int main(int argc, char const *argv[])
     map<int,diff> store1;
     int index = 0;
     for_each(ret.begin(),ret.end(),[&](diff & item){
-        store1[item.AValue] = item;
+        store1[item.rvalue] = item;
     });
 
+    vector<range> ls = vector<range>();
     //roll
     auto ret2 = CalcFileDiff("3.txt");
     map<int,diff> map2;
     int index2 = 0;
     for_each(ret2.begin(),ret2.end(),[&](diff & item){
-        auto ret = store1.find(item.AValue);
-        if(ret!=store1.end() && strcmp(ret->second.MD5Value,item.MD5Value) == 0)
-        log("find index: ",index2);
+        auto ret = store1.find(item.rvalue);
+        if(ret!=store1.end() && strcmp(ret->second.MD5Value,item.MD5Value) == 0){
+            log("find index: ",item.index);
+            log("origin index: ",ret->second.index);
+            ls.push_back(range(index2,CHUNK_SIZE));
+        }
         index2++;
     });
-
 
     // auto ret = LoadDiff<diff>(argv[1]);
 
