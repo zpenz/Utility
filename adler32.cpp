@@ -187,7 +187,7 @@ vector<diff> CalcFileDiff(const AString& filename){
     int size = 0;
     int startpos = 0;
 
-    while((size = fread(buf,sizeof(char),sizeof(buf),file))==CHUNK_SIZE){
+    while((size = fread(buf,sizeof(char),sizeof(buf),file))>0){
         auto MValue = MD5::Md516(buf,size);
         long AValue = 1, BValue = 0; 
         for(int index=0;index<size;index++){
@@ -453,6 +453,7 @@ vector<Action> Reverse(Type a,Type b,long alength,long blength){
 
 int main(int argc, char const *argv[])
 {
+    #pragma region --diff
     // File Diff
     // vector<AString> fileString = vector<AString>();
     // vector<AString> file2String = vector<AString>();
@@ -476,51 +477,12 @@ int main(int argc, char const *argv[])
 
     // Reverse(fileString, file2String,fileString.size(),file2String.size());
 
-    //----------------------------------
-    // auto ret1 = CalcFileDiff(argv[1]);
-    // log("diff size:",ret1.size());
+    #pragma endregion
 
-    // auto ret2 = CalcFileDiff(argv[2]);
-    // log("diff size:",ret2.size());
 
-    // auto oplist = Reverse(ret1,ret2,ret1.size(),ret2.size());
-
-    // fstream fs = fstream(AString(argv[1])+".marge",fstream::in | fstream::out | fstream::trunc);
-
-    // ifstream f1 = ifstream(argv[1],f1.binary|f1.in);
-    // ifstream f2 = ifstream(argv[2],f1.binary|f1.in);
-
-    // log("opsize ",oplist.size());
-    // for(int index = 0;index<oplist.size();index++){
-    //     auto item = oplist[index];
-
-    //     if(item.at == Action::ActionType::Normal){
-    //         char cha;
-    //         f1.seekg(item.pos);
-    //         f1.read(&cha,1);
-    //         log("normal ",cha);
-    //         fs.write(&cha,1);
-    //     }else if (item.at == Action::ActionType::Delete)
-    //     {
-    //         char cha;
-    //         f1.seekg(item.pos);
-    //         f1.read(&cha,1);
-    //         log("delet ",cha);
-    //         continue;
-    //     }
-    //     else if (item.at == Action::ActionType::Insert){
-    //         f2.seekg(item.pos);
-    //         char ta;
-    //         f2.read(&ta,1);
-    //         log("insert ",ta);
-    //         fs.write(&ta,1);
-    //     }
-    // }
-
-    // f1.close();
-    // f2.close();
-    // fs.close();
-
+    fstream f1("2.txt",f1.binary|f1.in);
+    fstream f2("3.txt",f1.binary|f1.in);
+    fstream fs = fstream("2.txt.marge",fstream::in | fstream::out | fstream::trunc);
     //Save
     auto ret = CalcFileSlideDiff("2.txt");
     map<int,diff> store1;
@@ -532,22 +494,43 @@ int main(int argc, char const *argv[])
     vector<range> ls = vector<range>();
     //roll
     auto ret2 = CalcFileDiff("3.txt");
-    map<int,diff> map2;
     int index2 = 0;
-    for_each(ret2.begin(),ret2.end(),[&](diff & item){
-        auto ret = store1.find(item.rvalue);
-        if(ret!=store1.end() && strcmp(ret->second.MD5Value,item.MD5Value) == 0){
-            log("find index: ",item.index);
-            log("origin index: ",ret->second.index);
-            ls.push_back(range(index2,CHUNK_SIZE));
+
+    int lastChunkIndex = -1;
+    for(int i=0;i<ret2.size();i++){
+        auto item = ret2[i];
+        auto findret = store1.find(item.rvalue);
+        if(findret!= store1.end() && strcmp(findret->second.MD5Value,item.MD5Value) == 0){
+            int delta = i-lastChunkIndex-CHUNK_SIZE;
+            if(lastChunkIndex!=-1 && delta > 0 ){
+                //
+                f2.seekg(lastChunkIndex+1+CHUNK_SIZE);
+                char buf[delta];
+                log("delta ",delta);
+                f2.read(buf,delta);
+                fs.write(buf,delta);
+                //
+            }
+            lastChunkIndex =i;
+
+            f1.seekg(i);
+            char buf[CHUNK_SIZE];
+            f1.read(buf,CHUNK_SIZE);
+            fs.write(buf,CHUNK_SIZE);
+
+            i+=CHUNK_SIZE;
+            continue;
         }
-        index2++;
-    });
+    }
+    
+    //write last
+    // char buf[CHUNK_SIZE];
+    // f2.read(buf,CHUNK_SIZE);
+    // int length = f2.gcount();
+    // fs.write(buf,length);    
 
-    // auto ret = LoadDiff<diff>(argv[1]);
-
-    // for_each(ret.begin(),ret.end(),[](diff & item){
-    //     log("AValue ",item.AValue,"  BValue ",item.BValue," MValue ",item.MD5Value);
-    // });
+    f1.close();
+    f2.close();
+    fs.close();
     return 0;
 }

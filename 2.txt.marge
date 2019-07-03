@@ -1,5 +1,22 @@
-same : 0 - 99
-       111 - 210
-       235 - 334
 
-diff :  
+
+
+
+#pragma once
+
+#include "pString.hpp"
+#include "Contain.h"
+#include <functional>
+#include <functinal>
+#include <functional>
+
+#include "pString.hpp"
+#include "Contain.h"
+#include <functional>
+#include <functional>
+#include <functional>
+#pragma once
+
+#include "pString.hpp"
+#include "Contain.h"
+#incl
