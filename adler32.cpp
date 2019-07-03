@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <vector>
 #include <algorithm>
+#include <map>
 
 #define CHUNK_SIZE 100
+#define MOD_DIGEST 65521
 #define MD5_SIZE 17
 
 void FileDelete(const AString& strName,int pos,int length){
@@ -156,16 +158,18 @@ vector<diff> CalcFileSlideDiff(const AString& filename){
     char buf[CHUNK_SIZE];
 
     long size = 0;
+    long BValue = 0;
     while(( size = fread(buf,sizeof(char),sizeof(buf),file))>0){
         auto MValue = MD5::Md516(buf,size);
-        log("md516 ",MValue);
-        long AValue = 0;
-        long BValue = 0;
+        long AValue = 1;
+        BValue = 0;
         for(int index=0;index<size;index++){
-            AValue+=static_cast<int>(buf[index]);
-            BValue+=AValue;
+            AValue = (AValue + static_cast<int>(buf[index]))%MOD_DIGEST;
+            BValue = (BValue + AValue)%MOD_DIGEST;
         }
+
         diff df = diff(AValue,BValue,MValue.c_str());
+        log(MValue);
         data.push_back(df);
     }
     log("diff size: ",data.size());
@@ -178,8 +182,7 @@ vector<diff> CalcFileDiff(const AString& filename){
     auto file = fopen(filename.c_str(),"rb+");
     
     char buf[CHUNK_SIZE];
-    long AValue = 0;
-    long BValue = 0;
+
     int size = 0;
     int headValue = 0;
     int start = 0;
@@ -189,56 +192,43 @@ vector<diff> CalcFileDiff(const AString& filename){
     fseek(file,0,SEEK_SET);
 
     size = fread(buf,sizeof(char),sizeof(buf),file);
+
+    long AValue = 1;
+    long BValue = 0;
     for(int index = 0;index<size;index++){
-        AValue+=static_cast<int>(buf[index]);
-        BValue+=AValue;
-        auto MValue = MD5::Md516(buf,size);
-        diff df = diff(AValue,BValue,MValue.c_str());
-        data.push_back(df);
+        AValue = (AValue+static_cast<int>(buf[index]))%MOD_DIGEST;
+        BValue = (BValue+AValue)%MOD_DIGEST;
     }
+    auto MValue = MD5::Md516(buf,size);
+    log(MValue);
+    diff df = diff(AValue,BValue,MValue.c_str());
+    data.push_back(df);
 
     //rolling
-    // char temp = 0;
     start++;
     int lastsize = size;
     fseek(file,start,SEEK_SET);
     headValue = buf[0];
 
-    while((size = fread(buf,sizeof(char),sizeof(buf),file))>0){
+    while((size = fread(buf,sizeof(char),sizeof(buf),file))==CHUNK_SIZE){
         auto MValue = MD5::Md516(buf,size);
-        AValue -= headValue;
-        AValue += buf[size-1];
-        BValue -= lastsize*headValue;
-        BValue += AValue;
+        AValue = 1,BValue = 0; 
+        for(int index=0;index<size;index++){
+            AValue = (AValue+static_cast<int>(buf[index]))%MOD_DIGEST;
+            BValue = (BValue + AValue)%MOD_DIGEST;
+        }
+
         diff df = diff(AValue,BValue,MValue.c_str());
         data.push_back(df);
 
-        fseek(file,start++,SEEK_SET);
+        fseek(file,++start,SEEK_SET);
         lastsize = size;
         headValue = buf[0];
         memset(buf,0,sizeof(buf));
     }
-    // while((size = fread(&temp,sizeof(char),1,file))>0){
-    //     headValue = buf[0];
-    //     for(int index = 0;index<CHUNK_SIZE;index++){
-    //         buf[index] = buf[index+1];
-    //     }
-    //     buf[CHUNK_SIZE-1] = temp;
-    //     auto MValue = MD5::Md5(buf,CHUNK_SIZE);
-
-    //     AValue -= headValue;
-    //     AValue += buf[CHUNK_SIZE-1];
-    //     BValue -= CHUNK_SIZE*headValue;
-    //     BValue += AValue;
-
-    //     diff df = diff(AValue,BValue,MValue.c_str());
-    //     data.push_back(df);
-    // }
     fclose(file);
     return data;
 }
-
-
 
 struct range{
     int start;
@@ -556,7 +546,24 @@ int main(int argc, char const *argv[])
     // fs.close();
 
     //Save
-    SaveDiff(AString(argv[1])+".diff",CalcFileSlideDiff(argv[1]));
+    auto ret = CalcFileSlideDiff("2.txt");
+    map<int,diff> store1;
+    int index = 0;
+    for_each(ret.begin(),ret.end(),[&](diff & item){
+        store1[item.AValue] = item;
+    });
+
+    //roll
+    auto ret2 = CalcFileDiff("3.txt");
+    map<int,diff> map2;
+    int index2 = 0;
+    for_each(ret2.begin(),ret2.end(),[&](diff & item){
+        auto ret = store1.find(item.AValue);
+        if(ret!=store1.end() && strcmp(ret->second.MD5Value,item.MD5Value) == 0)
+        log("find index: ",index2);
+        index2++;
+    });
+
 
     // auto ret = LoadDiff<diff>(argv[1]);
 
