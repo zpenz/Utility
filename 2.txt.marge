@@ -12,11 +12,11 @@
 
 #include "pString.hpp"
 #include "Contain.h"
-#include <functional>
-#include <functional>
+#include <functional>a
+#includ <functional>
 #include <functional>
 #pragma once
 
 #include "pString.hpp"
 #include "Contain.h"
-#incl
+#inclu
