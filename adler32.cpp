@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <map>
 
-#define CHUNK_SIZE 100
+#define CHUNK_SIZE 4096
 #define MOD_DIGEST 65521
 #define MD5_SIZE 17
 
@@ -237,10 +237,10 @@ vector<diff> CalcFileDiff_r(const AString& filename){
 
     while((size = fread(bufbk,sizeof(char),CHUNK_SIZE,file))>0){
         for(int j =0;j<size-1;j++){
-            for(int index=0;index<CHUNK_SIZE-1;index++){
-                bufcur[index] = bufcur[index+1];
-                bufcur[CHUNK_SIZE-1] = bufbk[j];
-            }
+            // for(int index=0;index<CHUNK_SIZE-1;index++){
+            //     bufcur[index] = bufcur[index+1];
+            //     bufcur[CHUNK_SIZE-1] = bufbk[j];
+            // }
 
             auto MValue = MD5::Md516(bufcur,CHUNK_SIZE);
             AValue = AValue - headvalue;
@@ -254,7 +254,7 @@ vector<diff> CalcFileDiff_r(const AString& filename){
             headvalue = bufcur[0];
         }
 
-        log(pos);
+        // log(pos);
         char* temp = bufcur;
         bufcur = bufbk;
         bufbk = temp;
