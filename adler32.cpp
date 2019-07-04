@@ -497,15 +497,18 @@ int main(int argc, char const *argv[])
     int index2 = 0;
 
     int lastChunkIndex = -1;
-    for(int i=0;i<ret2.size();i++){
+    int i = 0;
+    while(i<ret2.size()){
         auto item = ret2[i];
         auto findret = store1.find(item.rvalue);
         if(findret!= store1.end() && strcmp(findret->second.MD5Value,item.MD5Value) == 0){
+            log("index ",i);
             int delta = i-lastChunkIndex-CHUNK_SIZE;
             if(lastChunkIndex!=-1 && delta > 0 ){
                 //
-                f2.seekg(lastChunkIndex+1+CHUNK_SIZE);
+                f2.seekg(lastChunkIndex+CHUNK_SIZE);
                 char buf[delta];
+                log("i ",i);
                 log("delta ",delta);
                 f2.read(buf,delta);
                 fs.write(buf,delta);
@@ -513,13 +516,21 @@ int main(int argc, char const *argv[])
             }
             lastChunkIndex =i;
 
+            //0-99. 100-201 202.
+            //src: 100 100 100
+            //dst: 100 102 100
+            //lastChunkIndex = 0
+            //delta = 202 - 0 - 100 = 102
+            //common
             f1.seekg(i);
             char buf[CHUNK_SIZE];
             f1.read(buf,CHUNK_SIZE);
-            fs.write(buf,CHUNK_SIZE);
+            int length = f1.gcount();
+            fs.write(buf,length);
 
             i+=CHUNK_SIZE;
-            continue;
+        }else{
+            i++;
         }
     }
     
