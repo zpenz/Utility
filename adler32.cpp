@@ -96,8 +96,6 @@ struct FileData{
     }
 };
 
-
-
 template<typename T>
 vector<T> LoadDiff(const AString& name){
     auto file = fopen(name.c_str(),"rb");
@@ -207,10 +205,11 @@ vector<diff> CalcFileDiff(const AString& filename){
 }
 
 struct range{
-    int start;
-    int length;
-    range(int st,int lg):start(st),length(lg){}
-    range(){}
+    int  index;
+    int  length;
+    int  offset;
+    bool sameblock;
+    range(int _index,int _length,int _offset,bool _sb = false):index(_index),length(_length),offset(_offset),sameblock(_sb){}
 };
 
 #pragma region --mark DIFF
@@ -453,7 +452,7 @@ vector<Action> Reverse(Type a,Type b,long alength,long blength){
 
 int main(int argc, char const *argv[])
 {
-    #pragma region --diff
+    #pragma region --diff test
     // File Diff
     // vector<AString> fileString = vector<AString>();
     // vector<AString> file2String = vector<AString>();
@@ -479,50 +478,42 @@ int main(int argc, char const *argv[])
 
     #pragma endregion
 
-
     fstream f1("2.txt",f1.binary|f1.in);
     fstream f2("3.txt",f1.binary|f1.in);
     fstream fs = fstream("2.txt.marge",fstream::in | fstream::out | fstream::trunc);
     //Save
     auto ret = CalcFileSlideDiff("2.txt");
     map<int,diff> store1;
-    int index = 0;
     for_each(ret.begin(),ret.end(),[&](diff & item){
         store1[item.rvalue] = item;
     });
 
-    vector<range> ls = vector<range>();
     //roll
     auto ret2 = CalcFileDiff("3.txt");
-    int index2 = 0;
 
-    int lastChunkIndex = -1;
-    int i = 0;
+    //calc list
+    bool bDiff = false;
+    vector<range> list = vector<range>();
+
+    int  i = 0;
+    
+    int startpos = 0;
+    int length = 0;
     while(i<ret2.size()){
         auto item = ret2[i];
         auto findret = store1.find(item.rvalue);
         if(findret!= store1.end() && strcmp(findret->second.MD5Value,item.MD5Value) == 0){
             log("index ",i);
-            int delta = i-lastChunkIndex-CHUNK_SIZE;
-            if(lastChunkIndex!=-1 && delta > 0 ){
-                //
-                f2.seekg(lastChunkIndex+CHUNK_SIZE);
-                char buf[delta];
-                log("i ",i);
-                log("delta ",delta);
-                f2.read(buf,delta);
-                fs.write(buf,delta);
-                //
+            if(bDiff){
+                f2.seekg(startpos);
+                char wbuf[length];
+                f2.read(wbuf,length);
+                fs.write(wbuf,length);
+                bDiff = false;
             }
-            lastChunkIndex =i;
 
-            //0-99. 100-201 202.
-            //src: 100 100 100
-            //dst: 100 102 100
-            //lastChunkIndex = 0
-            //delta = 202 - 0 - 100 = 102
-            //common
-            f1.seekg(i);
+            f1.seekg(findret->second.index);
+            log("second index ",findret->second.index);
             char buf[CHUNK_SIZE];
             f1.read(buf,CHUNK_SIZE);
             int length = f1.gcount();
@@ -530,15 +521,26 @@ int main(int argc, char const *argv[])
 
             i+=CHUNK_SIZE;
         }else{
+            //delay
             i++;
+            if(bDiff){
+                length++;
+            }else{
+                bDiff = true;
+                startpos = i;
+                length = 0;
+            }
         }
     }
-    
-    //write last
-    // char buf[CHUNK_SIZE];
-    // f2.read(buf,CHUNK_SIZE);
-    // int length = f2.gcount();
-    // fs.write(buf,length);    
+
+    //other
+    if(bDiff){
+        f2.seekg(startpos);
+        char wbuf[length];
+        f2.read(wbuf,length);
+        fs.write(wbuf,length);
+        bDiff = false;
+    }
 
     f1.close();
     f2.close();
