@@ -3,8 +3,9 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <deque>
 
-#define CHUNK_SIZE 4096
+#define CHUNK_SIZE 1024
 #define MOD_DIGEST 65521
 #define MD5_SIZE 17
 
@@ -115,9 +116,10 @@ struct diff{
     int index;
     char MD5Value[MD5_SIZE];
     diff(){};
-    diff(long av,long bv,const char* mv)
+    diff(int av,int bv,const char* mv)
     {
-        rvalue = bv<<16|av;
+        rvalue = (bv<<16) | av;
+        printf("rvalue %0x\n",rvalue);
         memset(MD5Value,0,sizeof(MD5Value));
         memcpy(MD5Value,mv,MD5_SIZE);
     };
@@ -182,6 +184,7 @@ vector<diff> CalcFileSlideDiff(const AString& filename){
     return data;
 }
 
+
 vector<diff> CalcFileDiff(const AString& filename){
     vector<diff> data;
 
@@ -193,11 +196,12 @@ vector<diff> CalcFileDiff(const AString& filename){
     int startpos = 0;
 
     while((size = fread(buf,sizeof(char),sizeof(buf),file))>0){
-        auto MValue = MD5::Md516(buf,size);
-        long AValue = 1, BValue = 0; 
+        // auto MValue = MD5::Md516(buf,size);
+        AString MValue = "";
+        long AValue = 0, BValue = 0; 
         for(int index=0;index<size;index++){
             AValue = (AValue+static_cast<int>(buf[index]))%MOD_DIGEST;
-            BValue = (BValue + AValue)%MOD_DIGEST;
+            BValue = BValue + AValue%MOD_DIGEST;
         }
 
         diff df = diff(AValue,BValue,MValue.c_str());
@@ -211,6 +215,7 @@ vector<diff> CalcFileDiff(const AString& filename){
     return data;
 }
 
+
 vector<diff> CalcFileDiff_r(const AString& filename){
     vector<diff> data;
 
@@ -222,43 +227,35 @@ vector<diff> CalcFileDiff_r(const AString& filename){
 
     int pos = 0;
     int size = 0;
-    int startpos = 0;
     int headvalue = 0;
 
-    size = fread(buf,sizeof(char),sizeof(buf),file);
-    auto MValue = MD5::Md516(buf,size);
-    long AValue = 1,BValue = 0;
+    size = fread(buf,sizeof(char),CHUNK_SIZE,file);
+    int AValue = 1,BValue = 0;
     for(int index=0;index<size;index++){
         AValue = (AValue+static_cast<int>(buf[index]))%MOD_DIGEST;
         BValue = (BValue + AValue)%MOD_DIGEST;
     }
-    data.push_back(diff(AValue,BValue,MValue.c_str()));
+    data.push_back(diff(AValue,BValue,""));
     headvalue = buf[0];
+    // fseek(file,0,SEEK_SET);
 
     while((size = fread(bufbk,sizeof(char),CHUNK_SIZE,file))>0){
-        for(int j =0;j<size-1;j++){
-            // for(int index=0;index<CHUNK_SIZE-1;index++){
-            //     bufcur[index] = bufcur[index+1];
-            //     bufcur[CHUNK_SIZE-1] = bufbk[j];
-            // }
+        for(int j =0;j<size;j++){
+            AValue -= (bufcur[j]-static_cast<int>(bufbk[j]));
+            BValue -= (CHUNK_SIZE*(bufcur[j])+1-AValue);
 
-            auto MValue = MD5::Md516(bufcur,CHUNK_SIZE);
-            AValue = AValue - headvalue;
-            AValue += static_cast<int>(bufbk[j]);
-            BValue = BValue - headvalue*CHUNK_SIZE;
-            BValue += AValue;
-
-            diff df = diff(AValue,BValue,MValue.c_str());
+            diff df = diff(AValue,BValue,"");
             df.index = pos++;
             data.push_back(df);
-            headvalue = bufcur[0];
+            // headvalue = bufcur[j];
+            // log("headvalue: ",bufcur[j]);
+            if(j>10)
+            break;
         }
 
-        // log(pos);
         char* temp = bufcur;
         bufcur = bufbk;
         bufbk = temp;
-
     }
 
     fclose(file);
@@ -543,80 +540,90 @@ int main(int argc, char const *argv[])
     fstream f2("3.txt",f1.binary|f1.in);
     fstream fs = fstream("2.txt.marge",fstream::in | fstream::out | fstream::trunc);
     //Save
-    auto ret = CalcFileSlideDiff("app-release.apk");
-
-    // map<int,diff> store1;
-    // for_each(ret.begin(),ret.end(),[&](diff & item){
-    //     store1[item.rvalue] = item;
-    // });
-
-    SaveFile("test.send",ret);
-    //roll
-
-    // auto ret2 = CalcFileDiff_r("app-release.apk");
-
-    // //calc list
-    // bool bDiff = false;
-    // vector<range> list = vector<range>();
-
-    // int  i = 0;
+    auto ret = CalcFileSlideDiff("dhclient.conf");
     
-    // int startpos = 0;
-    // int length = 0;
-    // int offset = 0;
-    // while(i<ret2.size()){
-    //     auto item = ret2[i];
-    //     auto findret = store1.find(item.rvalue);
-    //     if(findret!= store1.end() && strcmp(findret->second.MD5Value,item.MD5Value) == 0){
-    //         // log("index ",i);
+    map<int,diff> store1;
+    for_each(ret.begin(),ret.end(),[&](diff & item){
+        store1[item.rvalue] = item;
+    });
 
-    //         // f1.seekg(findret->second.index);
-    //         // log("second index ",findret->second.index);
-    //         // char buf[CHUNK_SIZE];
-    //         // f1.read(buf,CHUNK_SIZE);
-    //         // int length = f1.gcount();
-    //         // fs.write(buf,length);
+    log("");
+    //roll
+    auto ret2 = CalcFileDiff_r("dhclient.conf");
 
-    //         list.push_back(range(startpos,length,i,true));
-    //         i+=CHUNK_SIZE;
+    //calc list
+    bool bDiff = false;
+    vector<range> list = vector<range>();
 
-    //         if(bDiff){
-    //             // f2.seekg(startpos);
-    //             // char wbuf[length];
-    //             // f2.read(wbuf,length);
-    //             // fs.write(wbuf,length);
-    //             bDiff = false;
+    int  i = 0;
+    
+    int startpos = 0;
+    int length = 0;
+    int offset = 0;
 
-    //             list.push_back(range(startpos,length,i));
-    //         }
-    //     }else{
-    //         //delay
-    //         i++;
-    //         if(bDiff){
-    //             length++;
-    //         }else{
-    //             bDiff = true;
-    //             startpos = i;
-    //             length = 0;
-    //         }
-    //     }
-    // }
+    while(i<ret2.size()){
+        auto item = ret2[i];
+        auto findret = store1.find(item.rvalue);
+        // log(item.rvalue);
+        if(findret!= store1.end()){
+            log("queal ","index",item.index);
+            f1.seekg(item.index);
+            char buf[CHUNK_SIZE];
+            f1.read(buf,CHUNK_SIZE);
+            auto md5 = MD5::Md516(buf,f1.gcount());
+            if(strcmp(md5.c_str(),findret->second.MD5Value)==0){
+                list.push_back(range(startpos,length,i,true));
+                log("queal ","index",item.index);
+                i+=CHUNK_SIZE;
+                if(bDiff){
+                    // f2.seekg(startpos);
+                    // char wbuf[length];
+                    // f2.read(wbuf,length);
+                    // fs.write(wbuf,length);
+                    bDiff = false;
+                    list.push_back(range(startpos,length,i));
+                }
+            }else{
+                goto other;
+            }
+            // log("index ",i);
 
-    // //other
-    // if(bDiff){
-    //     // f2.seekg(startpos);
-    //     // char wbuf[length];
-    //     // f2.read(wbuf,length);
-    //     // fs.write(wbuf,length);
+            // f1.seekg(findret->second.index);
+            // log("second index ",findret->second.index);
+            // char buf[CHUNK_SIZE];
+            // f1.read(buf,CHUNK_SIZE);
+            // int length = f1.gcount();
+            // fs.write(buf,length);
 
-    //     bDiff = false;
-    //     list.push_back(range(startpos,length,i));
-    // }
+        }else{
+            other:
+            //delay
+            i++;
+            if(bDiff){
+                length++;
+            }else{
+                bDiff = true;
+                startpos = i;
+                length = 0;
+            }
+        }
+    }
 
-    // SaveFile<range>("op.list",list);
+    //other
+    if(bDiff){
+        // f2.seekg(startpos);
+        // char wbuf[length];
+        // f2.read(wbuf,length);
+        // fs.write(wbuf,length);
 
-    // f1.close();
-    // f2.close();
-    // fs.close();
+        bDiff = false;
+        list.push_back(range(startpos,length,i));
+    }
+
+    SaveFile<range>("op.list",list);
+
+    f1.close();
+    f2.close();
+    fs.close();
     return 0;
 }
