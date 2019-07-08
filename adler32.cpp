@@ -113,11 +113,13 @@ vector<T> LoadDiff(const AString& name){
 
 struct diff{
     int rvalue;
-    int index;
+    int index = 0;
     char MD5Value[MD5_SIZE];
     diff(){};
     diff(int av,int bv,const char* mv)
     {
+        av = av % MOD_DIGEST;
+        bv = bv % MOD_DIGEST;
         rvalue = (bv<<16) | av;
         printf("rvalue %0x\n",rvalue);
         memset(MD5Value,0,sizeof(MD5Value));
@@ -171,8 +173,8 @@ vector<diff> CalcFileSlideDiff(const AString& filename){
         auto MValue = MD5::Md516(buf,size);
         long AValue = 1,BValue = 0;
         for(int index=0;index<size;index++){
-            AValue = (AValue + static_cast<int>(buf[index]))%MOD_DIGEST;
-            BValue = (BValue + AValue)%MOD_DIGEST;
+            AValue = (AValue + static_cast<int>(buf[index]));
+            BValue = (BValue + AValue);
         }
 
         diff df = diff(AValue,BValue,MValue.c_str());
@@ -227,30 +229,23 @@ vector<diff> CalcFileDiff_r(const AString& filename){
 
     int pos = 0;
     int size = 0;
-    int headvalue = 0;
 
     size = fread(buf,sizeof(char),CHUNK_SIZE,file);
     int AValue = 1,BValue = 0;
     for(int index=0;index<size;index++){
-        AValue = (AValue+static_cast<int>(buf[index]))%MOD_DIGEST;
-        BValue = (BValue + AValue)%MOD_DIGEST;
+        AValue = (AValue+static_cast<int>(buf[index]));
+        BValue = (BValue + AValue);
     }
     data.push_back(diff(AValue,BValue,""));
-    headvalue = buf[0];
-    // fseek(file,0,SEEK_SET);
 
     while((size = fread(bufbk,sizeof(char),CHUNK_SIZE,file))>0){
         for(int j =0;j<size;j++){
             AValue -= (bufcur[j]-static_cast<int>(bufbk[j]));
-            BValue -= (CHUNK_SIZE*(bufcur[j])+1-AValue);
+            BValue -= (CHUNK_SIZE*(bufcur[j])-AValue+1);
 
             diff df = diff(AValue,BValue,"");
             df.index = pos++;
             data.push_back(df);
-            // headvalue = bufcur[j];
-            // log("headvalue: ",bufcur[j]);
-            if(j>10)
-            break;
         }
 
         char* temp = bufcur;
@@ -540,7 +535,7 @@ int main(int argc, char const *argv[])
     fstream f2("3.txt",f1.binary|f1.in);
     fstream fs = fstream("2.txt.marge",fstream::in | fstream::out | fstream::trunc);
     //Save
-    auto ret = CalcFileSlideDiff("dhclient.conf");
+    auto ret = CalcFileSlideDiff("2.txt");
     
     map<int,diff> store1;
     for_each(ret.begin(),ret.end(),[&](diff & item){
@@ -549,7 +544,7 @@ int main(int argc, char const *argv[])
 
     log("");
     //roll
-    auto ret2 = CalcFileDiff_r("dhclient.conf");
+    auto ret2 = CalcFileDiff_r("3.txt");
 
     //calc list
     bool bDiff = false;
@@ -567,10 +562,10 @@ int main(int argc, char const *argv[])
         // log(item.rvalue);
         if(findret!= store1.end()){
             log("queal ","index",item.index);
-            f1.seekg(item.index);
+            f2.seekg(findret->second.index);
             char buf[CHUNK_SIZE];
-            f1.read(buf,CHUNK_SIZE);
-            auto md5 = MD5::Md516(buf,f1.gcount());
+            f2.read(buf,CHUNK_SIZE);
+            auto md5 = MD5::Md516(buf,CHUNK_SIZE);
             if(strcmp(md5.c_str(),findret->second.MD5Value)==0){
                 list.push_back(range(startpos,length,i,true));
                 log("queal ","index",item.index);
