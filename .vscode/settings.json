@@ -63,7 +63,8 @@
         ],
         "clocale": "cpp",
         "map": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "__tree": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false
 }
