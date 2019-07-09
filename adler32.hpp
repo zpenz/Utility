@@ -18,11 +18,12 @@
 
     struct diff{
         char MD5Value[MD5_SIZE];
-        int index = 0;
+        int index;
         int rvalue;
         diff(){};
-        diff(int av,int bv,const char* mv)
+        diff(int av,int bv,const char* mv,int _index)
         {
+            index = _index;
             av = av % MOD_DIGEST;
             bv = bv % MOD_DIGEST;
             rvalue = (bv<<16) | av;

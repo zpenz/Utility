@@ -107,7 +107,7 @@
                 BValue = (BValue + AValue);
             }
 
-            diff df = diff(AValue,BValue,MValue.c_str());
+            diff df = diff(AValue,BValue,MValue.c_str(),pos);
             df.index = pos;
             pos+=size;
             data.push_back(df);
@@ -135,8 +135,8 @@
                 BValue = BValue + AValue%MOD_DIGEST;
             }
 
-            diff df = diff(AValue,BValue,MValue.c_str());
-            df.index = pos++;
+            diff df = diff(AValue,BValue,MValue.c_str(),pos++);
+            // df.index = pos++;
             data.push_back(df);
 
             fseek(file,++startpos,SEEK_SET);
@@ -164,15 +164,15 @@
             AValue = (AValue+static_cast<int>(buf[index]));
             BValue = (BValue + AValue);
         }
-        data.push_back(diff(AValue,BValue,""));
+        data.push_back(diff(AValue,BValue,"",0));
 
         while((size = fread(bufbk,sizeof(char),CHUNK_SIZE,file))>0){
             for(int j =0;j<size;j++){
                 AValue -= (bufcur[j]-static_cast<int>(bufbk[j]));
                 BValue -= (CHUNK_SIZE*(bufcur[j])-AValue+1);
 
-                diff df = diff(AValue,BValue,"");
-                df.index = pos++;
+                diff df = diff(AValue,BValue,"",pos++);
+                // df.index = pos++;
                 data.push_back(df);
             }
 
@@ -406,10 +406,12 @@
         fstream f1(src,f1.binary|f1.in);
         fstream fs = fstream(src+AString(".marge"),fstream::in | fstream::out | fstream::trunc);
         auto ret = LoadDiff<diff>(dffile);
+        // auto ret = CalcFileSlideDiff("3.txt");
         
         std::map<int,diff> store1;
         for_each(ret.begin(),ret.end(),[&](diff & item){
             store1[item.rvalue] = item;
+            log(item.index);
         });
 
         //roll
@@ -423,47 +425,58 @@
         int startpos = 0;
         int length = 0;
         int offset = 0;
+        volatile int pos = 0;
         
-        while(i<ret2.size()){
+        while(i<ret2.size())
+        {
             auto localitem = ret2[i];
             auto remoteitem = store1.find(localitem.rvalue);
-            if(remoteitem!= store1.end()){
+
+            if(remoteitem!= store1.end())
+            {
+                log("remote ",pos);
                 f1.seekg(i);
                 char buf[CHUNK_SIZE];
                 f1.read(buf,CHUNK_SIZE);
                 auto md5 = MD5::Md516(buf,CHUNK_SIZE);
-                if(strcmp(md5.c_str(),remoteitem->second.MD5Value)==0){
 
-                    if(bDiff){
+                if(strcmp(md5.c_str(),remoteitem->second.MD5Value)==0)
+                {
+                    if(bDiff)
+                    {
                         log("diff length ",length);
                         bDiff = false;
+                        offset+=length;
                         list.push_back(range(startpos,length,offset));
                     }
 
                     //same block
                     log("localitem: ",localitem.index);
-                    list.push_back(range(localitem.index,CHUNK_SIZE,i,true));
+                    list.push_back(range(remoteitem->second.index,CHUNK_SIZE,i,true));
                     log("same block index",localitem.index);
                     i+=CHUNK_SIZE;
-                }else
-                    goto other;
-
-            }else{
-           other:
-                i++;
-                //delay
-                if(bDiff){
-                    length++;
-                }else{
-                    bDiff = true;
-                    startpos = i;
-                    length = 0;
+                    offset+=length;
+                    continue;
                 }
             }
+            
+            //delay
+            if(bDiff)
+            {
+                length++;
+            }
+            else
+            {
+                bDiff = true;
+                startpos = localitem.index;
+                length = 0;
+            }
+            i++;
         }
 
         // if last is diff
-        if(bDiff){
+        if(bDiff)
+        {
             bDiff = false;
             list.push_back(range(startpos,length,i));
         }
@@ -510,6 +523,7 @@
         fstream fs = fstream("3.marge",fstream::in | fstream::out | fstream::trunc);
 
         for_each(oplist.begin(),oplist.end(),[&](range& rg){
+            log("index ",rg.index," offset ",rg.offset," length ",rg.length," same ",rg.sameblock);
             if(rg.sameblock){
                 f1.seekg(rg.index);
                 char buf[CHUNK_SIZE];
