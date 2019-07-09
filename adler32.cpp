@@ -1,6 +1,7 @@
     #include "adler32.hpp"
     #include "md5.h"
     #include "HttpUtility.hpp"
+    #include <algorithm>
     #include <map>
 
     void FileDelete(const AString& strName,int pos,int length){
@@ -411,7 +412,7 @@
         std::map<int,diff> store1;
         for_each(ret.begin(),ret.end(),[&](diff & item){
             store1[item.rvalue] = item;
-            log(item.index);
+            // log(item.index);
         });
 
         //roll
@@ -425,7 +426,6 @@
         int startpos = 0;
         int length = 0;
         int offset = 0;
-        volatile int pos = 0;
         
         while(i<ret2.size())
         {
@@ -434,7 +434,8 @@
 
             if(remoteitem!= store1.end())
             {
-                log("remote ",pos);
+
+                log("i = ",i);
                 f1.seekg(i);
                 char buf[CHUNK_SIZE];
                 f1.read(buf,CHUNK_SIZE);
@@ -442,12 +443,13 @@
 
                 if(strcmp(md5.c_str(),remoteitem->second.MD5Value)==0)
                 {
+                    // log(buf); return list;
                     if(bDiff)
                     {
-                        log("diff length ",length);
+                        log("diff length ",length); 
                         bDiff = false;
                         offset+=length;
-                        list.push_back(range(startpos,length,offset));
+                        list.push_back(range(startpos, length, offset));
                     }
 
                     //same block
@@ -468,8 +470,8 @@
             else
             {
                 bDiff = true;
-                startpos = localitem.index;
-                length = 0;
+                startpos = localitem.index==0?0:localitem.index+1;
+                length = 1;
             }
             i++;
         }
@@ -480,6 +482,9 @@
             bDiff = false;
             list.push_back(range(startpos,length,i));
         }
+
+        //<<CHUNK_SIZE>
+        log("i=",i);
 
         f1.close();
         fs.close();
@@ -513,10 +518,11 @@
         // Reverse(fileString, file2String,fileString.size(),file2String.size());
         #pragma endregion
 
-        SaveFile("1.diff",CalcFileSlideDiff("3.txt"));
+        SaveFile("1.diff",CalcFileSlideDiff("2.txt"));
 
         localListener ls =  localListener("2.txt");
-        vector<range> oplist = performMarge("2.txt","1.diff",ls);
+        //bak 3->2 
+        vector<range> oplist = performMarge("3.txt","1.diff",ls);
 
         fstream f1 = fstream("2.txt",f1.binary|f1.in);
         fstream f2 = fstream("3.txt",f1.binary|f1.in);
@@ -532,9 +538,14 @@
             }else{
                 f2.seekg(rg.index);
                 char buf[rg.length];
+                // log("------------------------------------------");
+                // log(buf);
+                // log("------------------------------------------");
                 f2.read(buf,rg.length);
-                fs.write(buf,CHUNK_SIZE);
+                fs.write(buf, rg.length);
             }
         });
+
+        end:
         return 0;
     }
