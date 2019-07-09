@@ -58,7 +58,7 @@ namespace MD5{
     }
 
     pbyte PADDING[64] = {0x80};
-    const char HEX[16] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+    const char HEX[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
     uint32 state[4] = {
         0x67452301,
@@ -257,7 +257,6 @@ namespace MD5{
             memcpy(_count, oldCount, 8);
         };
 
-
         update((pbyte*)input,length);
         final();
         return bytesToHexString(_digest,16).c_str();
@@ -274,7 +273,6 @@ namespace MD5{
     AString Md516(const AString& str){
         return Md5(str).substr(8,16);
     }
-
 
 }
 

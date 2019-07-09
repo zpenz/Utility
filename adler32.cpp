@@ -373,15 +373,38 @@
     }
     #pragma endregion
 
+    template<typename T=AString>
     class WriteListener{
+        protected:
+            T data;
         public:
             virtual void WriteContent(int pos,int length,fstream & stream)=0; 
+            virtual ~WriteListener(){};
     };
 
-    void performMarge(const char * src,const char * dffile,WriteListener& listener){
+    class localListener:public WriteListener<>{
+        public:
+            localListener(const AString& _data) { data = move(_data);}
+
+            void WriteContent(int pos,int length,fstream & stream) override{
+                fstream sf = fstream(data,sf.in|sf.binary);
+                sf.seekg(pos);
+                log("seek pos ",pos," length ",length);
+                char buf[CHUNK_SIZE];
+
+                for(int index=0;index<length;){
+                    sf.read(buf,CHUNK_SIZE);
+                    auto size = sf.gcount();
+                    index+=size;
+                    stream.write(buf,size);
+                }
+
+            };
+    };
+
+    vector<range> performMarge(const char * src,const char * dffile,WriteListener<>& listener){
         fstream f1(src,f1.binary|f1.in);
-        fstream fs = fstream(src+AString(".diff"),fstream::in | fstream::out | fstream::trunc);
-        //Save
+        fstream fs = fstream(src+AString(".marge"),fstream::in | fstream::out | fstream::trunc);
         auto ret = LoadDiff<diff>(dffile);
         
         std::map<int,diff> store1;
@@ -400,42 +423,37 @@
         int startpos = 0;
         int length = 0;
         int offset = 0;
-
+        
         while(i<ret2.size()){
-            auto item = ret2[i];
-            auto findret = store1.find(item.rvalue);
-            if(findret!= store1.end()){
-                log("queal ","index",item.index);
-                f1.seekg(findret->second.index);
+            auto localitem = ret2[i];
+            auto remoteitem = store1.find(localitem.rvalue);
+            if(remoteitem!= store1.end()){
+                f1.seekg(i);
                 char buf[CHUNK_SIZE];
                 f1.read(buf,CHUNK_SIZE);
                 auto md5 = MD5::Md516(buf,CHUNK_SIZE);
-                if(strcmp(md5.c_str(),findret->second.MD5Value)==0){
-                    list.push_back(range(item.index,length,i,true));
-                    log("queal ","index",item.index);
-                    i+=CHUNK_SIZE;
-                    if(bDiff){
-                        // f2.seekg(startpos);
-                        // char wbuf[length];
-                        // f2.read(wbuf,length);
-                        // fs.write(wbuf,length);
-                        listener.WriteContent(startpos,length,fs);
-                        bDiff = false;
-                        list.push_back(range(startpos,length,i));
-                    }
-                }else{
-                    goto other;
-                }
+                if(strcmp(md5.c_str(),remoteitem->second.MD5Value)==0){
 
-                listener.WriteContent(startpos,CHUNK_SIZE,fs);
+                    if(bDiff){
+                        log("diff length ",length);
+                        bDiff = false;
+                        list.push_back(range(startpos,length,offset));
+                    }
+
+                    //same block
+                    log("localitem: ",localitem.index);
+                    list.push_back(range(localitem.index,CHUNK_SIZE,i,true));
+                    log("same block index",localitem.index);
+                    i+=CHUNK_SIZE;
+                }else
+                    goto other;
 
             }else{
-                other:
-                //delay
+           other:
                 i++;
+                //delay
                 if(bDiff){
                     length++;
-                    startpos++;
                 }else{
                     bDiff = true;
                     startpos = i;
@@ -444,25 +462,19 @@
             }
         }
 
-        //other
+        // if last is diff
         if(bDiff){
-            listener.WriteContent(startpos,length,fs);
             bDiff = false;
             list.push_back(range(startpos,length,i));
         }
 
-        SaveFile<range>("op.list",list);
-        for_each(list.begin(),list.end(),[](range & item){
-            log("item ",item.index);
-        });
-
         f1.close();
         fs.close();
+        return list;
     }
 
     int main(int argc, char const *argv[])
     {
-
         #pragma region --diff test
         // File Diff
         // vector<AString> fileString = vector<AString>();
@@ -486,8 +498,29 @@
         // }
 
         // Reverse(fileString, file2String,fileString.size(),file2String.size());
-
         #pragma endregion
 
+        SaveFile("1.diff",CalcFileSlideDiff("3.txt"));
+
+        localListener ls =  localListener("2.txt");
+        vector<range> oplist = performMarge("2.txt","1.diff",ls);
+
+        fstream f1 = fstream("2.txt",f1.binary|f1.in);
+        fstream f2 = fstream("3.txt",f1.binary|f1.in);
+        fstream fs = fstream("3.marge",fstream::in | fstream::out | fstream::trunc);
+
+        for_each(oplist.begin(),oplist.end(),[&](range& rg){
+            if(rg.sameblock){
+                f1.seekg(rg.index);
+                char buf[CHUNK_SIZE];
+                f1.read(buf,CHUNK_SIZE);
+                fs.write(buf,CHUNK_SIZE);
+            }else{
+                f2.seekg(rg.index);
+                char buf[rg.length];
+                f2.read(buf,rg.length);
+                fs.write(buf,CHUNK_SIZE);
+            }
+        });
         return 0;
     }

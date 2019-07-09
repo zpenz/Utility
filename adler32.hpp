@@ -13,12 +13,13 @@
         int  offset;
         bool sameblock;
         range(int _index,int _length,int _offset,bool _sb = false):index(_index),length(_length),offset(_offset),sameblock(_sb){}
+        range(){}
     };
 
     struct diff{
-        int rvalue;
-        int index = 0;
         char MD5Value[MD5_SIZE];
+        int index = 0;
+        int rvalue;
         diff(){};
         diff(int av,int bv,const char* mv)
         {

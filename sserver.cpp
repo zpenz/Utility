@@ -41,7 +41,7 @@ int main(void){
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, iRuse, sizeof(iRuse));
     int nRecvBuf=8*1024;
     setsockopt(sock,SOL_SOCKET,SO_RCVBUF,(const char*)&nRecvBuf,sizeof(int));
-    auto ibret = bind(sock,reinterpret_cast<sockaddr*>(&sockAddr),sizeof(sockAddr));
+    auto ibret = ::bind(sock,reinterpret_cast<sockaddr*>(&sockAddr),sizeof(sockAddr));
     if(ibret!=0) return 0;
 
     listen(sock,5);
@@ -49,7 +49,6 @@ int main(void){
     SOCKET sockConnect = 0;
     int size = sizeof(SOCKADDR);
 
-   
     fstream fs,fo;
 
     int totalsize=0;
@@ -104,7 +103,7 @@ int main(void){
                 exit(-1);
             }
             iCurrentIndex = 0;
-            
+
             log("size: ",ibret);
             fs << "SIZE: " << ibret << endl;
 
@@ -115,104 +114,105 @@ int main(void){
                 copy(ibret);
             }
 
-            auto headsize=((PACKAGE_HEAD*)buf)->package_size;
-            auto datakind=((PACKAGE_HEAD*)buf)->datakind;
-            cout<<"HEAD_SIZE:"<<headsize<<endl;
-            fs << "HEAD_SIZE:" << headsize << endl;
-            if(headsize==0) continue;
+            log("recv: ",buf);
+        //     auto headsize=((PACKAGE_HEAD*)buf)->package_size;
+        //     auto datakind=((PACKAGE_HEAD*)buf)->datakind;
+        //     cout<<"HEAD_SIZE:"<<headsize<<endl;
+        //     fs << "HEAD_SIZE:" << headsize << endl;
+        //     if(headsize==0) continue;
  
-            int iPos = 0;
-            while (iPos < ibret + iLastBufferSize)
-            {
-                if (datakind == 1 )
-                {
-                    if (iPos + sizeof(FILE_PACKAGE) > ibret + iLastBufferSize)
-                        break;
-                    //write
-                    FILE_PACKAGE *file_package = nullptr;
-                    file_package = (FILE_PACKAGE *)&buf[iPos];
-                    fs << "Package Start-------------------------------------" << endl;
-                    fs << "Recv_Data:"
-                       << "\n";
-                    fs << "file_index: " << file_package->index << endl;
-                    fs << "file_name: " << file_package->file_name << endl;
-                    fs << "file_size: " << file_package->file_info_size << endl;
-                    fs << "package_size: " << file_package->head.package_size << endl;
-                    fs<<  "total_size: "<<file_package->file_total_size<<endl;
-                    fs << "package_content: " << file_package->package_content << endl;
-                    fs << "package End---------------------------------------" << endl;
-                    if(file_package->head.package_size<0 || file_package->head.package_size>sizeof(FILE_PACKAGE)) {
-                        cout<<"Error: Parse Error!"<<endl;
-                        exit(-1);
-                    }
-                    totalsize+=file_package->file_info_size;
-                    if(file_package->index ==0){
+        //     int iPos = 0;
+        //     while (iPos < ibret + iLastBufferSize)
+        //     {
+        //         if (datakind == 1 )
+        //         {
+        //             if (iPos + sizeof(FILE_PACKAGE) > ibret + iLastBufferSize)
+        //                 break;
+        //             //write
+        //             FILE_PACKAGE *file_package = nullptr;
+        //             file_package = (FILE_PACKAGE *)&buf[iPos];
+        //             fs << "Package Start-------------------------------------" << endl;
+        //             fs << "Recv_Data:"
+        //                << "\n";
+        //             fs << "file_index: " << file_package->index << endl;
+        //             fs << "file_name: " << file_package->file_name << endl;
+        //             fs << "file_size: " << file_package->file_info_size << endl;
+        //             fs << "package_size: " << file_package->head.package_size << endl;
+        //             fs<<  "total_size: "<<file_package->file_total_size<<endl;
+        //             fs << "package_content: " << file_package->package_content << endl;
+        //             fs << "package End---------------------------------------" << endl;
+        //             if(file_package->head.package_size<0 || file_package->head.package_size>sizeof(FILE_PACKAGE)) {
+        //                 cout<<"Error: Parse Error!"<<endl;
+        //                 exit(-1);
+        //             }
+        //             totalsize+=file_package->file_info_size;
+        //             if(file_package->index ==0){
                         
-                        cout<<string(file_package->file_name).substr(string(file_package->file_name).rfind("/")+1)<<endl;
-                        fo.open(
-                            string(file_package->file_name).substr(string(file_package->file_name).rfind("/")+1),
-                            ios::out|ios::binary);
-                    }
-                    fo.write(file_package->package_content, file_package->file_info_size);
+        //                 cout<<string(file_package->file_name).substr(string(file_package->file_name).rfind("/")+1)<<endl;
+        //                 fo.open(
+        //                     string(file_package->file_name).substr(string(file_package->file_name).rfind("/")+1),
+        //                     ios::out|ios::binary);
+        //             }
+        //             fo.write(file_package->package_content, file_package->file_info_size);
 
-                    iPos += sizeof(FILE_PACKAGE);
-                }
-                else if (datakind == 0 )
-                {
-                    if (iPos + sizeof(TRANSFORM_STATE) > ibret + iLastBufferSize)
-                        break;
-                    TRANSFORM_STATE* pState = (TRANSFORM_STATE*)&buf[iPos];
-                    if(strcmp(pState->message,"final")==0) goto goon;
-                    iPos += sizeof(TRANSFORM_STATE);
-                }
-                datakind = ((PACKAGE_HEAD *)&buf[iPos])->datakind;
-                fs << "iPos: " << iPos << endl;
-                fs<<"datakind: " <<datakind<<endl;
-                //error
-                // iCurrentIndex++;
-                // if (iCurrentIndex>100) {
-                //     cout<<"rep"<<endl;
-                //     exit(-1);
-                // }
-            }
-            //remain
-            if (iPos < ibret + iLastBufferSize){
-                iLastBufferSize = iLastBufferSize + ibret - iPos;
-                fs<<"iLastBufferSize: "<<iLastBufferSize<<endl;
-                memset(lastBuffer,0,MAX_BUFFER*2);
-                memcpy(lastBuffer, &buf[iPos], iLastBufferSize);
-                bFirst = false;
-            }else{
-                memset(lastBuffer, 0, MAX_BUFFER * 2);
-                iLastBufferSize = 0;
-                bFirst = true;
-            }
+        //             iPos += sizeof(FILE_PACKAGE);
+        //         }
+        //         else if (datakind == 0 )
+        //         {
+        //             if (iPos + sizeof(TRANSFORM_STATE) > ibret + iLastBufferSize)
+        //                 break;
+        //             TRANSFORM_STATE* pState = (TRANSFORM_STATE*)&buf[iPos];
+        //             if(strcmp(pState->message,"final")==0) goto goon;
+        //             iPos += sizeof(TRANSFORM_STATE);
+        //         }
+        //         datakind = ((PACKAGE_HEAD *)&buf[iPos])->datakind;
+        //         fs << "iPos: " << iPos << endl;
+        //         fs<<"datakind: " <<datakind<<endl;
+        //         //error
+        //         // iCurrentIndex++;
+        //         // if (iCurrentIndex>100) {
+        //         //     cout<<"rep"<<endl;
+        //         //     exit(-1);
+        //         // }
+        //     }
+        //     //remain
+        //     if (iPos < ibret + iLastBufferSize){
+        //         iLastBufferSize = iLastBufferSize + ibret - iPos;
+        //         fs<<"iLastBufferSize: "<<iLastBufferSize<<endl;
+        //         memset(lastBuffer,0,MAX_BUFFER*2);
+        //         memcpy(lastBuffer, &buf[iPos], iLastBufferSize);
+        //         bFirst = false;
+        //     }else{
+        //         memset(lastBuffer, 0, MAX_BUFFER * 2);
+        //         iLastBufferSize = 0;
+        //         bFirst = true;
+        //     }
       
-            // memset(sendBuf,0,MAX_BUFFER);
-            // TRANSFORM_STATE state;
-            // memset(&state,0,sizeof(TRANSFORM_STATE));
-            // memcpy(state.message,"receive",strlen("receive"));
-            // send(sockConnect,reinterpret_cast<char*>(&state),sizeof(state),0);
-            cout<<endl;
-            fs << endl;
+        //     // memset(sendBuf,0,MAX_BUFFER);
+        //     // TRANSFORM_STATE state;
+        //     // memset(&state,0,sizeof(TRANSFORM_STATE));
+        //     // memcpy(state.message,"receive",strlen("receive"));
+        //     // send(sockConnect,reinterpret_cast<char*>(&state),sizeof(state),0);
+        //     cout<<endl;
+        //     fs << endl;
 
-            //clear buf
-            memset(buf,0,MAX_BUFFER*2);
-            if(strcmp(((TRANSFORM_STATE*)buf)->message,"final")==0) break;
-        }
+        //     //clear buf
+        //     memset(buf,0,MAX_BUFFER*2);
+        //     if(strcmp(((TRANSFORM_STATE*)buf)->message,"final")==0) break;
+        // }
         
-        goon:;
-        fs<<"total size: "<<totalsize<<endl;
-        fs<<"total recv: "<<iTotalRecvSize<<endl; 
-        cout<<"speed time: "<<(GetTickCount()-dStartTime)*0.001<<endl;
-        memset(buf,0,MAX_BUFFER*2);
-        memset(lastBuffer,0,MAX_BUFFER*2);
-        iLastBufferSize = 0;
-        bFirst = true;
-        totalsize = 0; 
-        iTotalRecvSize = 0;
-        fo.close();
-        fs.close();   
+        // goon:;
+        // fs<<"total size: "<<totalsize<<endl;
+        // fs<<"total recv: "<<iTotalRecvSize<<endl; 
+        // cout<<"speed time: "<<(GetTickCount()-dStartTime)*0.001<<endl;
+        // memset(buf,0,MAX_BUFFER*2);
+        // memset(lastBuffer,0,MAX_BUFFER*2);
+        // iLastBufferSize = 0;
+        // bFirst = true;
+        // totalsize = 0; 
+        // iTotalRecvSize = 0;
+        // fo.close();
+        // fs.close();   
          #ifdef WIN32
          if(sock) closesocket(sockConnect);
          #else
@@ -226,4 +226,5 @@ int main(void){
     if(sock) shutdown(sock, 2);
     #endif
     return 0;
+    }
 }

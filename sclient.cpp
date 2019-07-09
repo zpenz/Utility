@@ -24,7 +24,7 @@ int main(int argc, char const *argv[]){
     sockAddr.sin_addr.s_addr = INADDR_ANY;    
     #endif                                                                                         
     sockAddr.sin_addr.s_addr = inet_addr("192.168.10.250");                                     
-          
+
     auto iRuse = "1";
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, iRuse, sizeof(iRuse));
     int nSendBuf=16*1024;
@@ -88,7 +88,6 @@ int main(int argc, char const *argv[]){
                 exit(-1);     
             }
         iTotalSendSize+=ibret;
-
 
         if(reader.eof()) {
             memset(&state,0,sizeof(TRANSFORM_STATE));
