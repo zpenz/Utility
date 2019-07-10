@@ -22,8 +22,9 @@ think.cpp
 *.list
 *.op
 *.cmake
+*.out
 !CMakeLists.txt
-
+CMakeFiles/*
 
 
 
