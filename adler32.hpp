@@ -16,6 +16,13 @@
         range(){}
     };
 
+    struct header{
+        int RangeOffset;
+        int RangeLength;
+        int DataOffset;
+        header(int ro,int rl,int df):RangeOffset(ro),RangeLength(rl),DataOffset(df){};
+    };
+
     struct diff{
         char MD5Value[MD5_SIZE];
         int index;

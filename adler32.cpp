@@ -403,11 +403,40 @@
             };
     };
 
+    void SaveRange(const vector<range>& list,const fstream& flocal,const char * savename){
+        fstream fs = fstream(savename,fstream::in | fstream::out | fstream::trunc);
+        auto headsize = sizeof(header);
+        auto offset = headsize+sizeof(range)*list.size();
+        header hd = header(headsize,list.size()*sizeof(range),offset);
+        fs.write(reinterpret_cast<char*>(&hd),sizeof(hd));
+        //write list
+        for_each(list.begin(),list.end(),[&](range& rg){
+            if(!rg.sameblock){
+                rg.offset = offset;
+                offset+=rg.length;
+                fs.write(reinterpret_cast<char*>(&rg),sizeof(rg));
+            }
+        });
+        //write data
+        for_each(list.begin(),list.end(),[&](range& rg){
+            if(!rg.sameblock){
+                flocal.seekg(rg.index);
+                char buf[CHUNK_SIZE];
+                for(int index=0;index<rg.length/CHUNK_SIZE;index++){
+                    flocal.read(buf,sizeof(buf));
+                    fs.write(buf,sizeof(buf));
+                }
+                flocal.read(buf,rg.length%CHUNK_SIZE);
+                fs.write(buf,rg.length%CHUNK_SIZE);
+            }
+        });
+        fs.close();
+    }
+
     vector<range> performMarge(const char * src,const char * dffile,WriteListener<>& listener){
         fstream f1(src,f1.binary|f1.in);
         fstream fs = fstream(src+AString(".marge"),fstream::in | fstream::out | fstream::trunc);
         auto ret = LoadDiff<diff>(dffile);
-        // auto ret = CalcFileSlideDiff("3.txt");
         
         std::map<int,diff> store1;
         for_each(ret.begin(),ret.end(),[&](diff & item){
@@ -489,6 +518,9 @@
         log("i=",i);
         if(i<filesize)
             list.push_back(range(i,(int)filesize-i,i));
+
+        //save range
+        SaveRange(list,f1,AString("src")+".op");
 
         f1.close();
         fs.close();
