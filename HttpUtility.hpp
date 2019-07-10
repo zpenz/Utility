@@ -34,6 +34,9 @@ namespace Utility
         Linker<KV> OtherRecord=Linker<KV>();
         Request(hString url);
         hString ToString();
+
+        hString Boundary="";
+        static Request Parse(const AString& buf);
     };
 
     struct TransListener{

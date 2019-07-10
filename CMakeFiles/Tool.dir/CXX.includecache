@@ -1,4 +1,4 @@
-#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
 
 #IncludeRegexScan: ^.*$
 
@@ -6,13 +6,13 @@
 
 #IncludeRegexTransform: 
 
-/Users/szp/Desktop/OneDrive/progma/Contain.h
+/mnt/c/Users/pSong/Desktop/Utility/Contain.h
 Utility.h
-/Users/szp/Desktop/OneDrive/progma/Utility.h
+/mnt/c/Users/pSong/Desktop/Utility/Utility.h
 
-/Users/szp/Desktop/OneDrive/progma/HttpUtility.cpp
+/mnt/c/Users/pSong/Desktop/Utility/HttpUtility.cpp
 HttpUtility.hpp
-/Users/szp/Desktop/OneDrive/progma/HttpUtility.hpp
+/mnt/c/Users/pSong/Desktop/Utility/HttpUtility.hpp
 WinSock2.h
 -
 ws2tcpip.h
@@ -30,47 +30,47 @@ iostream
 fstream
 -
 
-/Users/szp/Desktop/OneDrive/progma/HttpUtility.hpp
+/mnt/c/Users/pSong/Desktop/Utility/HttpUtility.hpp
 pString.hpp
-/Users/szp/Desktop/OneDrive/progma/pString.hpp
+/mnt/c/Users/pSong/Desktop/Utility/pString.hpp
 Contain.h
-/Users/szp/Desktop/OneDrive/progma/Contain.h
+/mnt/c/Users/pSong/Desktop/Utility/Contain.h
 functional
 -
 
-/Users/szp/Desktop/OneDrive/progma/Utility.h
+/mnt/c/Users/pSong/Desktop/Utility/Utility.h
 iostream
 -
 memory
 -
 
-/Users/szp/Desktop/OneDrive/progma/adler32.cpp
+/mnt/c/Users/pSong/Desktop/Utility/adler32.cpp
 adler32.hpp
-/Users/szp/Desktop/OneDrive/progma/adler32.hpp
+/mnt/c/Users/pSong/Desktop/Utility/adler32.hpp
 md5.h
-/Users/szp/Desktop/OneDrive/progma/md5.h
+/mnt/c/Users/pSong/Desktop/Utility/md5.h
 HttpUtility.hpp
-/Users/szp/Desktop/OneDrive/progma/HttpUtility.hpp
+/mnt/c/Users/pSong/Desktop/Utility/HttpUtility.hpp
 algorithm
 -
 map
 -
 
-/Users/szp/Desktop/OneDrive/progma/adler32.hpp
+/mnt/c/Users/pSong/Desktop/Utility/adler32.hpp
 vector
 -
 pString.hpp
-/Users/szp/Desktop/OneDrive/progma/pString.hpp
+/mnt/c/Users/pSong/Desktop/Utility/pString.hpp
 
-/Users/szp/Desktop/OneDrive/progma/md5.cpp
+/mnt/c/Users/pSong/Desktop/Utility/md5.cpp
 md5.h
-/Users/szp/Desktop/OneDrive/progma/md5.h
+/mnt/c/Users/pSong/Desktop/Utility/md5.h
 
-/Users/szp/Desktop/OneDrive/progma/md5.h
+/mnt/c/Users/pSong/Desktop/Utility/md5.h
 pString.hpp
-/Users/szp/Desktop/OneDrive/progma/pString.hpp
+/mnt/c/Users/pSong/Desktop/Utility/pString.hpp
 
-/Users/szp/Desktop/OneDrive/progma/pString.hpp
+/mnt/c/Users/pSong/Desktop/Utility/pString.hpp
 memory
 -
 iostream
@@ -88,5 +88,5 @@ cmath
 string.h
 -
 Utility.h
-/Users/szp/Desktop/OneDrive/progma/Utility.h
+/mnt/c/Users/pSong/Desktop/Utility/Utility.h
 

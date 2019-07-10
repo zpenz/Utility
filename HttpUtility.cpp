@@ -51,6 +51,14 @@ hString Request::ToString(){
     return header;
 }
 
+Request Request::Parse(const AString& buf){
+    // auto ret = buf.Split("\n");
+    // for(int index=0;index<ret.size;index++){
+    //     auto item = ret[index];
+        
+    // }
+}
+
 hString::KeyValuePair<hString> CutUrl(const hString& url){
     if(url.StartWith("http"))
         return url.Cut("/",3);

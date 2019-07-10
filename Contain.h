@@ -144,14 +144,29 @@ namespace Contain{
             return false;
         }
 
+        // bool Contain(T value){
+        //     if (size == 0)
+        //         return false;
+        //     Nodetype node = value;
+            
+        //     auto temp = head->child;
+        //     while(temp && temp!=last){
+        //         if(node == *temp)
+        //             return true;
+        //         temp = temp->child;
+        //     }
+        //     return false;
+        // }
+        
+
         Linker(const T & node){
             Add(node);
         }
 
         template<class U,class ...V>
-        Linker(const U node,V...v){
+        Linker(U node,V...v){
             Add(node);
-            Linker(v...);
+            Add(v...);
         }
 
         Linker(){

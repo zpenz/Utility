@@ -49,7 +49,7 @@ int main(void){
     SOCKET sockConnect = 0;
     int size = sizeof(SOCKADDR);
 
-    fstream fs,fo;
+    fstream fo;
 
     int totalsize=0;
     //last
@@ -90,7 +90,7 @@ int main(void){
 
         plog("recv...");
 
-        fs.open("translate.log",ios::out|ios::binary);
+        // fs.open("translate.log",ios::out|ios::binary);
 
         dStartTime = GetTickCount();
         while(1){
@@ -105,7 +105,7 @@ int main(void){
             iCurrentIndex = 0;
 
             plog("size: ",ibret);
-            fs << "SIZE: " << ibret << endl;
+            // fs << "SIZE: " << ibret << endl;
 
             iTotalRecvSize+=ibret;
             //Megra

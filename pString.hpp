@@ -387,6 +387,23 @@ using namespace utility;
             auto value = String<T>(*this,realpos+split.length,length);
             return KeyValuePair<>(key,value);
         }
+
+        // typedef Contain::Linker<T> CL;
+        // CL Split(CL slist)
+        // {
+        //     CL list;
+        //     auto temp = *this;
+        //     String<T> store = "";
+        //     for(int index=0;index<length;index++){
+        //         if(slist.Contain(temp[index])){
+        //             list.Add(store.c_str());
+        //             store = "";
+        //         }else{
+        //             store+=temp;
+        //         }
+        //     }
+        //     return list;
+        // }
         
         ///des copy last 0
         friend String<T> operator+(const String<T>& src,const String<T>& des){
