@@ -484,7 +484,11 @@
         }
 
         //<<CHUNK_SIZE>
+        f1.seekg(0,f1.end);
+        auto filesize = f1.tellg();
         log("i=",i);
+        if(i<filesize)
+            list.push_back(range(i,(int)filesize-i,i));
 
         f1.close();
         fs.close();
