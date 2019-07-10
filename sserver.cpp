@@ -80,7 +80,7 @@ int main(void){
 
     DWORD dStartTime = GetTickCount();
     while(1){
-        log("accept...");
+        plog("accept...");
        
         #ifdef WIN32
         sockConnect = accept(sock, (SOCKADDR*)&sockAddr,&size);
@@ -88,7 +88,7 @@ int main(void){
         sockConnect = accept(sock, (SOCKADDR*)&sockAddr,reinterpret_cast<socklen_t*>(&size));
         #endif
 
-        log("recv...");
+        plog("recv...");
 
         fs.open("translate.log",ios::out|ios::binary);
 
@@ -104,7 +104,7 @@ int main(void){
             }
             iCurrentIndex = 0;
 
-            log("size: ",ibret);
+            plog("size: ",ibret);
             fs << "SIZE: " << ibret << endl;
 
             iTotalRecvSize+=ibret;
@@ -114,7 +114,8 @@ int main(void){
                 copy(ibret);
             }
 
-            log("recv: ",buf);
+            plog("recv: ",buf);
+            return 0;
         //     auto headsize=((PACKAGE_HEAD*)buf)->package_size;
         //     auto datakind=((PACKAGE_HEAD*)buf)->datakind;
         //     cout<<"HEAD_SIZE:"<<headsize<<endl;
