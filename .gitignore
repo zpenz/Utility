@@ -20,6 +20,10 @@ think.cpp
 *.apk
 *.marge
 *.list
+*.op
+*.cmake
+!CMakeLists.txt
+
 
 
 

@@ -20,6 +20,7 @@
         int RangeOffset;
         int RangeLength;
         int DataOffset;
+        header(){};
         header(int ro,int rl,int df):RangeOffset(ro),RangeLength(rl),DataOffset(df){};
     };
 

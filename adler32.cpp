@@ -338,25 +338,25 @@
                             for (long index = pyEnd+1; index <= yEnd; index++)
                             {
                                 if(k<pk && index==yEnd) break;
-                                log("  ",b[index-1]);
+                                plog("  ",b[index-1]);
                                 alist.push_back(Action(Action::TargetType::TargetRemote,
                                 Action::ActionType::Normal,index-1));
-                                // log("  ",index-1);
+                                // plog("  ",index-1);
                             }
                         }
 
                         if(k<pk )  {
-                            log("+ ",b[yEnd-1]);
+                            plog("+ ",b[yEnd-1]);
                             alist.push_back(Action(Action::TargetType::TargetRemote,
                                 Action::ActionType::Insert,yEnd-1));
                         }
-                        // if(k<pk )  log("+ ","b ",yEnd-1);
+                        // if(k<pk )  plog("+ ","b ",yEnd-1);
                         if(k>pk) {
-                            log("- ",a[xEnd-1]);
+                            plog("- ",a[xEnd-1]);
                             alist.push_back(Action(Action::TargetType::TargetLocal,
                                 Action::ActionType::Delete,xEnd-1));
                         }
-                        // if(k>pk) log("- ","a ",xEnd-1);
+                        // if(k>pk) plog("- ","a ",xEnd-1);
 
                         pk = k;
                         pyEnd = yEnd;
@@ -390,7 +390,7 @@
             void WriteContent(int pos,int length,fstream & stream) override{
                 fstream sf = fstream(data,sf.in|sf.binary);
                 sf.seekg(pos);
-                log("seek pos ",pos," length ",length);
+                plog("seek pos ",pos," length ",length);
                 char buf[CHUNK_SIZE];
 
                 for(int index=0;index<length;){
@@ -403,7 +403,7 @@
             };
     };
 
-    void SaveRange(const vector<range>& list,const fstream& flocal,const char * savename){
+    void SaveRange(vector<range>& list,fstream& flocal,const char * savename){
         fstream fs = fstream(savename,fstream::in | fstream::out | fstream::trunc);
         auto headsize = sizeof(header);
         auto offset = headsize+sizeof(range)*list.size();
@@ -411,11 +411,9 @@
         fs.write(reinterpret_cast<char*>(&hd),sizeof(hd));
         //write list
         for_each(list.begin(),list.end(),[&](range& rg){
-            if(!rg.sameblock){
                 rg.offset = offset;
                 offset+=rg.length;
                 fs.write(reinterpret_cast<char*>(&rg),sizeof(rg));
-            }
         });
         //write data
         for_each(list.begin(),list.end(),[&](range& rg){
@@ -441,7 +439,6 @@
         std::map<int,diff> store1;
         for_each(ret.begin(),ret.end(),[&](diff & item){
             store1[item.rvalue] = item;
-            // log(item.index);
         });
 
         //roll
@@ -464,7 +461,7 @@
             if(remoteitem!= store1.end())
             {
 
-                log("i = ",i);
+                plog("i = ",i);
                 f1.seekg(i);
                 char buf[CHUNK_SIZE];
                 f1.read(buf,CHUNK_SIZE);
@@ -472,19 +469,19 @@
 
                 if(strcmp(md5.c_str(),remoteitem->second.MD5Value)==0)
                 {
-                    // log(buf); return list;
+                    // plog(buf); return list;
                     if(bDiff)
                     {
-                        log("diff length ",length); 
+                        plog("diff length ",length); 
                         bDiff = false;
                         offset+=length;
                         list.push_back(range(startpos, length, offset));
                     }
 
                     //same block
-                    log("localitem: ",localitem.index);
+                    plog("localitem: ",localitem.index);
                     list.push_back(range(remoteitem->second.index,CHUNK_SIZE,i,true));
-                    log("same block index",localitem.index);
+                    plog("same block index",localitem.index);
                     i+=CHUNK_SIZE;
                     offset+=length;
                     continue;
@@ -515,12 +512,12 @@
         //<<CHUNK_SIZE>
         f1.seekg(0,f1.end);
         auto filesize = f1.tellg();
-        log("i=",i);
+        plog("i=",i);
         if(i<filesize)
             list.push_back(range(i,(int)filesize-i,i));
 
         //save range
-        SaveRange(list,f1,AString("src")+".op");
+        SaveRange(list,f1,AString(src)+".op");
 
         f1.close();
         fs.close();
@@ -558,30 +555,46 @@
 
         localListener ls =  localListener("2.txt");
         //bak 3->2 
-        vector<range> oplist = performMarge("3.txt","1.diff",ls);
+        vector<range> oplist = performMarge("app-release.apk","1.diff",ls);
 
-        fstream f1 = fstream("2.txt",f1.binary|f1.in);
-        fstream f2 = fstream("3.txt",f1.binary|f1.in);
-        fstream fs = fstream("3.marge",fstream::in | fstream::out | fstream::trunc);
+        // fstream f1 = fstream("2.txt",f1.binary|f1.in);
+        // fstream f2 = fstream("3.txt",f1.binary|f1.in);
+        // fstream fs = fstream("3.marge",fstream::in | fstream::out | fstream::trunc);
 
-        for_each(oplist.begin(),oplist.end(),[&](range& rg){
-            log("index ",rg.index," offset ",rg.offset," length ",rg.length," same ",rg.sameblock);
-            if(rg.sameblock){
-                f1.seekg(rg.index);
-                char buf[CHUNK_SIZE];
-                f1.read(buf,CHUNK_SIZE);
-                fs.write(buf,CHUNK_SIZE);
-            }else{
-                f2.seekg(rg.index);
-                char buf[rg.length];
-                // log("------------------------------------------");
-                // log(buf);
-                // log("------------------------------------------");
-                f2.read(buf,rg.length);
-                fs.write(buf, rg.length);
-            }
-        });
+        // for_each(oplist.begin(),oplist.end(),[&](range& rg){
+        //     plog("index ",rg.index," offset ",rg.offset," length ",rg.length," same ",rg.sameblock);
+        //     if(rg.sameblock){
+        //         f1.seekg(rg.index);
+        //         char buf[CHUNK_SIZE];
+        //         f1.read(buf,CHUNK_SIZE);
+        //         fs.write(buf,CHUNK_SIZE);
+        //     }else{
+        //         f2.seekg(rg.index);
+        //         char buf[rg.length];
+        //         f2.read(buf,rg.length);
+        //         fs.write(buf, rg.length);
+        //     }
+        // });
 
-        end:
+        Utility::Linker<AString> params;
+        params.Add("file");
+        params.Add("3.txt.op");
+
+        Utility::FormPost("http://192.168.10.158:5555/cgi-bin/xk_file_rsync_upload.cgi",params,99999,Utility::TransListener(nullptr,[](AString string){
+            plog("result: ",string);
+        },nullptr),[](Utility::Request& req){
+        req.OtherRecord.Add(Utility::KV("XK_JSON","{\"admin_id\":1001,\"sid\":\"8oCf4fda0tQKGQQVP330ciHWnK0kF5V\",\"path_name\":\"/var/share/mp/xklvm1562233594/gyy/\",\"file_name\":\"ppppppppppssssssss.txt\"}"));
+    });
+
+        fstream f1 = fstream("3.txt.op",f1.binary|f1.in);
+        header hd;
+        f1.read((char*)&hd,sizeof(hd));
+        plog(hd.RangeLength," ",hd.DataOffset," ",hd.RangeOffset," ",hd.RangeLength/sizeof(range));
+        for(int index=0;index<hd.RangeLength/sizeof(range);index++){
+            range item;
+            f1.read((char*)&item,sizeof(item));
+            plog(item.length," ",item.index," ",item.offset);
+        }
+
         return 0;
     }

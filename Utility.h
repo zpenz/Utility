@@ -24,7 +24,7 @@ namespace utility{
     #define SAFE_CLOSE(subject)\
         if(subject){ fclose(subject);}
 
-    #define log(params...)\
+    #define plog(params...)\
         {show_message(params);\
         cout<<"                          "<<"(in File:"<<__FILE__<<" Func:"<<__FUNCTION__<<" Line:"<<__LINE__<<")\n";}
 

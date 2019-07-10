@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.0)
+project(Tool)
+set(SOURCE adler32.cpp md5.cpp HttpUtility.cpp)
+set(CMAKE_CXX_STANDARD 14)
+add_executable(${PROJECT_NAME} ${SOURCE})
