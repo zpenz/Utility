@@ -7,6 +7,7 @@ XkWelcomeUser/*
 FrpcInfo/*
 XkAgent/*
 ruan/*
+CMakeFiles/*
 lua/*
 .vscode/*
 *.ipch
@@ -24,7 +25,6 @@ think.cpp
 *.cmake
 *.out
 !CMakeLists.txt
-CMakeFiles/*
 
 
 
