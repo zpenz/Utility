@@ -93,22 +93,17 @@ int main(void){
             plog("size: ",ibret);
 
             iTotalRecvSize+=ibret;
-            //Megra
-            // if (!bFirst)
-            // {
-            //     copy(ibret);
-            // }
 
             if(ibret!=0){
                 if(bFirst){
                     plog("recvlength: ",ibret);
                     auto ret = AString(buf).Cut("\r\n\r\n",1);
                     AString hd = ret._key;
-                    plog("content: ",ret._value._length());
                     request = Request::Parse(hd);
+                    plog("content: ",ret._value._length()," length ");
                     return 0;
                 }else{
-                    
+
                 }
             }
 

@@ -11,6 +11,8 @@ namespace Utility
     using KV = KeyValuePair<hString,hString>;
     extern AString::KeyValuePair<hString> CutUrl(const hString& url);
 
+    #define TRANSLATE_SIZE 4096
+
     struct Request:pobject<Request>{
         hString ContentType="";
         hString ContentLength="";

@@ -185,7 +185,7 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListe
     show_message("header: ",header);
     ibret = send(sock,header.c_str(),header._length(),0);
 
-    char tempbuf[4096*10];
+    char tempbuf[TRANSLATE_SIZE];
     for(int index=0;index<list.size;index+=2){
         if(list[index].Equal("file")){
             auto filename = list[index+1].Cut("/",-1)._value;
@@ -199,6 +199,7 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListe
                 memset(tempbuf,0,sizeof(tempbuf));
                 reader.read(tempbuf,sizeof(tempbuf));
                 auto size = reader.gcount();
+                
                 ibret = send(sock,tempbuf,size,0);
                 sendlength+=ibret;
                 if(listener.OnChange!=nullptr) listener.OnChange(sendlength,length);
