@@ -85,6 +85,7 @@ int main(void){
         #endif
 
         plog("recv...");
+        Request request;
 
         dStartTime = GetTickCount();
         while(1){
@@ -108,18 +109,15 @@ int main(void){
             }
 
             if(ibret!=0){
-                plog("recvlength: ",ibret);
-                AString hd = AString(buf).Cut("\r\n\r\n",1)._key;
-                plog(hd);
-                plog("---------------------------------------");
-                auto  req = Request::Parse(hd);
-                // plog("length ", req.ContentLength,"boundary ",req.Boundary);
-                // AString ack = "ACK FROM TCP Server";
-                // send(sockConnect,ack,ack._length(),0);
+                if(bFirst){
+                    plog("recvlength: ",ibret);
+                    plog(buf);
+                    AString hd = AString(buf).Cut("\r\n\r\n",1)._key;
+                    request = Request::Parse(hd);
+                    return 0;
+                }else{
 
-                plog("---------------------------------------");
-                // plog("parse: ",Request::Parse(buf).ToString());
-                return 0;
+                }
             }
 
         //     auto headsize=((PACKAGE_HEAD*)buf)->package_size;

@@ -374,6 +374,11 @@
             long count = cutpos<0?cutpos*-1:cutpos;
             long pos = 0;
             auto temp = *this;
+
+            if(-1 == temp.find(split)){
+                return KeyValuePair<>(temp,temp);
+            }
+
             long realpos = 0;
             while(count>0){
                 pos  = cutpos<0?temp.rfind(split):temp.find(split);

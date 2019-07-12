@@ -59,11 +59,8 @@ Request Request::Parse(const AString& buf) {
         auto item = ret[index];
         if(item.StartWith("POST") || item.StartWith("GET")){
             auto first = item.Split(" ");
-            // for(int indeZ=0;indeZ<first.size;indeZ++){
-                // plog("first ",first[indeZ]);
-            // }
             if(first.size<3){
-                plog("error");
+                plog("error parse post/get");
                 return req;
             }
             req.Methon = first[0];
@@ -93,11 +90,8 @@ Request Request::Parse(const AString& buf) {
             }else
             if(keyvalue._key.StartWith("Content-Type")){
                 req.ContentType = value;
-                plog("zxxxxxxxx",value);
-                plog("Contain? ",value.Contain("boundary"));
                 if(value.Contain("boundary")){
                     req.Boundary = value.Cut("=")._value;
-                    plog("boundary ",req.Boundary);
                 }
             }else
             if(keyvalue._key.StartWith("Referer")){

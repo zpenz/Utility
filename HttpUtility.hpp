@@ -38,8 +38,7 @@ namespace Utility
         hString Boundary="";
         static Request Parse(const AString& buf) ;
 
-        protected:
-            Request(){}
+        Request(){}
     };
 
     struct TransListener{
