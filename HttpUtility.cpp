@@ -57,9 +57,7 @@ Request Request::Parse(const AString& buf) {
     auto ret = buf.Split("\r\n");
     for(int index=0;index<ret.size;index++){
         auto item = ret[index];
-        plog("item ",item);
         if(item.StartWith("POST") || item.StartWith("GET")){
-            plog(item);
             auto first = item.Split(" ");
             // for(int indeZ=0;indeZ<first.size;indeZ++){
                 // plog("first ",first[indeZ]);
@@ -99,6 +97,7 @@ Request Request::Parse(const AString& buf) {
                 plog("Contain? ",value.Contain("boundary"));
                 if(value.Contain("boundary")){
                     req.Boundary = value.Cut("=")._value;
+                    plog("boundary ",req.Boundary);
                 }
             }else
             if(keyvalue._key.StartWith("Referer")){
