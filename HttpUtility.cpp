@@ -54,10 +54,10 @@ hString Request::ToString(){
 Request Request::Parse(const AString& buf) {
     Request req;
 
-    auto ret = buf.Split("\n");
+    auto ret = buf.Split("\r\n");
     for(int index=0;index<ret.size;index++){
         auto item = ret[index];
-
+        plog("item ",item);
         if(item.StartWith("POST") || item.StartWith("GET")){
             plog(item);
             auto first = item.Split(" ");
@@ -95,6 +95,11 @@ Request Request::Parse(const AString& buf) {
             }else
             if(keyvalue._key.StartWith("Content-Type")){
                 req.ContentType = value;
+                plog("zxxxxxxxx",value);
+                plog("Contain? ",value.Contain("boundary"));
+                if(value.Contain("boundary")){
+                    req.Boundary = value.Cut("=")._value;
+                }
             }else
             if(keyvalue._key.StartWith("Referer")){
                 req.Referer = value;

@@ -399,14 +399,22 @@
             int index=0;
             for(;index<length;index++){
                 for(int indeY = 0;indeY<slist.size;indeY++){
-                    if(slist[indeY] == temp[index]){
-                        list.Add(store);
-                        store = "";
+                    String<T> item = slist[indeY];
+                    for(int indeZ=0;indeZ<slist[indeY].size && indeY+indeZ<length;indeZ++){
+                        if(slist[indeY][indeZ] == temp[index+indeZ]) 
+                        {
+                            continue;
+                        }
                         goto next;
                     }
+                    list.Add(store);
+                    store = "";
+                    index+=item.length;
+                    break;
+                next:
+                    ;
                 }
                 store+=temp[index];
-                next:;
             }
             //left
             if(!store.Equal("")){

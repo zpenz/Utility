@@ -86,8 +86,6 @@ int main(void){
 
         plog("recv...");
 
-        // fs.open("translate.log",ios::out|ios::binary);
-
         dStartTime = GetTickCount();
         while(1){
             ibret = recv(sockConnect,buf,MAX_BUFFER,0);
@@ -101,7 +99,6 @@ int main(void){
             iCurrentIndex = 0;
 
             plog("size: ",ibret);
-            // fs << "SIZE: " << ibret << endl;
 
             iTotalRecvSize+=ibret;
             //Megra
@@ -111,14 +108,20 @@ int main(void){
             }
 
             if(ibret!=0){
-                plog("recv: ",buf);
                 plog("recvlength: ",ibret);
-                AString ack = "ACK FROM TCP Server";
-                send(sockConnect,ack,ack._length(),0);
+                AString hd = AString(buf).Cut("\r\n\r\n",1)._key;
+                plog(hd);
                 plog("---------------------------------------");
-                plog("parse: ",Request::Parse(buf).ToString());
+                auto  req = Request::Parse(hd);
+                // plog("length ", req.ContentLength,"boundary ",req.Boundary);
+                // AString ack = "ACK FROM TCP Server";
+                // send(sockConnect,ack,ack._length(),0);
+
+                plog("---------------------------------------");
+                // plog("parse: ",Request::Parse(buf).ToString());
                 return 0;
             }
+
         //     auto headsize=((PACKAGE_HEAD*)buf)->package_size;
         //     auto datakind=((PACKAGE_HEAD*)buf)->datakind;
         //     cout<<"HEAD_SIZE:"<<headsize<<endl;
