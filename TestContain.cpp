@@ -39,6 +39,6 @@ int main(int argc, char const *argv[])
     // for(int index=0;index<header.OtherRecord.size;index++){
     //     plog("key ",header.OtherRecord[index]._key," value ",header.OtherRecord[index]._value);
     // }
-    plog("length",header.Host);
+    plog(header.ToString());
     return 0;
 }

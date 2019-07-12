@@ -61,9 +61,9 @@ Request Request::Parse(const AString& buf) {
         if(item.StartWith("POST") || item.StartWith("GET")){
             plog(item);
             auto first = item.Split(" ");
-            for(int indeZ=0;indeZ<first.size;indeZ++){
-                plog("first ",first[indeZ]);
-            }
+            // for(int indeZ=0;indeZ<first.size;indeZ++){
+                // plog("first ",first[indeZ]);
+            // }
             if(first.size<3){
                 plog("error");
                 return req;
