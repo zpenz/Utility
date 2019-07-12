@@ -64,15 +64,6 @@ int main(void){
     int iCurrentIndex=0;
     int iTotalRecvSize = 0;
 
-    auto copy = [&](int iBufCount){
-         cout<<"copy"<<endl;
-         char temp[MAX_BUFFER * 2];
-         memset(temp,0,MAX_BUFFER*2);
-         memcpy(temp,lastBuffer,iLastBufferSize);
-         memcpy(&temp[iLastBufferSize],buf,iBufCount);
-         memset(buf,0,MAX_BUFFER*2);
-         memcpy(buf,temp,iBufCount+iLastBufferSize);    
-    };
 
     DWORD dStartTime = GetTickCount();
     while(1){
@@ -103,20 +94,21 @@ int main(void){
 
             iTotalRecvSize+=ibret;
             //Megra
-            if (!bFirst)
-            {
-                copy(ibret);
-            }
+            // if (!bFirst)
+            // {
+            //     copy(ibret);
+            // }
 
             if(ibret!=0){
                 if(bFirst){
                     plog("recvlength: ",ibret);
-                    plog(buf);
-                    AString hd = AString(buf).Cut("\r\n\r\n",1)._key;
+                    auto ret = AString(buf).Cut("\r\n\r\n",1);
+                    AString hd = ret._key;
+                    plog("content: ",ret._value._length());
                     request = Request::Parse(hd);
                     return 0;
                 }else{
-
+                    
                 }
             }
 
