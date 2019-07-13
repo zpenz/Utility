@@ -43,6 +43,22 @@ namespace Utility
         Request(){}
     };
 
+    struct Response:pobject<Response>{
+        hString ContentType="";
+        hString ContentLength="";
+        hString Date="";
+        hString Server="server/0.1";
+        hString HttpVersion="HTTP/1.1";
+        int rcode = 0;
+        hString rdesc = "";
+        Linker<KV> OtherRecord=Linker<KV>();
+
+        Response(){};
+        static Response Parse(const AString& buf);
+        hString ToString();
+        Response(const AString& buf);
+    };
+
     struct TransListener{
         function<void(long current,long total)> OnChange = nullptr;
         function<void(hString)> OnComplete = nullptr;

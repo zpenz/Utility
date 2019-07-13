@@ -595,7 +595,7 @@
 
         Utility::FormPost("http://192.168.10.158:5555/cgi-bin/xk_file_rsync_upload.cgi",params,99999,Utility::TransListener(nullptr,[](AString string){
                 plog("result: ",string);
-            },nullptr),[](Utility::Request& req){
+            },nullptr,nullptr),[](Utility::Request& req){
             req.OtherRecord.Add(Utility::KV("XK_JSON","{\"admin_id\":1001,\"sid\":\"8oCf4fda0tQKGQQVP330ciHWnK0kF5V\",\"path_name\":\"/var/share/mp/xklvm1562233594/gyy/\",\"file_name\":\"ppppppppppssssssss.txt\"}"));
         });
 

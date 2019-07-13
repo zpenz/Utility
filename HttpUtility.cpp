@@ -68,7 +68,7 @@ Request Request::Parse(const AString& buf) {
             req.HttpVersion = first[2];
         }
         else{
-            auto keyvalue = item.Cut(":",1);
+            auto keyvalue = item.Cut(": ",1);
             auto value = keyvalue._value;
             if(keyvalue._key.StartWith("Host")){
                 req.Host = value;
@@ -108,6 +108,59 @@ Request Request::Parse(const AString& buf) {
         }
     }
     return req;
+}
+
+Response Response::Parse(const AString& buf){
+    auto ret = buf.Split("\r\n");
+    Response spo;
+    for(int index=0;index<ret.size;index++){
+        auto item = ret[index];
+        if(item.StartWith("POST") || item.StartWith("GET")){
+            auto first = item.Split(" ");
+            if(first.size<3){
+                plog("error parse post/get");
+                return spo;
+            }
+            spo.HttpVersion = first[0];
+            spo.rcode = first[1].ToLong();
+            spo.rdesc = first[2];
+        }else{
+            auto keyvalue = item.Cut(": ",1);
+            auto value = keyvalue._value;
+            if(keyvalue._key.StartWith("Content-Type")){
+                spo.ContentType = value;
+            }else
+            if(keyvalue._key.StartWith("Content-Length")){
+                spo.ContentLength = value;
+            }else
+            if(keyvalue._key.StartWith("Date")){
+                spo.Date = value;
+            }else
+            if(keyvalue._key.StartWith("Server")){
+                spo.Server = value;
+            }else
+            {
+                spo.OtherRecord.Add(KV(keyvalue._key,value));
+            }
+        }
+
+    }
+    return spo;
+}
+Response::Response(const AString& buf){ *this = move(Response::Parse(buf));}
+
+hString Response::ToString(){
+    hString 
+    ret  = HttpVersion+" "+AString(rcode)+" "+rdesc+"\r\n";
+    ret += "Content-Type: "+ContentType+"\r\n";
+    ret += "Content-Length: "+ContentLength+"\r\n";
+    ret += "Date: "+Date+"\r\n";
+    ret += "Server: "+Server+"\r\n";
+    for(int index=0;index<OtherRecord.size;index++){
+        ret += OtherRecord[index]._key+": "+OtherRecord[index]._value+"\r\n";
+    }
+    ret += "\r\n";
+    return ret;
 }
 
 hString::KeyValuePair<hString> CutUrl(const hString& url){
