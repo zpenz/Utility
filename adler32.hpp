@@ -82,7 +82,7 @@
     extern vector<diff> CalcFileSlideDiff(const AString& filename);
     extern vector<diff> CalcFileDiff(const AString& filename);
     extern vector<diff> CalcFileDiff_r(const AString& filename);
-
+    extern vector<range> performMarge(const char * src,const char * dffile);
 
     struct Point{
         int x;

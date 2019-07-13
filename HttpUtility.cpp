@@ -230,7 +230,10 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListe
         memset(tempbuf,0,sizeof(tempbuf));
         ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
         if(ibret ==0 ) break;
-        RequestResult+=tempbuf;
+        if(listener.OnReceiveData!=nullptr)
+            listener.OnReceiveData(tempbuf);
+        else
+            RequestResult+=tempbuf;
     }
 
     if(listener.OnComplete !=nullptr){
@@ -295,7 +298,10 @@ hString Post(const hString& url,const hString& data,long timeout,TransListener l
         memset(tempbuf,0,sizeof(tempbuf));
         ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
         if(ibret ==0 ) break;
-        RequestResult+=tempbuf;
+        if(listener.OnReceiveData!=nullptr)
+            listener.OnReceiveData(tempbuf);
+        else
+            RequestResult+=tempbuf;
     }
     if(listener.OnComplete !=nullptr){
         listener.OnComplete(RequestResult);
@@ -307,7 +313,6 @@ hString Post(const hString& url,const hString& data,long timeout,TransListener l
     #else
     if(sock) shutdown(sock,2);
     #endif
-
     return RequestResult.substr(RequestResult.find("{"),RequestResult._length()-1);
 }
 

@@ -444,7 +444,7 @@
         // fs.close();
     }
 
-    vector<range> performMarge(const char * src,const char * dffile,WriteListener<>& listener){
+    vector<range> performMarge(const char * src,const char * dffile){
         fstream f1(src,f1.binary|f1.in);
         fstream fs = fstream(src+AString(".marge"),fstream::in | fstream::out | fstream::trunc);
         auto ret = LoadDiff<diff>(dffile);
@@ -568,7 +568,7 @@
 
         localListener ls =  localListener("2.txt");
         //bak 3->2 
-        vector<range> oplist = performMarge("app-release.apk","1.diff",ls);
+        vector<range> oplist = performMarge("app-release.apk","1.diff");
 
         // fstream f1 = fstream("2.txt",f1.binary|f1.in);
         // fstream f2 = fstream("3.txt",f1.binary|f1.in);
