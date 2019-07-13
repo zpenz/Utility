@@ -218,6 +218,9 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListe
             reader.seekg(0,reader.beg);
             reader.close();
             builder +="\r\n";
+        }else if(list[index].Equal("json")){
+            builder += "--"+boundary+"\r\nContent-Disposition: form-data; \r\nContent-Type: application/json\r\n\r\n";
+            builder += list[index+1]+"\r\n";
         }else{
             builder += "--"+boundary+"\r\nContent-Disposition: form-data; name=\""+list[index]+"\"\r\n\r\n";
             builder += list[index+1]+"\r\n";
@@ -235,7 +238,7 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListe
     if(OtherSetting!=nullptr) OtherSetting(request);
 
     auto header = request.ToString();
-    show_message("header: ",header);
+    plog("header: ",header);
     ibret = send(sock,header.c_str(),header._length(),0);
 
     char tempbuf[TRANSLATE_SIZE];
@@ -264,6 +267,12 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListe
             ibret = send(sock,builder.c_str(),builder._length(),0); 
             sendlength+=ibret;
             builder = "";
+        }else if(list[index].Equal("json")){
+            builder += "--"+boundary+"\r\nContent-Disposition: form-data; \r\nContent-Type: application/json\r\n\r\n";
+            builder += list[index+1]+"\r\n";
+            ibret = send(sock,builder.c_str(),builder._length(),0); 
+            sendlength+=ibret;
+            builder = "";
         }else{
             builder += "--"+boundary+"\r\nContent-Disposition: form-data; name=\""+list[index]+"\"\r\n\r\n";
             builder += list[index+1]+"\r\n";
@@ -277,23 +286,67 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListe
     ibret = send(sock,footer,footer._length(),0);
     sendlength+=ibret;
 
-    show_message("before recv"," content-length:",length," sendlength:",sendlength);
+    plog("before recv"," content-length:",length," sendlength:",sendlength);
     hString RequestResult = "";
+
+    //first recv ,get response
+    memset(tempbuf,0,sizeof(tempbuf));
+    ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
+
     while(1){
+        if(hString(tempbuf).Contain("\r\n0\r\n\r\n")) break;
+        plog(".........");
         memset(tempbuf,0,sizeof(tempbuf));
         ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
-        if(ibret ==0 ) break;
-        if(listener.OnReceiveData!=nullptr)
-            listener.OnReceiveData(tempbuf);
-        else
-            RequestResult+=tempbuf;
     }
+
+    plog("tempbuf=",ibret);
+    auto ResponeAndContent = AString(tempbuf).Cut("\r\n\r\n",1);
+    Response spo = ResponeAndContent._key;
+    bool chunk = ResponeAndContent._key.Contain("Transfer-Encoding: chunked");
+
+    auto MessageContent = ResponeAndContent._value;
+
+    // if(chunk){
+    //     hString chunksize = MessageContent.Cut("\r\n",1)._key;
+    //     int nsize = hString::ToLH(chunksize);
+    //     int pos = 2+chunksize._length();
+    //     int chunksizepos = 0;
+        
+    //     while(pos<MessageContent._length()){
+    //         RequestResult+=MessageContent.substr(pos,nsize);
+    //         nsize = MessageContent[pos+nsize+2];
+    //         chunksize = "";
+    //         chunksizepos = pos+nsize+2;
+    //         while(MessageContent[chunksizepos]!='\r'){
+    //             chunksize+=MessageContent[chunksizepos];
+    //             chunksizepos++;
+    //         }
+    //         nsize = hString::ToLH(chunksize);
+    //         pos = chunksizepos+2;
+    //     }
+    // }
+
+    if(listener.OnReceiveData!=nullptr)
+        listener.OnReceiveData(ResponeAndContent._value,spo);
+    else
+        RequestResult+=ResponeAndContent._value;
+
+    // while(1){
+    //     memset(tempbuf,0,sizeof(tempbuf));
+    //     ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
+    //     if(tempbuf[ibret-1]==0) break;
+    //     if(listener.OnReceiveData!=nullptr)
+    //         listener.OnReceiveData(tempbuf,spo);
+    //     else
+    //         RequestResult+=tempbuf;
+    // }
 
     if(listener.OnComplete !=nullptr){
         listener.OnComplete(RequestResult);
     }
 
-    show_message("recv:",RequestResult);
+    plog("recv:",RequestResult);
 
     #ifdef WIN32
     closesocket(sock);
@@ -346,13 +399,24 @@ hString Post(const hString& url,const hString& data,long timeout,TransListener l
 
     ibret = send(sock,builder.c_str(),header._length(),0);
     hString RequestResult = "";
-    char tempbuf[4096];
+    char tempbuf[TRANSLATE_SIZE];
+
+    //first recv ,get response
+    memset(tempbuf,0,sizeof(tempbuf));
+    recv(sock,tempbuf,sizeof(tempbuf),0);
+    auto ResponeAndContent = AString(tempbuf).Cut("\r\n");
+    Response spo = ResponeAndContent._key;
+    if(listener.OnReceiveData!=nullptr)
+        listener.OnReceiveData(ResponeAndContent._value,spo);
+    else
+        RequestResult+=tempbuf;
+
     while(1){
         memset(tempbuf,0,sizeof(tempbuf));
         ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
         if(ibret ==0 ) break;
         if(listener.OnReceiveData!=nullptr)
-            listener.OnReceiveData(tempbuf);
+            listener.OnReceiveData(tempbuf,spo);
         else
             RequestResult+=tempbuf;
     }

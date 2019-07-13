@@ -63,13 +63,13 @@ namespace Utility
         function<void(long current,long total)> OnChange = nullptr;
         function<void(hString)> OnComplete = nullptr;
         function<void(hString)> OnError = nullptr;
-        function<void(AString)> OnReceiveData = nullptr;
+        function<void(AString,Response& spn)> OnReceiveData = nullptr;
         TransListener(){};
         TransListener(
             function<void(long current,long total)> change,
             function<void(hString)> complete,
             function<void(hString)> error,
-            function<void(AString)> receive):OnChange(change),OnComplete(complete),OnError(error),OnReceiveData(receive){}; 
+            function<void(AString,Response& spn)> receive):OnChange(change),OnComplete(complete),OnError(error),OnReceiveData(receive){}; 
     };
 
     extern AString FormPost(const hString& url,Linker<hString> list,long timeout = 99999,TransListener listener = TransListener(),function<void(Request& req)> OtherSetting = nullptr) ;  

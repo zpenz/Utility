@@ -19,8 +19,7 @@
         int size;
   public:
         static bool IsIntC(const T c){
-            return c>='0' && c<='9';
-            //SAME?
+            return (c>='0' && c<='9') || (c>='a' && c<='f') || (c>='A' && c<='F');
         }
 
         static bool IsInt(const String<T>& des){
@@ -32,6 +31,12 @@
 
         static int ToIC(const T c){
             CONDITION_MESSAGE(!IsIntC(c),"invalid conver int");
+            if(c=='a' || c=='A') return 10;
+            if(c=='b' || c=='B') return 11;
+            if(c=='c' || c=='C') return 12;
+            if(c=='d' || c=='D') return 13;
+            if(c=='e' || c=='E') return 14;
+            if(c=='f' || c=='F') return 15;
             return c-'0';
         }
 
@@ -41,6 +46,16 @@
             for(int index=negative?1:0;index<des.length;index++){
                 if(des.buffer.get()[index] == ' ') continue; //skip empty
                 sum = 10*sum+ToIC(des.buffer.get()[index]);
+            }
+            return negative?-1*sum:sum;
+        }
+
+        static long long ToLH(const String<T>& des){
+            long long sum = 0;
+            bool negative = des.buffer.get()[0]=='-';
+            for(int index=negative?1:0;index<des.length;index++){
+                if(des.buffer.get()[index] == ' ') continue; //skip empty
+                sum = 16*sum+ToIC(des.buffer.get()[index]);
             }
             return negative?-1*sum:sum;
         }

@@ -15,9 +15,8 @@ unsigned long GetTickCount() {
     return ts.tv_sec * 1000;
 }
 
-int main(void){
-
-    #ifdef WIN32
+bool start(){
+        #ifdef WIN32
         WSAData wsa;
         if (::WSAStartup(MAKEWORD(1,1),&wsa) != 0)
         {
@@ -64,7 +63,6 @@ int main(void){
     int iCurrentIndex=0;
     int iTotalRecvSize = 0;
 
-
     DWORD dStartTime = GetTickCount();
     while(1){
         plog("accept...");
@@ -103,7 +101,7 @@ int main(void){
                     plog("content: ",ret._value._length()," length ");
                     return 0;
                 }else{
-
+                    
                 }
             }
 
@@ -219,4 +217,8 @@ int main(void){
     #endif
     return 0;
     }
+}
+
+int main(void){
+    start();
 }
