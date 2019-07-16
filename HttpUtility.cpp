@@ -293,7 +293,7 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListe
     memset(tempbuf,0,sizeof(tempbuf));
     ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
 
-    while(1){
+    while(1){ 
         if(hString(tempbuf).Contain("\r\n0\r\n\r\n")) break;
         plog(".........");
         memset(tempbuf,0,sizeof(tempbuf));

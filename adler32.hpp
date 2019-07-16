@@ -3,7 +3,7 @@
     #include <vector>
     #include "pString.hpp"
 
-    #define CHUNK_SIZE 1024
+    #define CHUNK_SIZE 4096
     #define MOD_DIGEST 65521
     #define MD5_SIZE 17
 
@@ -81,7 +81,7 @@
 
     extern vector<diff> CalcFileSlideDiff(const AString& filename);
     extern vector<diff> CalcFileDiff(const AString& filename);
-    extern vector<diff> CalcFileDiff_r(const AString& filename);
+    extern vector<diff> CalcFileDiff_r(const AString& filename,std::function<void(diff&,bool&)> func);
     extern vector<range> performMarge(const char * src,const char * dffile);
 
     struct Point{
