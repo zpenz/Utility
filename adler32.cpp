@@ -187,82 +187,6 @@
     //     return data;
     // }
 
-    //func : fun(buf,checkvalue,index)
-    //cancel save diff because of bad alloc
-    void CalcFileDiff_r(const AString& filename,std::function<void(diff&,bool&,int&)> func){
-        fstream file = fstream(filename.c_str(),fstream::in|fstream::binary);
-        typedef unsigned char rChar;
-
-        rChar buf[CHUNK_SIZE];
-        rChar buf2[CHUNK_SIZE];
-        rChar* bufcur = buf;
-        rChar* bufbk = buf2;
-
-        int pos = 0;
-        int size = 0;
-        bool sameblock = false;
-
-        file.seekg(0,file.end);
-        long FileLen = file.tellg();
-        file.seekg(0,file.beg);
-
-        while(1){
-            bufcur = buf;
-            bufbk = buf2;
-
-            file.read((char*)bufcur,CHUNK_SIZE);
-            size = file.gcount();
-            int AValue = 1,BValue = 0;
-            for(int index=0;index<size;index++){
-                AValue = (AValue+bufcur[index]);
-                BValue = (BValue + AValue);
-            }
-            diff df = diff(AValue,BValue,"",pos);
-            plog("pos ",pos);
-
-            if(func) func(df,sameblock,pos);
-            if(sameblock){
-                if(df.index+CHUNK_SIZE>FileLen) {
-                    file.close();
-                    return ;
-                }
-                file.seekg(df.index+CHUNK_SIZE,file.beg);
-                memset(buf,0, sizeof(buf));
-                continue;
-            }
-            
-            if(file.eof()) break;
-            
-            while(1){
-                plog("---------- ",pos);
-                file.seekg(pos,file.beg);
-                file.read((char*)bufbk,CHUNK_SIZE);
-                size = file.gcount();
-                for(int j =0;j<size;j++){
-                    AValue -= (bufcur[j]-bufbk[j]);
-                    BValue -= (CHUNK_SIZE*(bufcur[j])-AValue+1);
-
-                    diff df = diff(AValue,BValue,"",pos);
-                    if(func) func(df,sameblock,pos);
-                    if(sameblock){
-                        file.seekg(df.index+CHUNK_SIZE,file.beg);
-                        memset(buf,0, sizeof(buf));
-                        goto next;
-                    }
-                    if(file.eof()) {
-                        file.close();
-                        return ;
-                    }
-                }
-
-                rChar* temp = bufcur;
-                bufcur = bufbk;
-                bufbk = temp;
-            }
-           next:;
-        }
-        file.close();
-    }
 
     #pragma region Diff
     void MyersDiff(AString src,AString des){
@@ -615,6 +539,83 @@
     //     return list;
     // }
 
+    
+    //func : fun(buf,checkvalue,index)
+    //cancel save diff because of bad alloc
+    void CalcFileDiff_r(const AString& filename,std::function<void(diff&,bool&,int&)> func){
+        fstream file = fstream(filename.c_str(),fstream::in|fstream::binary);
+        typedef unsigned char rChar;
+
+        rChar buf[CHUNK_SIZE];
+        rChar buf2[CHUNK_SIZE];
+        rChar* bufcur = buf;
+        rChar* bufbk = buf2;
+
+        int pos = 0;
+        int size = 0;
+        bool sameblock = false;
+
+        file.seekg(0,file.end);
+        long FileLen = file.tellg();
+        file.seekg(0,file.beg);
+
+        while(1){
+            bufcur = buf;
+            bufbk = buf2;
+
+            file.read((char*)bufcur,CHUNK_SIZE);
+            size = file.gcount();
+            int AValue = 1,BValue = 0;
+            for(int index=0;index<size;index++){
+                AValue = (AValue+bufcur[index]);
+                BValue = (BValue + AValue);
+            }
+            diff df = diff(AValue,BValue,"",pos);
+            plog("pos ",pos);
+
+            if(func) func(df,sameblock,pos);
+            if(sameblock){
+                if(df.index+CHUNK_SIZE>FileLen) {
+                    file.close();
+                    return ;
+                }
+                file.seekg(pos,file.beg);
+                memset(buf,0, sizeof(buf));
+                continue;
+            }
+            
+            if(file.eof()) break;
+            
+            while(1){
+                plog("---------- ",pos);
+                file.read((char*)bufbk,CHUNK_SIZE);
+                size = file.gcount();
+                for(int j =0;j<size;j++){
+                    AValue -= (bufcur[j]-bufbk[j]);
+                    BValue -= (CHUNK_SIZE*(bufcur[j])-AValue+1);
+
+                    diff df = diff(AValue,BValue,"",pos);
+                    if(func) func(df,sameblock,pos);
+                    if(sameblock){
+                        file.seekg(df.index+CHUNK_SIZE,file.beg);
+                        memset(buf,0, sizeof(buf));
+                        goto next;
+                    }
+                    if(file.eof()) {
+                        file.close();
+                        return ;
+                    }
+                }
+
+                rChar* temp = bufcur;
+                bufcur = bufbk;
+                bufbk = temp;
+            }
+           next:;
+        }
+        file.close();
+    }
+
     vector<range> performMarge(const char * src,const char * dffile){
             
         fstream f1(src,f1.binary|f1.in);
@@ -641,6 +642,7 @@
             auto remoteitem = store1.find(localitem.rvalue);
             lastpos = localitem.index;
             if(remoteitem!=store1.end()){
+                plog("rvalue same! remote index: ",remoteitem->second.index," local index: ",localitem.index);
                 f1.seekg(localitem.index);
                 char buf[CHUNK_SIZE];
                 f1.read(buf,CHUNK_SIZE);
@@ -706,11 +708,11 @@
     int main(int argc, char const *argv[])
     {
         // auto ret = LoadDiff<diff>("verify27262990");
-        // SaveFile<diff>("verify27262990",CalcFileSlideDiff("xk.apk"));
+        // SaveFile<diff>("diff",CalcFileSlideDiff("test.test"));
         // for_each(ret.begin(),ret.end(),[](diff& item){
         //     plog("index: ",item.index," rvale: ",item.rvalue," md5: ",item.MD5Value);
         // });
         
-        vector<range> oplist = performMarge("xk.apk","verify27262990");
+        vector<range> oplist = performMarge("test.test","diff");
         return 0;
     }

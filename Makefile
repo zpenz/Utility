@@ -39,38 +39,27 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/Cellar/cmake/3.14.3/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/Cellar/cmake/3.14.3/bin/cmake -E remove -f
+RM = /usr/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/szp/Desktop/Utility-master
+CMAKE_SOURCE_DIR = /home/szp/Utility-master
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/szp/Desktop/Utility-master
+CMAKE_BINARY_DIR = /home/szp/Utility-master
 
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/local/Cellar/cmake/3.14.3/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/local/Cellar/cmake/3.14.3/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -78,11 +67,22 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
+
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/szp/Desktop/Utility-master/CMakeFiles /Users/szp/Desktop/Utility-master/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/szp/Utility-master/CMakeFiles /home/szp/Utility-master/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/szp/Desktop/Utility-master/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/szp/Utility-master/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -124,19 +124,6 @@ sserver/fast:
 .PHONY : sserver/fast
 
 #=============================================================================
-# Target rules for targets named TestContain
-
-# Build rule for target.
-TestContain: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 TestContain
-.PHONY : TestContain
-
-# fast build rule for target.
-TestContain/fast:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/build
-.PHONY : TestContain/fast
-
-#=============================================================================
 # Target rules for targets named adler32
 
 # Build rule for target.
@@ -149,6 +136,19 @@ adler32/fast:
 	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/build
 .PHONY : adler32/fast
 
+#=============================================================================
+# Target rules for targets named TestContain
+
+# Build rule for target.
+TestContain: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 TestContain
+.PHONY : TestContain
+
+# fast build rule for target.
+TestContain/fast:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/build
+.PHONY : TestContain/fast
+
 HttpUtility.o: HttpUtility.cpp.o
 
 .PHONY : HttpUtility.o
@@ -156,8 +156,8 @@ HttpUtility.o: HttpUtility.cpp.o
 # target to build an object file
 HttpUtility.cpp.o:
 	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/HttpUtility.cpp.o
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.cpp.o
 	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/HttpUtility.cpp.o
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.cpp.o
 .PHONY : HttpUtility.cpp.o
 
 HttpUtility.i: HttpUtility.cpp.i
@@ -167,8 +167,8 @@ HttpUtility.i: HttpUtility.cpp.i
 # target to preprocess a source file
 HttpUtility.cpp.i:
 	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/HttpUtility.cpp.i
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.cpp.i
 	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/HttpUtility.cpp.i
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.cpp.i
 .PHONY : HttpUtility.cpp.i
 
 HttpUtility.s: HttpUtility.cpp.s
@@ -178,8 +178,8 @@ HttpUtility.s: HttpUtility.cpp.s
 # target to generate assembly for a file
 HttpUtility.cpp.s:
 	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/HttpUtility.cpp.s
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.cpp.s
 	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/HttpUtility.cpp.s
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.cpp.s
 .PHONY : HttpUtility.cpp.s
 
 TestContain.o: TestContain.cpp.o
@@ -296,11 +296,11 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... sserver"
-	@echo "... TestContain"
-	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... sserver"
+	@echo "... rebuild_cache"
 	@echo "... adler32"
+	@echo "... TestContain"
 	@echo "... HttpUtility.o"
 	@echo "... HttpUtility.i"
 	@echo "... HttpUtility.s"

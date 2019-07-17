@@ -2,6 +2,7 @@
 
     #include <vector>
     #include "pString.hpp"
+    #include <functional>
 
     #define CHUNK_SIZE 4096
     #define MOD_DIGEST 65521
