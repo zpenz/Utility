@@ -15,11 +15,7 @@ typedef unsigned int DWORD;
 #include <ws2tcpip.h>
 #endif
 
-<<<<<<< HEAD
 #define MAX_BUFFER 5120
-=======
-#define MAX_BUFFER 70000
->>>>>>> 64197da08ed9f4d8ea0559c1821e13361e62fb51
 #define MAX_FILE_NAME 1024
 #define MAX_SID_LENGTH 64
 #define MAX_READ_SIZE 4096
