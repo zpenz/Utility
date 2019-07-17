@@ -1,0 +1,40 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(lldb) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/${file_name}.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "linux": {			// 下面是Linux平台下，需要配置的参数
+                "MIMode": "gdb",
+                "setupCommands": [{
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }]
+            },
+            "osx": {			// 下面是Mac平台下，需要配置的参数
+                "MIMode": "lldb"
+            },
+            "windows": {		// 下面是Windows平台下，需要配置的参数
+                "MIMode": "gdb",		// VSCode要使用的调试工具
+                "miDebuggerPath": "E:\\mingw64\\bin\\gdb.exe",		// miDebugger的路径，该值必须设置。尽管会自动搜索
+                "setupCommands": [{
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }]
+            }
+
+        }
+    ]
+}
