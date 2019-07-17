@@ -96,17 +96,17 @@
     vector<diff> CalcFileSlideDiff(const AString& filename){
         vector<diff> data;
         auto file = fopen(filename.c_str(),"rb+");
-        char buf[CHUNK_SIZE];
+        unsigned char buf[CHUNK_SIZE];
 
         int size = 0;
         int pos = 0;
 
-        while(( size = fread(buf,sizeof(char),sizeof(buf),file))>0){
+        while(( size = fread(buf,sizeof(unsigned char),sizeof(buf),file))>0){
             auto MValue = MD5::Md516(buf,size);
             long AValue = 1,BValue = 0;
             for(int index=0;index<size;index++){
-                AValue = (AValue + static_cast<int>(buf[index]));
-                BValue = (BValue + AValue);
+                AValue = (AValue + buf[index])%MOD_DIGEST;
+                BValue = (BValue + AValue)%MOD_DIGEST;
             }
 
             diff df = diff(AValue,BValue,MValue.c_str(),pos);
@@ -191,12 +191,13 @@
     //cancel push diff because of bad alloc
     vector<diff> CalcFileDiff_r(const AString& filename,std::function<void(diff&,bool&)> func){
         vector<diff> data;
+        typedef unsigned char rChar;
 
         auto file = fopen(filename.c_str(),"rb+");
-        char buf[CHUNK_SIZE];
-        char buf2[CHUNK_SIZE];
-        char* bufcur = buf;
-        char* bufbk = buf2;
+        rChar buf[CHUNK_SIZE];
+        rChar buf2[CHUNK_SIZE];
+        rChar* bufcur = buf;
+        rChar* bufbk = buf2;
 
         int pos = 0;
         int size = 0;
@@ -208,7 +209,7 @@
 
     start:
 
-        size = fread(buf,sizeof(char),CHUNK_SIZE,file);
+        size = fread(buf,sizeof(rChar),CHUNK_SIZE,file);
         int AValue = 1,BValue = 0;
         for(int index=0;index<size;index++){
             AValue = (AValue+static_cast<int>(buf[index]));
@@ -241,7 +242,7 @@
                 }
             }
 
-            char* temp = bufcur;
+            rChar* temp = bufcur;
             bufcur = bufbk;
             bufbk = temp;
         }
@@ -711,11 +712,16 @@
         // Reverse(fileString, file2String,fileString.size(),file2String.size());
         #pragma endregion
 
-        SaveFile("1.diff",CalcFileSlideDiff(""));
+        plog(sizeof(unsigned char));
+        auto ret = CalcFileSlideDiff("xk1.apk");
+        for_each(ret.begin(),ret.begin()+5,[](diff& df){
+            plog(df.rvalue," ",df.MD5Value," ",df.index);
+            printf("rvalue %0x\n",df.rvalue); 
+        });
 
-        localListener ls =  localListener("2.txt");
-        //bak 3->2 
-        vector<range> oplist = performMarge("HttpUtility.cpp","1.diff");
+        // localListener ls =  localListener("2.txt");
+        // //bak 3->2 
+        // vector<range> oplist = performMarge("HttpUtility.cpp","1.diff");
 
         // fstream f1 = fstream("2.txt",f1.binary|f1.in);
         // fstream f2 = fstream("3.txt",f1.binary|f1.in);
@@ -736,25 +742,25 @@
         //     }
         // });
 
-        Utility::Linker<AString> params;
-        params.Add("file");
-        params.Add("3.txt.op");
+        // Utility::Linker<AString> params;
+        // params.Add("file");
+        // params.Add("3.txt.op");
 
-        Utility::FormPost("http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi",params,99999,Utility::TransListener(nullptr,[](AString string){
-                plog("result: ",string);
-            },nullptr,nullptr),[](Utility::Request& req){
-            req.OtherRecord.Add(Utility::KV("XK_JSON","{\"admin_id\":1001,\"sid\":\"PY9Su8Gu8f64EIvAso4tMMy4l7fY6f5\",\"path_name\":\"/var/share/mp/xklvm1562125210/photo/\",\"file_name\":\"ppppppppppssssssss.txt\"}"));
-        });
+        // Utility::FormPost("http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi",params,99999,Utility::TransListener(nullptr,[](AString string){
+        //         plog("result: ",string);
+        //     },nullptr,nullptr),[](Utility::Request& req){
+        //     req.OtherRecord.Add(Utility::KV("XK_JSON","{\"admin_id\":1001,\"sid\":\"PY9Su8Gu8f64EIvAso4tMMy4l7fY6f5\",\"path_name\":\"/var/share/mp/xklvm1562125210/photo/\",\"file_name\":\"ppppppppppssssssss.txt\"}"));
+        // });
 
-        fstream f1 = fstream("3.txt.op",f1.binary|f1.in);
-        header hd;
-        f1.read((char*)&hd,sizeof(hd));
-        plog(hd.RangeLength," ",hd.DataOffset," ",hd.RangeOffset," ",hd.RangeLength/sizeof(range));
-        for(int index=0;index<hd.RangeLength/sizeof(range);index++){
-            range item;
-            f1.read((char*)&item,sizeof(item));
-            plog(item.length," ",item.index," ",item.offset);
-        }
+        // fstream f1 = fstream("3.txt.op",f1.binary|f1.in);
+        // header hd;
+        // f1.read((char*)&hd,sizeof(hd));
+        // plog(hd.RangeLength," ",hd.DataOffset," ",hd.RangeOffset," ",hd.RangeLength/sizeof(range));
+        // for(int index=0;index<hd.RangeLength/sizeof(range);index++){
+        //     range item;
+        //     f1.read((char*)&item,sizeof(item));
+        //     plog(item.length," ",item.index," ",item.offset);
+        // }
 
         return 0;
 
