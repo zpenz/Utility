@@ -25,9 +25,9 @@
     };
 
     struct diff{
-        char MD5Value[MD5_SIZE];
         int index;
         int rvalue;
+        char MD5Value[MD5_SIZE];
         diff(){};
         diff(int av,int bv,const char* mv,int _index)
         {
@@ -81,7 +81,7 @@
 
     extern vector<diff> CalcFileSlideDiff(const AString& filename);
     extern vector<diff> CalcFileDiff(const AString& filename);
-    extern vector<diff> CalcFileDiff_r(const AString& filename,std::function<void(diff&,bool&)> func);
+    extern void CalcFileDiff_r(const AString& filename,std::function<void(diff&,bool&,int&)> func);
     extern vector<range> performMarge(const char * src,const char * dffile);
 
     struct Point{
