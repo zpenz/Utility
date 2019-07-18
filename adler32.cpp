@@ -553,11 +553,11 @@
         });
 
         // if last is diff
-        if(bDiff)
-        {
-            bDiff = false;
-            list.push_back(range(startpos,length,offset));
-        }
+        // if(bDiff)
+        // {
+        //     bDiff = false;
+        //     list.push_back(range(startpos,length,offset));
+        // }
 
         //<<CHUNK_SIZE>
         f1.seekg(0,f1.end);
