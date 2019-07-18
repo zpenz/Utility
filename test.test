@@ -1,4 +1,4 @@
-##include "pString.hpp"asff
+##include "pString.hpp"adfafs
 #include <vector>
 #include <cstdio>
 #include <cstdlib>
@@ -9,7 +9,7 @@ enum class TokenFlag{
     FLAG_COMMENT,
     FLAG_BLANK,
     FLAG_PUNCUATION,
-    FLAG_ACTION,sdd
+    FLAG_ACTION,
     FLAG_NAME,
     FLAG_TABLE_FILED_NAME,
     FLAG_TABLE_FILED_TYPE_NAME,

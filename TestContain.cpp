@@ -54,7 +54,7 @@ int main(int argc, char const *argv[])
         params.Add("file","test.test.op");
 
         // fstream fs = fstream("1.diff",fs.out);
-        FormPost("http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi",params,99999,Utility::TransListener(nullptr,[&](AString string){
+        FormPostTest("http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi",params,99999,Utility::TransListener(nullptr,[&](AString string){
             // fs.close();
             plog("result: ",string._length()," content:",string);
             
@@ -62,7 +62,7 @@ int main(int argc, char const *argv[])
         nullptr
         ),[](Utility::Request& req){
                     Utility::JObject job;
-            job.Add("admin_id",1001,"sid","c4VFW2UOF13eIkNQWAv4KANd3g54Im2","path_name","/var/share/mp/xklvm1562233594/wxy/xk/","file_name","UnitTest.cpp");
+            job.Add("admin_id",1001,"sid","57HDrFs1Sbu6MgteTpH4Rf6nVbIlBk8","path_name","/var/share/mp/xklvm1562233594/wxy/xk/","file_name","UnitTest.cpp");
             req.OtherRecord.Add(Utility::KV("XK_JSON",job.Serial()));
         });
 

@@ -72,6 +72,7 @@ namespace Utility
             function<void(AString,Response& spn)> receive):OnChange(change),OnComplete(complete),OnError(error),OnReceiveData(receive){}; 
     };
 
-    extern AString FormPost(const hString& url,Linker<hString> list,long timeout = 99999,TransListener listener = TransListener(),function<void(Request& req)> OtherSetting = nullptr) ;  
+    extern AString FormPost(const hString& url,Linker<hString> list,long timeout = 99999,TransListener listener = TransListener(),function<void(Request& req)> OtherSetting = nullptr);  
+    extern AString FormPostTest(const hString& url,Linker<hString> list,long timeout = 99999,TransListener listener = TransListener(),function<void(Request& req)> OtherSetting = nullptr);  
     extern AString Post(const hString& url,const hString& data,long timeout = 99999,TransListener listener = TransListener(),function<void(Request& req)> OtherSetting = nullptr);   
 } // namespace Utility

@@ -280,6 +280,7 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
         show_message("before recv"," content-length:",length," sendlength:",sendlength);
         hString RequestResult = "";
         Response spn;
+
         while(1){
             memset(tempbuf,0,sizeof(tempbuf));
             ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
@@ -305,192 +306,195 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
 
         return RequestResult;
     }
-// hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListener listener,std::function<void(Request& req)> OtherSetting){
-//     if(list.size %2 !=0) return -3;
-//     #ifdef WIN32
-//     WSAData wsa;
-//     if (::WSAStartup(MAKEWORD(1,1),&wsa) != 0)
-//     {
-//         std::cout<<"WSAStartup error"<<std::endl;
-//         return 0;
-//     }
-//     #endif                                          
-//     auto sock = socket(AF_INET,SOCK_STREAM,0);
-//     if(!sock) 
-//         {if(listener.OnError!=nullptr) listener.OnError("创建socket失败!"); return "";}
-//     hString boundary = "--xkboundary";
 
-//     auto urlkeyvalue = CutUrl(url);
-//     int port = urlkeyvalue._key.Contain(":")?hString::ToL(urlkeyvalue._key.Cut(":")._value):80;
-//     auto address = urlkeyvalue._key.Contain(":")?urlkeyvalue._key.Cut(":")._key:urlkeyvalue._key;
-//     address = address.Contain("http")?address.Cut("/",3)._value:address;
+    hString FormPostTest(const hString& url,Linker<hString> list,long timeout,TransListener listener,std::function<void(Request& req)> OtherSetting){
+        if(list.size %2 !=0) return -3;
+        #ifdef WIN32
+        WSAData wsa;
+        if (::WSAStartup(MAKEWORD(1,1),&wsa) != 0)
+        {
+            std::cout<<"WSAStartup error"<<std::endl;
+            return 0;
+        }
+        #endif                                          
+        auto sock = socket(AF_INET,SOCK_STREAM,0);
+        if(!sock) 
+            {if(listener.OnError!=nullptr) listener.OnError("创建socket失败!"); return "";}
+        hString boundary = "--xkboundary";
 
-//     sockaddr_in sockAddr;
-//     memset(&sockAddr,0,sizeof(sockAddr));
-//     sockAddr.sin_family = AF_INET;
-//     sockAddr.sin_addr.s_addr = inet_addr(address.c_str());
-//     sockAddr.sin_port = htons(port);
+        auto urlkeyvalue = CutUrl(url);
+        int port = urlkeyvalue._key.Contain(":")?hString::ToL(urlkeyvalue._key.Cut(":")._value):80;
+        auto address = urlkeyvalue._key.Contain(":")?urlkeyvalue._key.Cut(":")._key:urlkeyvalue._key;
+        address = address.Contain("http")?address.Cut("/",3)._value:address;
 
-//     setsockopt(sock,SOL_SOCKET,SO_TIMESTAMP,&timeout,sizeof(timeout));
+        sockaddr_in sockAddr;
+        memset(&sockAddr,0,sizeof(sockAddr));
+        sockAddr.sin_family = AF_INET;
+        sockAddr.sin_addr.s_addr = inet_addr(address.c_str());
+        sockAddr.sin_port = htons(port);
 
-//     auto ibret = connect(sock,reinterpret_cast<sockaddr*>(&sockAddr),sizeof(sockAddr));
-//     if(ibret!=0) 
-//         {if(listener.OnError!=nullptr) listener.OnError("连接到服务器失败!"); return "";}
+        setsockopt(sock,SOL_SOCKET,SO_TIMESTAMP,&timeout,sizeof(timeout));
 
-//     std::fstream reader;
+        auto ibret = connect(sock,reinterpret_cast<sockaddr*>(&sockAddr),sizeof(sockAddr));
+        if(ibret!=0) 
+            {if(listener.OnError!=nullptr) listener.OnError("连接到服务器失败!"); return "";}
 
-//     long length = 0;
-//     long filesize = 0;
-//     long sendlength = 0;
-//     hString builder;
-//     for(int index=0;index<list.size;index+=2){
-//         if(list[index].Equal("file")){
-//             auto filename = list[index+1].Cut("/",-1)._value;
-//             builder += "--"+boundary+"\r\nContent-Disposition: form-data; name= \"file\"; filename=\""+filename+"\"\r\nContent-Type: application/octet-stream\r\n\r\n";
-//             reader.open(list[index+1].c_str(),std::ios::in|std::ios::binary);
-//             reader.seekg(0,reader.end);
-//             size_t filesize = reader.tellg();
-//             length  +=filesize;
-//             reader.seekg(0,reader.beg);
-//             reader.close();
-//             builder +="\r\n";
-//         }else if(list[index].Equal("json")){
-//             builder += "--"+boundary+"\r\nContent-Disposition: form-data; \r\nContent-Type: application/json\r\n\r\n";
-//             builder += list[index+1]+"\r\n";
-//         }else{
-//             builder += "--"+boundary+"\r\nContent-Disposition: form-data; name=\""+list[index]+"\"\r\n\r\n";
-//             builder += list[index+1]+"\r\n";
-//         }
-//     }
-//     builder+="--"+boundary+"--\r\n\r\n";
-//     length+=builder._length();
-//     show_message(builder);
-//     builder = "";
+        std::fstream reader;
 
-//     Request request(url);
-//     request.ContentLength = length;
-//     request.ContentType = "multipart/form-data; boundary="+boundary;
-//     request.Connection = "close";
-//     if(OtherSetting!=nullptr) OtherSetting(request);
+        long length = 0;
+        long filesize = 0;
+        long sendlength = 0;
+        hString builder;
+        for(int index=0;index<list.size;index+=2){
+            if(list[index].Equal("file")){
+                auto filename = list[index+1].Cut("/",-1)._value;
+                builder += "--"+boundary+"\r\nContent-Disposition: form-data; name= \"file\"; filename=\""+filename+"\"\r\nContent-Type: application/octet-stream\r\n\r\n";
+                reader.open(list[index+1].c_str(),std::ios::in|std::ios::binary);
+                reader.seekg(0,reader.end);
+                size_t filesize = reader.tellg();
+                length  +=filesize;
+                reader.seekg(0,reader.beg);
+                reader.close();
+                builder +="\r\n";
+            }else if(list[index].Equal("json")){
+                builder += "--"+boundary+"\r\nContent-Disposition: form-data; \r\nContent-Type: application/json\r\n\r\n";
+                builder += list[index+1]+"\r\n";
+            }else{
+                builder += "--"+boundary+"\r\nContent-Disposition: form-data; name=\""+list[index]+"\"\r\n\r\n";
+                builder += list[index+1]+"\r\n";
+            }
+        }
+        builder+="--"+boundary+"--\r\n\r\n";
+        length+=builder._length();
+        show_message(builder);
+        builder = "";
 
-//     auto header = request.ToString();
-//     plog("header: ",header);
-//     ibret = send(sock,header.c_str(),header._length(),0);
+        Request request(url);
+        request.ContentLength = length;
+        request.ContentType = "multipart/form-data; boundary="+boundary;
+        request.Connection = "close";
+        if(OtherSetting!=nullptr) OtherSetting(request);
 
-//     char tempbuf[TRANSLATE_SIZE];
-//     for(int index=0;index<list.size;index+=2){
-//         if(list[index].Equal("file")){
-//             auto filename = list[index+1].Cut("/",-1)._value;
-//             builder += "--"+boundary+"\r\nContent-Disposition: form-data; name= \"file\"; filename=\""+filename+"\"\r\nContent-Type: application/octet-stream\r\n\r\n";
-//             ibret = send(sock,builder.c_str(),builder._length(),0); 
-//             sendlength+=ibret;
-//             builder = "";
+        auto header = request.ToString();
+        plog("header: ",header);
+        ibret = send(sock,header.c_str(),header._length(),0);
 
-//             reader.open(list[index+1].c_str(),std::ios::in|std::ios::binary);
-//             while(1){
-//                 memset(tempbuf,0,sizeof(tempbuf));
-//                 reader.read(tempbuf,sizeof(tempbuf));
-//                 auto size = reader.gcount();
-                
-//                 ibret = send(sock,tempbuf,size,0);
-//                 sendlength+=ibret;
-//                 if(listener.OnChange!=nullptr) listener.OnChange(sendlength,length);
-//                 if(reader.eof()) break;
-//             }
-//             reader.close();
+        char tempbuf[TRANSLATE_SIZE];
+        for(int index=0;index<list.size;index+=2){
+            if(list[index].Equal("file")){
+                auto filename = list[index+1].Cut("/",-1)._value;
+                builder += "--"+boundary+"\r\nContent-Disposition: form-data; name= \"file\"; filename=\""+filename+"\"\r\nContent-Type: application/octet-stream\r\n\r\n";
+                ibret = send(sock,builder.c_str(),builder._length(),0); 
+                sendlength+=ibret;
+                builder = "";
 
-//             builder +="\r\n";
-//             ibret = send(sock,builder.c_str(),builder._length(),0); 
-//             sendlength+=ibret;
-//             builder = "";
-//         }else if(list[index].Equal("json")){
-//             builder += "--"+boundary+"\r\nContent-Disposition: form-data; \r\nContent-Type: application/json\r\n\r\n";
-//             builder += list[index+1]+"\r\n";
-//             ibret = send(sock,builder.c_str(),builder._length(),0); 
-//             sendlength+=ibret;
-//             builder = "";
-//         }else{
-//             builder += "--"+boundary+"\r\nContent-Disposition: form-data; name=\""+list[index]+"\"\r\n\r\n";
-//             builder += list[index+1]+"\r\n";
-//             ibret = send(sock,builder.c_str(),builder._length(),0); 
-//             sendlength+=ibret;
-//             builder = "";
-//         }
-//     }
+                reader.open(list[index+1].c_str(),std::ios::in|std::ios::binary);
+                while(1){
+                    memset(tempbuf,0,sizeof(tempbuf));
+                    reader.read(tempbuf,sizeof(tempbuf));
+                    auto size = reader.gcount();
+            
+                    ibret = send(sock,tempbuf,size,0);
+                    sendlength+=ibret;
+                    if(listener.OnChange!=nullptr) listener.OnChange(sendlength,length);
+                    if(reader.eof()) break;
+                }
+                reader.close();
 
-//     hString footer = "--"+boundary+"--\r\n\r\n";
-//     ibret = send(sock,footer,footer._length(),0);
-//     sendlength+=ibret;
+                builder +="\r\n";
+                ibret = send(sock,builder.c_str(),builder._length(),0); 
+                sendlength+=ibret;
+                builder = "";
+            }else if(list[index].Equal("json")){
+                builder += "--"+boundary+"\r\nContent-Disposition: form-data; \r\nContent-Type: application/json\r\n\r\n";
+                builder += list[index+1]+"\r\n";
+                ibret = send(sock,builder.c_str(),builder._length(),0); 
+                sendlength+=ibret;
+                builder = "";
+            }else{
+                builder += "--"+boundary+"\r\nContent-Disposition: form-data; name=\""+list[index]+"\"\r\n\r\n";
+                builder += list[index+1]+"\r\n";
+                ibret = send(sock,builder.c_str(),builder._length(),0); 
+                sendlength+=ibret;
+                builder = "";
+            }
+        }
 
-//     plog("before recv"," content-length:",length," sendlength:",sendlength);
-//     hString RequestResult = "";
+        hString footer = "--"+boundary+"--\r\n\r\n";
+        ibret = send(sock,footer,footer._length(),0);
+        sendlength+=ibret;
 
-//     //first recv ,get response
-//     memset(tempbuf,0,sizeof(tempbuf));
-//     ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
+        //diff
+        plog("before recv"," content-length:",length," sendlength:",sendlength);
+        hString RequestResult = "";
 
-//     while(1){ 
-//         if(hString(tempbuf).Contain("\r\n0\r\n\r\n")) break;
-//         memset(tempbuf,0,sizeof(tempbuf));
-//         ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
-//     }
+        //first recv ,get response
+        memset(tempbuf,0,sizeof(tempbuf));
+        ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
 
-//     auto ResponeAndContent = AString(tempbuf).Cut("\r\n\r\n",1);
-//     Response spo = ResponeAndContent._key;
-//     bool chunk = ResponeAndContent._key.Contain("Transfer-Encoding: chunked");
+        while(1){ 
+            if(hString(tempbuf).Contain("\r\n0\r\n\r\n")) break;
+            memset(tempbuf,0,sizeof(tempbuf));
+            ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
+            if(ibret == 0) break;
+        }
 
-//     auto MessageContent = ResponeAndContent._value;
+        auto ResponeAndContent = AString(tempbuf).Cut("\r\n\r\n",1);
+        Response spo = ResponeAndContent._key;
+        bool chunk = ResponeAndContent._key.Contain("Transfer-Encoding: chunked");
 
-//     // if(chunk){
-//     //     hString chunksize = MessageContent.Cut("\r\n",1)._key;
-//     //     int nsize = hString::ToLH(chunksize);
-//     //     int pos = 2+chunksize._length();
-//     //     int chunksizepos = 0;
-        
-//     //     while(pos<MessageContent._length()){
-//     //         RequestResult+=MessageContent.substr(pos,nsize);
-//     //         nsize = MessageContent[pos+nsize+2];
-//     //         chunksize = "";
-//     //         chunksizepos = pos+nsize+2;
-//     //         while(MessageContent[chunksizepos]!='\r'){
-//     //             chunksize+=MessageContent[chunksizepos];
-//     //             chunksizepos++;
-//     //         }
-//     //         nsize = hString::ToLH(chunksize);
-//     //         pos = chunksizepos+2;
-//     //     }
-//     // }
+        auto MessageContent = ResponeAndContent._value;
 
-//     if(listener.OnReceiveData!=nullptr)
-//         listener.OnReceiveData(ResponeAndContent._value,spo);
-//     else
-//         RequestResult+=ResponeAndContent._value;
+        // if(chunk){
+        //     hString chunksize = MessageContent.Cut("\r\n",1)._key;
+        //     int nsize = hString::ToLH(chunksize);
+        //     int pos = 2+chunksize._length();
+        //     int chunksizepos = 0;
 
-//     // while(1){
-//     //     memset(tempbuf,0,sizeof(tempbuf));
-//     //     ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
-//     //     if(tempbuf[ibret-1]==0) break;
-//     //     if(listener.OnReceiveData!=nullptr)
-//     //         listener.OnReceiveData(tempbuf,spo);
-//     //     else
-//     //         RequestResult+=tempbuf;
-//     // }
+        //     while(pos<MessageContent._length()){
+        //         RequestResult+=MessageContent.substr(pos,nsize);
+        //         nsize = MessageContent[pos+nsize+2];
+        //         chunksize = "";
+        //         chunksizepos = pos+nsize+2;
+        //         while(MessageContent[chunksizepos]!='\r'){
+        //             chunksize+=MessageContent[chunksizepos];
+        //             chunksizepos++;
+        //         }
+        //         nsize = hString::ToLH(chunksize);
+        //         pos = chunksizepos+2;
+        //     }
+        // }
 
-//     if(listener.OnComplete !=nullptr){
-//         listener.OnComplete(RequestResult);
-//     }
+        if(listener.OnReceiveData!=nullptr)
+            listener.OnReceiveData(ResponeAndContent._value,spo);
+        else
+            RequestResult+=ResponeAndContent._value;
 
-//     plog("recv:",RequestResult);
+        // while(1){
+        //     memset(tempbuf,0,sizeof(tempbuf));
+        //     ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
+        //     if(tempbuf[ibret-1]==0) break;
+        //     if(listener.OnReceiveData!=nullptr)
+        //         listener.OnReceiveData(tempbuf,spo);
+        //     else
+        //         RequestResult+=tempbuf;
+        // }
 
-//     #ifdef WIN32
-//     closesocket(sock);
-//     WSACleanup();
-//     #else
-//     if(sock) shutdown(sock,2);
-//     #endif
+        if(listener.OnComplete !=nullptr){
+            listener.OnComplete(RequestResult);
+        }
 
-//     return true;
-// }
+        plog("recv:",RequestResult);
+
+        #ifdef WIN32
+        closesocket(sock);
+        WSACleanup();
+        #else
+        if(sock) shutdown(sock,2);
+        #endif
+
+        return true;
+    }
 
 hString Post(const hString& url,const hString& data,long timeout,TransListener listener,std::function<void(Request& req)> OtherSetting ){
     #ifdef WIN32
