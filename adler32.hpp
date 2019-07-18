@@ -12,7 +12,7 @@
         int  index;
         int  length;
         int  offset;
-        bool sameblock;
+        int sameblock;
         range(int _index,int _length,int _offset,bool _sb = false):index(_index),length(_length),offset(_offset),sameblock(_sb){}
         range(){}
     };
@@ -84,6 +84,8 @@
     extern vector<diff> CalcFileDiff(const AString& filename);
     extern void CalcFileDiff_r(const AString& filename,std::function<void(diff&,bool&,int&)> func);
     extern vector<range> performMarge(const char * src,const char * dffile);
+    
+    extern vector<range> LoadRange(const char * filename);
 
     struct Point{
         int x;

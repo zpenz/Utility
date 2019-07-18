@@ -365,6 +365,29 @@
             };
     };
 
+    vector<range> LoadRange(const char * filename){
+        fstream fo = fstream(filename,fstream::in|fstream::binary);
+        range rg;
+        fo.seekg(0,fo.end);
+        int length = fo.tellg();
+        fo.seekg(0,fo.beg);
+
+        fo.seekg(sizeof(header),fo.beg);
+        vector<range> list;
+
+        while(1){
+            fo.read(reinterpret_cast<char *>(&rg),sizeof(rg));
+            if(fo.gcount()==0) break;
+            list.push_back(rg);
+            if(!rg.sameblock)
+                fo.seekg(rg.length,fo.cur);
+
+            plog(rg.index," ",rg.length);
+        }
+        fo.close();
+        return list;
+    }
+
     void SaveRange(vector<range>& list,fstream& flocal,const char * savename){
         fstream fs = fstream(savename,fstream::in | fstream::out | fstream::trunc);
         auto headsize = sizeof(header);
@@ -382,10 +405,12 @@
                     flocal.seekg(rg.index);
                     char buf[CHUNK_SIZE];
                     for(int index=0;index<rg.length/CHUNK_SIZE;index++){
+                        memset(buf,0,sizeof(buf));
                         flocal.read(buf,sizeof(buf));
                         plog(buf);
                         fs.write(buf,sizeof(buf));
                     }
+                    memset(buf,0,sizeof(buf));
                     flocal.read(buf,rg.length%CHUNK_SIZE);
                     fs.write(buf,rg.length%CHUNK_SIZE);
                     offset+=rg.length;
@@ -404,7 +429,7 @@
         //         fs.write(buf,rg.length%CHUNK_SIZE);
         //     }
         // });
-        // fs.close();
+        fs.close();
     }
     
     //func : fun(buf,checkvalue,index)

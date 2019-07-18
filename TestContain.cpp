@@ -40,26 +40,31 @@ int main(int argc, char const *argv[])
         //     plog("index: ",item.index," rvale: ",item.rvalue," md5: ",item.MD5Value);
         // });
         
-        vector<range> oplist = performMarge("test.test","diff");
+        vector<range> oplist = performMarge("test.test","verify27263090");
 
+        // auto oplist = LoadRange("");
         for_each(oplist.begin(),oplist.end(),[](range& rg){
             plog(rg.index," ",rg.length," ",rg.sameblock," ",rg.offset);
         });
-        // Linker<AString> params;
-        // Utility::JObject obj;
+
+        Linker<AString> params;
+        Utility::JObject obj;
         // obj.Add("admin_id",1001,"sid","npJ8cS1q25M9vQcXXW02H9Te2G2L7O7","directory_path","/var/share/mp/xklvm1562233594/wxy/xk","all_file_name","/var/share/mp/xklvm1562233594/wxy/xk/UtilityTest.cpp");
         // params.Add("json",obj.Serial());
-        // params.Add("file","test.test.op");
+        params.Add("file","test.test.op");
 
-        // // fstream fs = fstream("1.diff",fs.out);
-        // FormPost("http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi",params,99999,Utility::TransListener(nullptr,[&](AString string){
-        //     // fs.close();
-        //     plog("result: ",string._length()," content:",string);
+        // fstream fs = fstream("1.diff",fs.out);
+        FormPost("http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi",params,99999,Utility::TransListener(nullptr,[&](AString string){
+            // fs.close();
+            plog("result: ",string._length()," content:",string);
             
-        // },nullptr,
-        // nullptr
-        // ),[](Utility::Request& req){
-        // });
+        },nullptr,
+        nullptr
+        ),[](Utility::Request& req){
+                    Utility::JObject job;
+            job.Add("admin_id",1001,"sid","c4VFW2UOF13eIkNQWAv4KANd3g54Im2","path_name","/var/share/mp/xklvm1562233594/wxy/xk/","file_name","UnitTest.cpp");
+            req.OtherRecord.Add(Utility::KV("XK_JSON",job.Serial()));
+        });
 
     return 0;
 }
