@@ -34,27 +34,29 @@ int main(int argc, char const *argv[])
     // job.Add("admin_id",1001,"sid","Hd3M1a1jII4MZeUx5fIKswfgWoFVH9l","mount_point","xkraid1560365017","begin_line",1);
     // plog(job.Serial());
 
-    Linker<AString> params;
-    Utility::JObject obj;
-    obj.Add("admin_id",1001,"sid","iIF1Ss9pCq1Am08sUWz02k8Wq874g8E","directory_path","/var/share/mp/xklvm1562233594/photo/","all_file_name","/var/share/mp/xklvm1562233594/photo/Licence.txt");
-    params.Add("json",obj.Serial());
-
-    fstream fs = fstream("1.diff",fs.out);
-    FormPost("http://192.168.10.23:5555/cgi-bin/xk_file_rsync_verify.cgi",params,99999,Utility::TransListener(nullptr,[&](AString string){
-        fs.close();
-        plog("result: ",string._length()," content:",string);
-        
-        // auto ret = LoadDiff<diff>("1.diff");
-        // for_each(ret.begin(),ret.end(),[](diff &item){
-        //     plog(item.MD5Value," ",item.rvalue);
+        // auto ret = LoadDiff<diff>("verify27262990");
+        // SaveFile<diff>("diff",CalcFileSlideDiff("test.test"));
+        // for_each(ret.begin(),ret.end(),[](diff& item){
+        //     plog("index: ",item.index," rvale: ",item.rvalue," md5: ",item.MD5Value);
         // });
-    },nullptr,//nullptr
-    [&](AString rece,Utility::Response& spo){
-        fs.write(rece.c_str(),rece._length());
-        plog(rece);
-    }
-    ),[](Utility::Request& req){
-    });
+        
+        vector<range> oplist = performMarge("test.test","diff");
+
+        Linker<AString> params;
+        Utility::JObject obj;
+        obj.Add("admin_id",1001,"sid","npJ8cS1q25M9vQcXXW02H9Te2G2L7O7","directory_path","/var/share/mp/xklvm1562233594/wxy/xk","all_file_name","/var/share/mp/xklvm1562233594/wxy/xk/UtilityTest.cpp");
+        params.Add("json",obj.Serial());
+        params.Add("file","test.test.op");
+
+        fstream fs = fstream("1.diff",fs.out);
+        FormPost("http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi",params,99999,Utility::TransListener(nullptr,[&](AString string){
+            fs.close();
+            plog("result: ",string._length()," content:",string);
+            
+        },nullptr,
+        nullptr
+        ),[](Utility::Request& req){
+        });
 
     return 0;
 }

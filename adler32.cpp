@@ -148,123 +148,6 @@
         return data;
     }
 
-    // vector<diff> CalcFileDiff_r(const AString& filename){
-    //     vector<diff> data;
-
-    //     auto file = fopen(filename.c_str(),"rb+");
-    //     char buf[CHUNK_SIZE];
-    //     char buf2[CHUNK_SIZE];
-    //     char* bufcur = buf;
-    //     char* bufbk = buf2;
-
-    //     int pos = 0;
-    //     int size = 0;
-
-    //     size = fread(buf,sizeof(char),CHUNK_SIZE,file);
-    //     int AValue = 1,BValue = 0;
-    //     for(int index=0;index<size;index++){
-    //         AValue = (AValue+static_cast<int>(buf[index]));
-    //         BValue = (BValue + AValue);
-    //     }
-    //     data.push_back(diff(AValue,BValue,"",0));
-
-    //     while((size = fread(bufbk,sizeof(char),CHUNK_SIZE,file))>0){
-    //         for(int j =0;j<size;j++){
-    //             AValue -= (bufcur[j]-static_cast<int>(bufbk[j]));
-    //             BValue -= (CHUNK_SIZE*(bufcur[j])-AValue+1);
-
-    //             diff df = diff(AValue,BValue,"",pos++);
-    //             // df.index = pos++;
-    //             data.push_back(df);
-    //         }
-
-    //         char* temp = bufcur;
-    //         bufcur = bufbk;
-    //         bufbk = temp;
-    //     }
-
-    //     fclose(file);
-    //     return data;
-    // }
-
-    //func : fun(buf,checkvalue,index)
-    //cancel save diff because of bad alloc
-    void CalcFileDiff_r(const AString& filename,std::function<void(diff&,bool&,int&)> func){
-        fstream file = fstream(filename.c_str(),fstream::in|fstream::binary);
-
-        typedef unsigned char rChar;
-
-        rChar buf[CHUNK_SIZE];
-        rChar buf2[CHUNK_SIZE];
-        rChar* bufcur = buf;
-        rChar* bufbk = buf2;
-
-        int pos = 0;
-        int size = 0;
-        bool sameblock = false;
-
-        file.seekg(0,file.end);
-        long FileLen = file.tellg();
-        file.seekg(0,file.beg);
-
-        while(1){
-            bufcur = buf;
-            bufbk = buf2;
-
-            file.read((char*)bufcur,CHUNK_SIZE);
-            size = file.gcount();
-            int AValue = 1,BValue = 0;
-            for(int index=0;index<size;index++){
-                AValue = (AValue+bufcur[index]);
-                BValue = (BValue + AValue);
-            }
-            diff df = diff(AValue,BValue,"",pos);
-            plog("pos ",pos);
-
-            if(func) func(df,sameblock,pos);
-            if(sameblock){
-                if(df.index+CHUNK_SIZE>FileLen) {
-                    file.close();
-                    return ;
-                }
-                file.seekg(df.index+CHUNK_SIZE,file.beg);
-                memset(buf,0, sizeof(buf));
-                continue;
-            }
-            
-            if(file.eof()) break;
-            
-        //     while(1){
-        //         plog("---------- ",pos);
-        //         file.seekp(pos);
-        //         file.read((char*)bufbk,CHUNK_SIZE);
-        //         size = file.gcount();
-        //         for(int j =0;j<size;j++){
-        //             AValue -= (bufcur[j]-bufbk[j]);
-        //             BValue -= (CHUNK_SIZE*(bufcur[j])-AValue+1);
-
-        //             diff df = diff(AValue,BValue,"",pos);
-        //             if(func) func(df,sameblock,pos);
-        //             if(sameblock){
-        //                 file.seekg(df.index+CHUNK_SIZE,file.beg);
-        //                 memset(buf,0, sizeof(buf));
-        //                 goto next;
-        //             }
-        //             if(file.eof()) {
-        //                 file.close();
-        //                 return ;
-        //             }
-        //         }
-
-        //         rChar* temp = bufcur;
-        //         bufcur = bufbk;
-        //         bufbk = temp;
-        //     }
-        //    next:;
-        }
-        file.close();
-    }
-
     #pragma region Diff
     void MyersDiff(AString src,AString des){
         int sizea  = src._length();
@@ -500,6 +383,7 @@
                     char buf[CHUNK_SIZE];
                     for(int index=0;index<rg.length/CHUNK_SIZE;index++){
                         flocal.read(buf,sizeof(buf));
+                        plog(buf);
                         fs.write(buf,sizeof(buf));
                     }
                     flocal.read(buf,rg.length%CHUNK_SIZE);
@@ -522,99 +406,82 @@
         // });
         // fs.close();
     }
+    
+    //func : fun(buf,checkvalue,index)
+    //cancel save diff because of bad alloc
+    void CalcFileDiff_r(const AString& filename,std::function<void(diff&,bool&,int&)> func){
+        fstream file = fstream(filename.c_str(),fstream::in|fstream::binary);
+        typedef unsigned char rChar;
 
-    // vector<range> performMarge(const char * src,const char * dffile){
-    //     fstream f1(src,f1.binary|f1.in);
-    //     fstream fs = fstream(src+AString(".marge"),fstream::in | fstream::out | fstream::trunc);
-    //     auto ret = LoadDiff<diff>(dffile);
-        
-    //     std::map<int,diff> store1;
-    //     for_each(ret.begin(),ret.end(),[&](diff & item){
-    //         store1[item.rvalue] = item;
-    //     });
+        rChar buf[CHUNK_SIZE];
+        rChar buf2[CHUNK_SIZE];
+        rChar* bufcur = buf;
+        rChar* bufbk = buf2;
 
-    //     //roll
-    //     auto ret2 = CalcFileDiff_r(src);
+        int pos = 0;
+        int size = 0;
+        bool sameblock = false;
 
-    //     //calc list
-    //     bool bDiff = false;
-    //     vector<range> list = vector<range>();
+        file.seekg(0,file.end);
+        long FileLen = file.tellg();
+        file.seekg(0,file.beg);
 
-    //     int  i = 0;
-    //     int startpos = 0;
-    //     int length = 0;
-    //     int offset = 0;
-        
-    //     while(i<ret2.size())
-    //     {
-    //         auto localitem = ret2[i];
-    //         auto remoteitem = store1.find(localitem.rvalue);
+        while(1){
+            bufcur = buf;
+            bufbk = buf2;
 
-    //         if(remoteitem!= store1.end())
-    //         {
+            file.read((char*)bufcur,CHUNK_SIZE);
+            size = file.gcount();
+            int AValue = 1,BValue = 0;
+            for(int index=0;index<size;index++){
+                AValue = (AValue+bufcur[index]);
+                BValue = (BValue + AValue);
+            }
+            diff df = diff(AValue,BValue,"",pos);
+            plog("pos ",pos);
 
-    //             plog("i = ",i);
-    //             f1.seekg(i);
-    //             char buf[CHUNK_SIZE];
-    //             f1.read(buf,CHUNK_SIZE);
-    //             auto md5 = MD5::Md516(buf,CHUNK_SIZE);
-
-    //             if(strcmp(md5.c_str(),remoteitem->second.MD5Value)==0)
-    //             {
-    //                 // plog(buf); return list;
-    //                 if(bDiff)
-    //                 {
-    //                     plog("diff length ",length); 
-    //                     bDiff = false;
-    //                     offset+=length;
-    //                     list.push_back(range(startpos, length, offset));
-    //                 }
-
-    //                 //same block
-    //                 plog("localitem: ",localitem.index);
-    //                 list.push_back(range(remoteitem->second.index,CHUNK_SIZE,i,true));
-    //                 plog("same block index",localitem.index);
-    //                 i+=CHUNK_SIZE;
-    //                 offset+=length;
-    //                 continue;
-    //             }
-    //         }
+            if(func) func(df,sameblock,pos);
+            if(sameblock){
+                if(df.index+CHUNK_SIZE>FileLen) {
+                    file.close();
+                    return ;
+                }
+                file.seekg(pos,file.beg);
+                memset(buf,0, sizeof(buf));
+                continue;
+            }
             
-    //         //delay
-    //         if(bDiff)
-    //         {
-    //             length++;
-    //         }
-    //         else
-    //         {
-    //             bDiff = true;
-    //             startpos = localitem.index==0?0:localitem.index+1;
-    //             length = 1;
-    //         }
-    //         i++;
-    //     }
+            if(file.eof()) break;
+            
+            while(1){
+                plog("---------- ",pos);
+                file.read((char*)bufbk,CHUNK_SIZE);
+                size = file.gcount();
+                for(int j =0;j<size;j++){
+                    AValue -= (bufcur[j]-bufbk[j]);
+                    BValue -= (CHUNK_SIZE*(bufcur[j])-AValue+1);
 
-    //     // if last is diff
-    //     if(bDiff)
-    //     {
-    //         bDiff = false;
-    //         list.push_back(range(startpos,length,i));
-    //     }
+                    diff df = diff(AValue,BValue,"",pos);
+                    if(func) func(df,sameblock,pos);
+                    if(sameblock){
+                        file.seekg(df.index+CHUNK_SIZE,file.beg);
+                        memset(buf,0, sizeof(buf));
+                        goto next;
+                    }
+                    if(file.eof()) {
+                        file.close();
+                        return ;
+                    }
+                }
 
-    //     //<<CHUNK_SIZE>
-    //     f1.seekg(0,f1.end);
-    //     auto filesize = f1.tellg();
-    //     plog("i=",i);
-    //     if(i<filesize)
-    //         list.push_back(range(i,(int)filesize-i,i));
-
-    //     //save range
-    //     SaveRange(list,f1,AString(src)+".op");
-
-    //     f1.close();
-    //     fs.close();
-    //     return list;
-    // }
+                rChar* temp = bufcur;
+                bufcur = bufbk;
+                bufbk = temp;
+            }
+           next:;
+        }
+        file.close();
+    }
 
     vector<range> performMarge(const char * src,const char * dffile){
             
@@ -642,6 +509,7 @@
             auto remoteitem = store1.find(localitem.rvalue);
             lastpos = localitem.index;
             if(remoteitem!=store1.end()){
+                plog("rvalue same! remote index: ",remoteitem->second.index," local index: ",localitem.index);
                 f1.seekg(localitem.index);
                 char buf[CHUNK_SIZE];
                 f1.read(buf,CHUNK_SIZE);
@@ -702,16 +570,4 @@
 
         f1.close();
         return list;
-    }
-
-    int main(int argc, char const *argv[])
-    {
-        // auto ret = LoadDiff<diff>("verify27262990");
-        // SaveFile<diff>("verify27262990",CalcFileSlideDiff("xk.apk"));
-        // for_each(ret.begin(),ret.end(),[](diff& item){
-        //     plog("index: ",item.index," rvale: ",item.rvalue," md5: ",item.MD5Value);
-        // });
-        
-        vector<range> oplist = performMarge("xk.apk","verify27262990");
-        return 0;
     }

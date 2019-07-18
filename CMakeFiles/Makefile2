@@ -71,7 +71,7 @@ CMAKE_BINARY_DIR = /Users/szp/Desktop/Utility-master
 CMakeFiles/sserver.dir/all:
 	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/depend
 	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/szp/Desktop/Utility-master/CMakeFiles --progress-num=8,9,10 "Built target sserver"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/szp/Desktop/Utility-master/CMakeFiles --progress-num=6,7,8 "Built target sserver"
 .PHONY : CMakeFiles/sserver.dir/all
 
 # Include target in all.
@@ -108,7 +108,7 @@ clean: CMakeFiles/sserver.dir/clean
 CMakeFiles/TestContain.dir/all:
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/depend
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/szp/Desktop/Utility-master/CMakeFiles --progress-num=1,2,3 "Built target TestContain"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/szp/Desktop/Utility-master/CMakeFiles --progress-num=1,2,3,4,5 "Built target TestContain"
 .PHONY : CMakeFiles/TestContain.dir/all
 
 # Include target in all.
@@ -118,7 +118,7 @@ all: CMakeFiles/TestContain.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/TestContain.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/szp/Desktop/Utility-master/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/szp/Desktop/Utility-master/CMakeFiles 5
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/TestContain.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/szp/Desktop/Utility-master/CMakeFiles 0
 .PHONY : CMakeFiles/TestContain.dir/rule
@@ -135,43 +135,6 @@ CMakeFiles/TestContain.dir/clean:
 
 # clean rule for target.
 clean: CMakeFiles/TestContain.dir/clean
-
-.PHONY : clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/adler32.dir
-
-# All Build rule for target.
-CMakeFiles/adler32.dir/all:
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/depend
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/szp/Desktop/Utility-master/CMakeFiles --progress-num=4,5,6,7 "Built target adler32"
-.PHONY : CMakeFiles/adler32.dir/all
-
-# Include target in all.
-all: CMakeFiles/adler32.dir/all
-
-.PHONY : all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/adler32.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/szp/Desktop/Utility-master/CMakeFiles 4
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/adler32.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/szp/Desktop/Utility-master/CMakeFiles 0
-.PHONY : CMakeFiles/adler32.dir/rule
-
-# Convenience name for target.
-adler32: CMakeFiles/adler32.dir/rule
-
-.PHONY : adler32
-
-# clean rule for target.
-CMakeFiles/adler32.dir/clean:
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/clean
-.PHONY : CMakeFiles/adler32.dir/clean
-
-# clean rule for target.
-clean: CMakeFiles/adler32.dir/clean
 
 .PHONY : clean
 

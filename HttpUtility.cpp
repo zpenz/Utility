@@ -295,12 +295,10 @@ hString FormPost(const hString& url,Linker<hString> list,long timeout,TransListe
 
     while(1){ 
         if(hString(tempbuf).Contain("\r\n0\r\n\r\n")) break;
-        plog(".........");
         memset(tempbuf,0,sizeof(tempbuf));
         ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
     }
 
-    plog("tempbuf=",ibret);
     auto ResponeAndContent = AString(tempbuf).Cut("\r\n\r\n",1);
     Response spo = ResponeAndContent._key;
     bool chunk = ResponeAndContent._key.Contain("Transfer-Encoding: chunked");
