@@ -191,6 +191,7 @@
     //cancel save diff because of bad alloc
     void CalcFileDiff_r(const AString& filename,std::function<void(diff&,bool&,int&)> func){
         fstream file = fstream(filename.c_str(),fstream::in|fstream::binary);
+
         typedef unsigned char rChar;
 
         rChar buf[CHUNK_SIZE];
@@ -233,33 +234,33 @@
             
             if(file.eof()) break;
             
-            while(1){
-                plog("---------- ",pos);
-                file.seekg(pos,file.beg);
-                file.read((char*)bufbk,CHUNK_SIZE);
-                size = file.gcount();
-                for(int j =0;j<size;j++){
-                    AValue -= (bufcur[j]-bufbk[j]);
-                    BValue -= (CHUNK_SIZE*(bufcur[j])-AValue+1);
+        //     while(1){
+        //         plog("---------- ",pos);
+        //         file.seekp(pos);
+        //         file.read((char*)bufbk,CHUNK_SIZE);
+        //         size = file.gcount();
+        //         for(int j =0;j<size;j++){
+        //             AValue -= (bufcur[j]-bufbk[j]);
+        //             BValue -= (CHUNK_SIZE*(bufcur[j])-AValue+1);
 
-                    diff df = diff(AValue,BValue,"",pos);
-                    if(func) func(df,sameblock,pos);
-                    if(sameblock){
-                        file.seekg(df.index+CHUNK_SIZE,file.beg);
-                        memset(buf,0, sizeof(buf));
-                        goto next;
-                    }
-                    if(file.eof()) {
-                        file.close();
-                        return ;
-                    }
-                }
+        //             diff df = diff(AValue,BValue,"",pos);
+        //             if(func) func(df,sameblock,pos);
+        //             if(sameblock){
+        //                 file.seekg(df.index+CHUNK_SIZE,file.beg);
+        //                 memset(buf,0, sizeof(buf));
+        //                 goto next;
+        //             }
+        //             if(file.eof()) {
+        //                 file.close();
+        //                 return ;
+        //             }
+        //         }
 
-                rChar* temp = bufcur;
-                bufcur = bufbk;
-                bufbk = temp;
-            }
-           next:;
+        //         rChar* temp = bufcur;
+        //         bufcur = bufbk;
+        //         bufbk = temp;
+        //     }
+        //    next:;
         }
         file.close();
     }
@@ -645,7 +646,7 @@
                 char buf[CHUNK_SIZE];
                 f1.read(buf,CHUNK_SIZE);
                 auto md5 = MD5::Md516(buf,CHUNK_SIZE);
-                if(strcmp(md5.c_str(),remoteitem->second.MD5Value)==0)
+                if(strcmp(md5,remoteitem->second.MD5Value)==0)
                 {
                     if(bDiff)
                     {
