@@ -337,7 +337,7 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
 
         auto ibret = connect(sock,reinterpret_cast<sockaddr*>(&sockAddr),sizeof(sockAddr));
         if(ibret!=0) 
-            {if(listener.OnError!=nullptr) listener.OnError("连接到服务器失败!"); return "";}
+            {if(listener.OnError!=nullptr) listener.OnError("connect server error!"); return "";}
 
         std::fstream reader;
 
@@ -366,7 +366,7 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
         }
         builder+="--"+boundary+"--\r\n\r\n";
         length+=builder._length();
-        show_message(builder);
+        // plog(builder);
         builder = "";
 
         Request request(url);
@@ -376,7 +376,7 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
         if(OtherSetting!=nullptr) OtherSetting(request);
 
         auto header = request.ToString();
-        plog("header: ",header);
+        // plog("header: ",header);
         ibret = send(sock,header.c_str(),header._length(),0);
 
         char tempbuf[TRANSLATE_SIZE];
@@ -426,16 +426,23 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
 
         //diff
         plog("before recv"," content-length:",length," sendlength:",sendlength);
-        hString RequestResult = "";
 
         //first recv ,get response
         memset(tempbuf,0,sizeof(tempbuf));
         ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
+        if(ibret<0){
+            char errbuf[100]={0};
+            perror(errbuf);
+            plog(errbuf);
+            return "";
+        }
+        plog("recv length ",ibret);
 
         while(1){ 
             if(hString(tempbuf).Contain("\r\n0\r\n\r\n")) break;
             memset(tempbuf,0,sizeof(tempbuf));
             ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
+            plog("recv length ",ibret);
             if(ibret == 0) break;
         }
 
@@ -465,10 +472,10 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
         //     }
         // }
 
+        hString RequestResult = ""; 
         if(listener.OnReceiveData!=nullptr)
             listener.OnReceiveData(ResponeAndContent._value,spo);
-        else
-            RequestResult+=ResponeAndContent._value;
+        RequestResult+=ResponeAndContent._value;
 
         // while(1){
         //     memset(tempbuf,0,sizeof(tempbuf));

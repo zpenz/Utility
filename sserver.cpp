@@ -104,6 +104,7 @@ bool start(){
                     
                 }
             }
+            // send(sockConnect,AString("ACK FROM SERVER").c_str(),AString("ACK FROM SERVER")._length(),0);
 
         //     auto headsize=((PACKAGE_HEAD*)buf)->package_size;
         //     auto datakind=((PACKAGE_HEAD*)buf)->datakind;

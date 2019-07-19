@@ -4,6 +4,7 @@
 #include "json.hpp"
 #include "HttpUtility.hpp"
 #include "adler32.hpp"
+#include <algorithm>
 
 using namespace Contain;
 using namespace Iterator;
@@ -53,9 +54,9 @@ int main(int argc, char const *argv[])
         // params.Add("json",obj.Serial());
         params.Add("file","test.test.op");
 
-        // fstream fs = fstream("1.diff",fs.out);
-        FormPostTest("http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi",params,99999,Utility::TransListener(nullptr,[&](AString string){
-            // fs.close();
+        // auto url = "http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi";
+        auto url = "192.168.1.154:9000";
+        FormPostTest(url,params,99999,Utility::TransListener(nullptr,[&](AString string){
             plog("result: ",string._length()," content:",string);
             
         },nullptr,
