@@ -662,7 +662,7 @@ YY_DECL
 		}
 
 	{
-#line 5 "1.l"
+#line 6 "1.l"
 
 #line 667 "lex.yy.c"
 
@@ -723,32 +723,32 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 6 "1.l"
+#line 7 "1.l"
 {printf("word : %s\n",yytext);}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 7 "1.l"
+#line 8 "1.l"
 {printf("number : %s\n",yytext);}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 8 "1.l"
+#line 9 "1.l"
 {printf("op : %s\n",yytext);}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 9 "1.l"
+#line 10 "1.l"
 ; 
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 10 "1.l"
+#line 11 "1.l"
 {}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 11 "1.l"
+#line 12 "1.l"
 ECHO;
 	YY_BREAK
 #line 754 "lex.yy.c"
@@ -1756,7 +1756,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 11 "1.l"
+#line 12 "1.l"
 
 
 int yywrap(){return 1;}
