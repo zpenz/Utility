@@ -40,13 +40,12 @@ int main(int argc, char const *argv[])
         // for_each(ret.begin(),ret.end(),[](diff& item){
         //     plog("index: ",item.index," rvale: ",item.rvalue," md5: ",item.MD5Value);
         // });
-        
-        vector<range> oplist = performMarge("test.test","verify27263090");
+        // vector<range> oplist = performMarge("test.test","verify27263090");
 
         // auto oplist = LoadRange("");
-        for_each(oplist.begin(),oplist.end(),[](range& rg){
-            plog(rg.index," ",rg.length," ",rg.sameblock," ",rg.offset);
-        });
+        // for_each(oplist.begin(),oplist.end(),[](range& rg){
+        //     plog(rg.index," ",rg.length," ",rg.sameblock," ",rg.offset);
+        // });
 
         Linker<AString> params;
         Utility::JObject obj;
