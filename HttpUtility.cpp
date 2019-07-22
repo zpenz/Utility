@@ -1,4 +1,5 @@
 #include "HttpUtility.hpp"
+
 #ifdef WIN32
 #include <WinSock2.h>
 #include <ws2tcpip.h>
@@ -7,8 +8,8 @@
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
-
 #endif
+
 #include <iostream>
 #include <fstream>
 
@@ -110,6 +111,12 @@ Request Request::Parse(const AString& buf) {
     return req;
 }
 
+hString Response::ParseChunkContent(const hString& buf){
+    hString RealContent = LastChunkLeft+buf;
+    
+    return LastChunkLeft;
+}
+
 Response Response::Parse(const AString& buf){
     auto ret = buf.Split("\r\n");
     Response spo;
@@ -140,6 +147,8 @@ Response Response::Parse(const AString& buf){
                 spo.Server = value;
             }else
             {
+                if(keyvalue._key.StartWith("Transfer-Encoding") && (keyvalue._value.Equal("chunked"))) 
+                    spo.chunk = true;
                 spo.OtherRecord.Add(KV(keyvalue._key,value));
             }
         }
@@ -376,7 +385,6 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
         if(OtherSetting!=nullptr) OtherSetting(request);
 
         auto header = request.ToString();
-        // plog("header: ",header);
         ibret = send(sock,header.c_str(),header._length(),0);
 
         char tempbuf[TRANSLATE_SIZE];
@@ -436,56 +444,44 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
             plog(errbuf);
             return "";
         }
-        plog("recv length ",ibret);
+        plog("recv length ",ibret," content: ",tempbuf);
 
-        while(1){ 
-            if(hString(tempbuf).Contain("\r\n0\r\n\r\n")) break;
-            memset(tempbuf,0,sizeof(tempbuf));
-            ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
-            plog("recv length ",ibret);
-            if(ibret == 0) break;
+        //Get Response Content
+        auto FirstPackage = hString(tempbuf);
+        hString RequestResult = ""; 
+        Response spo;
+        hString MessageContent;
+        bool http = FirstPackage.StartWith("HTTP");
+        if(http){
+            auto ResponeAndContent = FirstPackage.Cut("\r\n\r\n",1);
+            MessageContent = ResponeAndContent._value;
+            spo = ResponeAndContent._key;
+            
+            if(listener.OnReceiveData) {
+                listener.OnReceiveData(spo.chunk?spo.ParseChunkContent(MessageContent):MessageContent,spo);
+            }else 
+                RequestResult+=MessageContent;
+        }else{
+            if(listener.OnOtherData) listener.OnOtherData(tempbuf);
+            else RequestResult+=MessageContent;
         }
 
-        auto ResponeAndContent = AString(tempbuf).Cut("\r\n\r\n",1);
-        Response spo = ResponeAndContent._key;
-        bool chunk = ResponeAndContent._key.Contain("Transfer-Encoding: chunked");
-
-        auto MessageContent = ResponeAndContent._value;
-
-        // if(chunk){
-        //     hString chunksize = MessageContent.Cut("\r\n",1)._key;
-        //     int nsize = hString::ToLH(chunksize);
-        //     int pos = 2+chunksize._length();
-        //     int chunksizepos = 0;
-
-        //     while(pos<MessageContent._length()){
-        //         RequestResult+=MessageContent.substr(pos,nsize);
-        //         nsize = MessageContent[pos+nsize+2];
-        //         chunksize = "";
-        //         chunksizepos = pos+nsize+2;
-        //         while(MessageContent[chunksizepos]!='\r'){
-        //             chunksize+=MessageContent[chunksizepos];
-        //             chunksizepos++;
-        //         }
-        //         nsize = hString::ToLH(chunksize);
-        //         pos = chunksizepos+2;
-        //     }
-        // }
-
-        hString RequestResult = ""; 
-        if(listener.OnReceiveData!=nullptr)
-            listener.OnReceiveData(ResponeAndContent._value,spo);
-        RequestResult+=ResponeAndContent._value;
-
-        // while(1){
-        //     memset(tempbuf,0,sizeof(tempbuf));
-        //     ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
-        //     if(tempbuf[ibret-1]==0) break;
-        //     if(listener.OnReceiveData!=nullptr)
-        //         listener.OnReceiveData(tempbuf,spo);
-        //     else
-        //         RequestResult+=tempbuf;
-        // }
+        while(1){ 
+            memset(tempbuf,0,sizeof(tempbuf));
+            ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
+            if(ibret == 0) break;
+            plog("recv length ",ibret);
+            if(http){
+                if(listener.OnReceiveData) {
+                    listener.OnReceiveData(spo.chunk?spo.ParseChunkContent(tempbuf):tempbuf,spo);
+                }else 
+                    RequestResult+=tempbuf;
+            }else{
+                if(listener.OnOtherData) listener.OnOtherData(tempbuf);
+                else RequestResult+=tempbuf;
+            }
+            if(spo.chunk && hString(tempbuf).Contain("\r\n0\r\n\r\n")) break;
+        }
 
         if(listener.OnComplete !=nullptr){
             listener.OnComplete(RequestResult);

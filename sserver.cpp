@@ -88,7 +88,7 @@ bool start(){
             }
             iCurrentIndex = 0;
 
-            plog("size: ",ibret);
+            // plog("size: ",ibret);
 
             iTotalRecvSize+=ibret;
 
@@ -99,12 +99,12 @@ bool start(){
                     AString hd = ret._key;
                     request = Request::Parse(hd);
                     plog("content: ",ret._value._length()," length ");
-                    return 0;
+                    // return 0;
                 }else{
                     
                 }
             }
-            // send(sockConnect,AString("ACK FROM SERVER").c_str(),AString("ACK FROM SERVER")._length(),0);
+            send(sockConnect,AString("ACK FROM SERVER").c_str(),AString("ACK FROM SERVER")._length(),0);
 
         //     auto headsize=((PACKAGE_HEAD*)buf)->package_size;
         //     auto datakind=((PACKAGE_HEAD*)buf)->datakind;

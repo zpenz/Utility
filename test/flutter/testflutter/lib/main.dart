@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 
 void main() => runApp(MyApp());
 
@@ -18,9 +19,71 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutterasfasfd Demo Home Page'),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+
+
+}
+
+class Item extends StatelessWidget {
+    Widget _getWidget(IconData icon,String text){
+    ///充满 Row 横向的布局
+    return new Expanded(
+      flex: 1,
+      ///居中显示
+      child: new Center(
+        ///横向布局
+        child: new Row(
+          ///主轴居中,即是横向居中
+          mainAxisAlignment: MainAxisAlignment.center,
+          ///大小按照最大充满
+          mainAxisSize : MainAxisSize.max,
+          ///竖向也居中
+          crossAxisAlignment : CrossAxisAlignment.center,
+          children: <Widget>[
+            ///一个图标，大小16.0，灰色
+            new Icon(
+              icon,
+              size: 16.0,
+              color: Colors.grey,
+            ),
+            ///间隔
+            new Padding(padding: new EdgeInsets.only(left:5.0)),
+            ///显示文本
+            new Text(
+              text,
+              //设置字体样式：颜色灰色，字体大小14.0
+              style: new TextStyle(color: Colors.grey, fontSize: 14.0),
+              //超过的省略为...显示
+              overflow: TextOverflow.ellipsis,
+              //最长一行
+              maxLines: 1,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+       child: new Card(
+         child:new FlatButton(
+           child: new Row(
+           crossAxisAlignment: CrossAxisAlignment.center,
+           children: <Widget>[
+             _getWidget(Icons.star, "1000"),
+             _getWidget(Icons.link, "1000"),
+             _getWidget(Icons.subject, "1000"),
+           ],
+         ),
+           onPressed: (){print("点击了");},
+         )
+       ),
     );
   }
 }
@@ -71,40 +134,48 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
+      body
+      :new ListView.builder(
+        itemBuilder: (context,index){
+            return new Item();
+        },
+        itemCount: 10,
       ),
+      // Center(
+      //   // Center is a layout widget. It takes a single child and positions it
+      //   // in the middle of the parent.
+      //   child: Column(
+      //     // Column is also layout widget. It takes a list of children and
+      //     // arranges them vertically. By default, it sizes itself to fit its
+      //     // children horizontally, and tries to be as tall as its parent.
+      //     //
+      //     // Invoke "debug painting" (press "p" in the console, choose the
+      //     // "Toggle Debug Paint" action from the Flutter Inspector in Android
+      //     // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+      //     // to see the wireframe for each widget.
+      //     //
+      //     // Column has various properties to control how it sizes itself and
+      //     // how it positions its children. Here we use mainAxisAlignment to
+      //     // center the children vertically; the main axis here is the vertical
+      //     // axis because Columns are vertical (the cross axis would be
+      //     // horizontal).
+      //     mainAxisAlignment: MainAxisAlignment.center,
+      //     children: <Widget>[
+      //       Text(
+      //         'You have pushed the button this many times:',
+      //       ),
+      //       Text(
+      //         '$_counter',
+      //         style: Theme.of(context).textTheme.display1,
+      //       ),
+      //     ],
+          
+      //   ),
+      // ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: Icon(Icons.add_to_photos),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

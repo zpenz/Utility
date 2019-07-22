@@ -41,12 +41,12 @@ int main(int argc, char const *argv[])
         //     plog("index: ",item.index," rvale: ",item.rvalue," md5: ",item.MD5Value);
         // });
         
-        vector<range> oplist = performMarge("test.test","verify27263090");
+        // vector<range> oplist = performMarge("test.test","verify27263090");
 
         // auto oplist = LoadRange("");
-        for_each(oplist.begin(),oplist.end(),[](range& rg){
-            plog(rg.index," ",rg.length," ",rg.sameblock," ",rg.offset);
-        });
+        // for_each(oplist.begin(),oplist.end(),[](range& rg){
+        //     plog(rg.index," ",rg.length," ",rg.sameblock," ",rg.offset);
+        // });
 
         Linker<AString> params;
         Utility::JObject obj;
@@ -55,7 +55,7 @@ int main(int argc, char const *argv[])
         params.Add("file","test.test.op");
 
         // auto url = "http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi";
-        auto url = "192.168.1.154:9000";
+        auto url = "192.168.10.250:9000";
         FormPostTest(url,params,99999,Utility::TransListener(nullptr,[&](AString string){
             plog("result: ",string._length()," content:",string);
             
