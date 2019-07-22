@@ -113,7 +113,7 @@ Request Request::Parse(const AString& buf) {
 
 hString Response::ParseChunkContent(const hString& buf){
     hString RealContent = LastChunkLeft+buf;
-    
+
     return LastChunkLeft;
 }
 
@@ -386,6 +386,8 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
 
         auto header = request.ToString();
         ibret = send(sock,header.c_str(),header._length(),0);
+        plog("header-length: ",ibret);
+        sendlength+=ibret;
 
         char tempbuf[TRANSLATE_SIZE];
         for(int index=0;index<list.size;index+=2){
@@ -437,6 +439,7 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
 
         //first recv ,get response
         memset(tempbuf,0,sizeof(tempbuf));
+
         ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
         if(ibret<0){
             char errbuf[100]={0};
@@ -469,7 +472,7 @@ hString::KeyValuePair<hString> CutUrl(const hString& url){
         while(1){ 
             memset(tempbuf,0,sizeof(tempbuf));
             ibret = recv(sock,tempbuf,sizeof(tempbuf),0);
-            if(ibret == 0) break;
+            if(ibret <=0) break;
             plog("recv length ",ibret);
             if(http){
                 if(listener.OnReceiveData) {

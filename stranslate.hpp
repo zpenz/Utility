@@ -15,6 +15,9 @@ typedef unsigned int DWORD;
 #include <ws2tcpip.h>
 #endif
 
+#include "HttpUtility.hpp"
+using namespace Utility;
+
 #define MAX_BUFFER 5120
 #define MAX_FILE_NAME 1024
 #define MAX_SID_LENGTH 64
@@ -43,3 +46,10 @@ struct TRANSFORM_STATE{
     char message[MAX_FILE_NAME];
 };
 
+struct ReceviceListner{
+    typedef function<void(hString& buf,Request& req,long index)> _recvfun;
+    _recvfun OnHandleData;
+    ReceviceListner(_recvfun datalistener=nullptr):OnHandleData(datalistener){}
+};
+
+extern bool start(ReceviceListner::_recvfun func);
