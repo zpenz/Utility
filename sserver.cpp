@@ -86,10 +86,11 @@ bool start(ReceviceListner listener){
             ibret = recv(sockConnect,buf,MAX_BUFFER,0);
             LastBuffer+=buf;
             if(LastBuffer.Contain("\r\n\r\n")){
-                auto temp = LastBuffer.Cut("\r\n\r\n");
+                auto temp = LastBuffer.Cut("\r\n\r\n",1);
                 req = temp._key;
                 LastBuffer = temp._value;
                 TotalLength+=LastBuffer._length();
+                plog("Header ",req.ToString());
                 break;
             }
         }
