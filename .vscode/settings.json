@@ -67,5 +67,6 @@
         "__tree": "cpp",
         "deque": "cpp"
     },
-    "C_Cpp.dimInactiveRegions": false
+    "C_Cpp.dimInactiveRegions": false,
+    "commentTranslate.targetLanguage": "en"
 }
