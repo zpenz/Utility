@@ -48,6 +48,7 @@ int main(int argc, char const *argv[])
         //     plog(rg.index," ",rg.length," ",rg.sameblock," ",rg.offset);
         // });
 
+        //----
         Linker<AString> params;
         Utility::JObject obj;
         // obj.Add("admin_id",1001,"sid","npJ8cS1q25M9vQcXXW02H9Te2G2L7O7","directory_path","/var/share/mp/xklvm1562233594/wxy/xk","all_file_name","/var/share/mp/xklvm1562233594/wxy/xk/UtilityTest.cpp");
@@ -66,6 +67,7 @@ int main(int argc, char const *argv[])
             job.Add("admin_id",1001,"sid","ydanp32o8VTum13m1zoclVu9bbyK6p0","path_name","/var/share/mp/xklvm1562233594/wxy/xk/","file_name","UnitTest.cpp");
             req.OtherRecord.Add(Utility::KV("XK_JSON",job.Serial()));
         });
+
 
     return 0;
 }

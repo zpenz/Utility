@@ -49,17 +49,10 @@ bool start(ReceviceListner listener){
 
     SOCKET sockConnect = 0;
     int size = sizeof(SOCKADDR);
-
     fstream fo;
 
     //last
-    char buf[MAX_BUFFER * 2];
-    char sendBuf[MAX_BUFFER];
-    char lastBuffer[MAX_BUFFER*2];
-    char tempBuffer[MAX_BUFFER];
-    int iLastBufferSize = 0;
-    int iCurrentIndex=0;
-    int iTotalRecvSize = 0;
+    char buf[MAX_BUFFER];
 
     long CurrentPackageReceviceSize =0;
     hString LastBuffer = "";
@@ -87,17 +80,18 @@ bool start(ReceviceListner listener){
             LastBuffer+=buf;
             if(LastBuffer.Contain("\r\n\r\n")){
                 auto temp = LastBuffer.Cut("\r\n\r\n",1);
-                req = temp._key;
+                req = Request::Parse(temp._key);
                 LastBuffer = temp._value;
                 TotalLength+=LastBuffer._length();
-                plog("Header ",req.ToString());
                 break;
             }
         }
+        plog("Content-Length :",req.ContentLength.ToLong());
         //Content
         while(1){
-
-            if(TotalLength == req.ContentLength.ToLong()) {
+            memset(buf,0,MAX_BUFFER);
+            if(TotalLength >= req.ContentLength.ToLong()) {
+                plog("==");
                 if(listener.OnHandleData)
                     listener.OnHandleData(CurrentBuffer,req,ChunkIndex++);
 
@@ -109,17 +103,20 @@ bool start(ReceviceListner listener){
 
                 break;
             }
+            plog("TotalLength :",TotalLength);
 
             ibret = recv(sockConnect,buf,MAX_BUFFER,0);
 
             CurrentPackageReceviceSize += ibret;
             TotalLength+=ibret;
+            LastBuffer += buf;
 
             if(CurrentPackageReceviceSize<MAX_BUFFER ) {
-                LastBuffer += buf;
                 continue;
             };
-
+            
+            plog("LastBuffer Length: ",strlen(buf)," Length ",AString(buf)._length()," LastBuffer ",LastBuffer._length(),"buffer ",LastBuffer);
+            plog("CurrentPackageReceviceSize: ",CurrentPackageReceviceSize);
             CurrentBuffer = LastBuffer.substr(0,MAX_BUFFER);
             CurrentPackageReceviceSize = LastBuffer._length()-MAX_BUFFER;
             LastBuffer = LastBuffer.substr(MAX_BUFFER-1);
