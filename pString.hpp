@@ -461,7 +461,7 @@
         }
         const String<T>& operator=(const String<T>&& src){
             if(*this!=src){
-                buffer = src.buffer;
+                buffer = move(src.buffer);
                 length = src.length;
                 size   = src.size;
             }
@@ -469,6 +469,10 @@
         }
 
         bool operator==(const String<T>& des)const{
+            if(des.buffer==nullptr) {
+                // plog("null des compare object!");
+                return false;
+            }
             if(size!=des.size && length!=des.length) return false;
             return Compare(*this,des) == 0;
         }
