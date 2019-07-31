@@ -32,7 +32,9 @@ namespace Utility
         KeyValue(JString _key,PValue _value):key(_key){
             bstr = is_string<PValue>::value;
             __tvalue = typeid(PValue).name();
+            plog(_value);
             value = _value;
+            plog(value);
             blist = false;
             barraylist = false;
         }
