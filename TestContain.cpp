@@ -9,6 +9,15 @@
 using namespace Contain;
 using namespace Iterator;
 
+Tree<AString> build(const AString& expr){
+    int i=0;
+    Tree<AString> ret;
+    while(i<expr._length()-1){
+        
+        i++;
+    }
+}
+
 int main(int argc, char const *argv[])
 {
     Tree<AString> tree("*");
@@ -19,6 +28,8 @@ int main(int argc, char const *argv[])
 
     Tree<AString> tree3("|");
     tree3.Add(tree,tree2); 
+
+
     // Utility::JObject obj;
     // AString a = 1;
     // obj.Add("where",1);

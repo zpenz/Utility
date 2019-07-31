@@ -1,6 +1,5 @@
 #pragma once
 #include "Utility.h"
-#include "GL/gl.h"
 
 namespace Contain{
     using namespace utility;
@@ -25,11 +24,12 @@ namespace Contain{
     template<typename T>
     struct Tree{
         typedef TreeNode<T> TreeNodeType;
-        shared_ptr<TreeNodeType> base;
+        shared_ptr<TreeNodeType> base = nullptr;
         Tree(const TreeNodeType head):base(move(head)){}
         Tree(T && headdata){
             base = make_shared<TreeNodeType>(headdata);
         }
+        Tree(){}
 
         void AddLeft(const T & left){ 
             base->lchild = make_shared<TreeNodeType>(move(left));
@@ -51,6 +51,14 @@ namespace Contain{
         void Add(Tree & left,Tree & right){
             AddLeft(left);
             AddRight(right);
+        }
+        Tree<T>& operator=(const T& data){
+            base = make_shared<TreeNodeType>(data);
+            return *this;
+        }
+        Tree<T>& operator=(const Tree& tree){
+            base = tree.base;
+            return *this;
         }
     };
     
