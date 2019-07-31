@@ -11,17 +11,17 @@ using namespace Iterator;
 
 int main(int argc, char const *argv[])
 {
-    // problem
-    {
-        Linker<int> lk;
-        lk.Add(10);
-        lk.Add(20);
-        plog("..........");
-    }
+    Tree<AString> tree("*");
+    
+    tree.AddLeft("a");
+    Tree<AString> tree2("*");
+    tree.AddLeft("b");
 
-    Utility::JObject obj;
+    Tree<AString> tree3("|");
+    tree3.Add(tree,tree2); 
+    // Utility::JObject obj;
     // AString a = 1;
-    obj.Add("where",1);
+    // obj.Add("where",1);
     // auto ret = obj.Serial();
     // plog(ret); 
 
@@ -29,9 +29,9 @@ int main(int argc, char const *argv[])
     // params.Add("file");
     // params.Add("md5.h");
 
-    Utility::JObject job;
-    job.Add("admin_id",1001,"sid","Hd3M1a1jII4MZeUx5fIKswfgWoFVH9l","mount_point","xkraid1560365017","begin_line",1);
-    plog(job.Serial());
+    // Utility::JObject job;
+    // job.Add("admin_id",1001,"sid","Hd3M1a1jII4MZeUx5fIKswfgWoFVH9l","mount_point","xkraid1560365017","begin_line",1);
+    // plog(job.Serial());
 
         // auto ret = LoadDiff<diff>("verify27262990");
         // SaveFile<diff>("diff",CalcFileSlideDiff("test.test"));

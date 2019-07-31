@@ -1,10 +1,58 @@
 #pragma once
 #include "Utility.h"
+#include "GL/gl.h"
 
 namespace Contain{
     using namespace utility;
     using namespace smartpoint;
     using namespace stype;
+
+    template<typename T>
+    struct TreeNode{
+        typedef TreeNode<T> TreeNodeType;
+        shared_ptr<TreeNodeType> lchild;
+        shared_ptr<TreeNodeType> rchild;
+        shared_ptr<T> data;
+        TreeNode(){
+            lchild=rchild=data=nullptr;
+        }
+        TreeNode(const T & Data){
+            data = make_shared<T>(move(Data));
+        };
+    };
+
+    //left=>right
+    template<typename T>
+    struct Tree{
+        typedef TreeNode<T> TreeNodeType;
+        shared_ptr<TreeNodeType> base;
+        Tree(const TreeNodeType head):base(move(head)){}
+        Tree(T && headdata){
+            base = make_shared<TreeNodeType>(headdata);
+        }
+
+        void AddLeft(const T & left){ 
+            base->lchild = make_shared<TreeNodeType>(move(left));
+        }
+        void AddRight(const T & right){
+            base->rchild = make_shared<TreeNodeType>(move(right));
+        }
+        void AddLeft(const Tree & lTree){
+            base->lchild = move(lTree.base);
+        }
+        void AddRight(const Tree & rTree){
+            base->rchild = move(rTree.base);
+        }
+
+        void Add(const T& left,const T & right){
+            AddLeft(left);
+            AddRight(right);
+        }
+        void Add(Tree & left,Tree & right){
+            AddLeft(left);
+            AddRight(right);
+        }
+    };
     
     template<typename T>
     struct LinkNode{
@@ -28,14 +76,12 @@ namespace Contain{
             parent = move(NodeMove.parent);
             child  = move(NodeMove.child);
             pData  = move(NodeMove.pData);
-            // SHOW_MESSAGE("move construct",1);
         }
 
         LinkNode(LinkNode<T> & node){
             parent = node.parent;
             child  = node.child;
             pData  = make_unique<T>(*node.pData);
-            // SHOW_MESSAGE("copy construct",1);
         }
         
         LinkNode<T>& operator=(LinkNode<T>&& NodeMove) {
@@ -53,7 +99,6 @@ namespace Contain{
         }
 
         ~LinkNode(){
-            // if(pData) {SHOW_MESSAGE(*pData,1);} //if can log..
             SHOW_MESSAGE("destructor..",1);
         }
         

@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named opengl
+
+# Build rule for target.
+opengl: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 opengl
+.PHONY : opengl
+
+# fast build rule for target.
+opengl/fast:
+	$(MAKE) -f CMakeFiles/opengl.dir/build.make CMakeFiles/opengl.dir/build
+.PHONY : opengl/fast
+
+#=============================================================================
 # Target rules for targets named TestContain
 
 # Build rule for target.
@@ -136,143 +149,98 @@ sserver/fast:
 	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/build
 .PHONY : sserver/fast
 
-HttpUtility.o: HttpUtility.cpp.o
-
+# target to build an object file
+HttpUtility.o:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.o
+	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/HttpUtility.o
 .PHONY : HttpUtility.o
 
-# target to build an object file
-HttpUtility.cpp.o:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.cpp.o
-	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/HttpUtility.cpp.o
-.PHONY : HttpUtility.cpp.o
-
-HttpUtility.i: HttpUtility.cpp.i
-
+# target to preprocess a source file
+HttpUtility.i:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.i
+	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/HttpUtility.i
 .PHONY : HttpUtility.i
 
-# target to preprocess a source file
-HttpUtility.cpp.i:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.cpp.i
-	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/HttpUtility.cpp.i
-.PHONY : HttpUtility.cpp.i
-
-HttpUtility.s: HttpUtility.cpp.s
-
+# target to generate assembly for a file
+HttpUtility.s:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.s
+	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/HttpUtility.s
 .PHONY : HttpUtility.s
 
-# target to generate assembly for a file
-HttpUtility.cpp.s:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.cpp.s
-	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/HttpUtility.cpp.s
-.PHONY : HttpUtility.cpp.s
-
-TestContain.o: TestContain.cpp.o
-
+# target to build an object file
+TestContain.o:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/TestContain.o
 .PHONY : TestContain.o
 
-# target to build an object file
-TestContain.cpp.o:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/TestContain.cpp.o
-.PHONY : TestContain.cpp.o
-
-TestContain.i: TestContain.cpp.i
-
+# target to preprocess a source file
+TestContain.i:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/TestContain.i
 .PHONY : TestContain.i
 
-# target to preprocess a source file
-TestContain.cpp.i:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/TestContain.cpp.i
-.PHONY : TestContain.cpp.i
-
-TestContain.s: TestContain.cpp.s
-
+# target to generate assembly for a file
+TestContain.s:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/TestContain.s
 .PHONY : TestContain.s
 
-# target to generate assembly for a file
-TestContain.cpp.s:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/TestContain.cpp.s
-.PHONY : TestContain.cpp.s
-
-adler32.o: adler32.cpp.o
-
+# target to build an object file
+adler32.o:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/adler32.o
 .PHONY : adler32.o
 
-# target to build an object file
-adler32.cpp.o:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/adler32.cpp.o
-.PHONY : adler32.cpp.o
-
-adler32.i: adler32.cpp.i
-
+# target to preprocess a source file
+adler32.i:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/adler32.i
 .PHONY : adler32.i
 
-# target to preprocess a source file
-adler32.cpp.i:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/adler32.cpp.i
-.PHONY : adler32.cpp.i
-
-adler32.s: adler32.cpp.s
-
+# target to generate assembly for a file
+adler32.s:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/adler32.s
 .PHONY : adler32.s
 
-# target to generate assembly for a file
-adler32.cpp.s:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/adler32.cpp.s
-.PHONY : adler32.cpp.s
-
-md5.o: md5.cpp.o
-
+# target to build an object file
+md5.o:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/md5.o
 .PHONY : md5.o
 
-# target to build an object file
-md5.cpp.o:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/md5.cpp.o
-.PHONY : md5.cpp.o
-
-md5.i: md5.cpp.i
-
+# target to preprocess a source file
+md5.i:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/md5.i
 .PHONY : md5.i
 
-# target to preprocess a source file
-md5.cpp.i:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/md5.cpp.i
-.PHONY : md5.cpp.i
-
-md5.s: md5.cpp.s
-
+# target to generate assembly for a file
+md5.s:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/md5.s
 .PHONY : md5.s
 
-# target to generate assembly for a file
-md5.cpp.s:
-	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/md5.cpp.s
-.PHONY : md5.cpp.s
-
-sserver.o: sserver.cpp.o
-
+# target to build an object file
+sserver.o:
+	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/sserver.o
 .PHONY : sserver.o
 
-# target to build an object file
-sserver.cpp.o:
-	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/sserver.cpp.o
-.PHONY : sserver.cpp.o
-
-sserver.i: sserver.cpp.i
-
+# target to preprocess a source file
+sserver.i:
+	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/sserver.i
 .PHONY : sserver.i
 
-# target to preprocess a source file
-sserver.cpp.i:
-	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/sserver.cpp.i
-.PHONY : sserver.cpp.i
-
-sserver.s: sserver.cpp.s
-
+# target to generate assembly for a file
+sserver.s:
+	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/sserver.s
 .PHONY : sserver.s
 
+# target to build an object file
+testopengl.o:
+	$(MAKE) -f CMakeFiles/opengl.dir/build.make CMakeFiles/opengl.dir/testopengl.o
+.PHONY : testopengl.o
+
+# target to preprocess a source file
+testopengl.i:
+	$(MAKE) -f CMakeFiles/opengl.dir/build.make CMakeFiles/opengl.dir/testopengl.i
+.PHONY : testopengl.i
+
 # target to generate assembly for a file
-sserver.cpp.s:
-	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/sserver.cpp.s
-.PHONY : sserver.cpp.s
+testopengl.s:
+	$(MAKE) -f CMakeFiles/opengl.dir/build.make CMakeFiles/opengl.dir/testopengl.s
+.PHONY : testopengl.s
 
 # Help Target
 help:
@@ -282,6 +250,7 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... opengl"
 	@echo "... TestContain"
 	@echo "... sserver"
 	@echo "... HttpUtility.o"
@@ -299,6 +268,9 @@ help:
 	@echo "... sserver.o"
 	@echo "... sserver.i"
 	@echo "... sserver.s"
+	@echo "... testopengl.o"
+	@echo "... testopengl.i"
+	@echo "... testopengl.s"
 .PHONY : help
 
 
