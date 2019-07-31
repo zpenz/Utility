@@ -11,7 +11,7 @@ public final class GeneratedPluginRegistrant {
       return;
     }
   }
-
+  
   private static boolean alreadyRegisteredWith(PluginRegistry registry) {
     final String key = GeneratedPluginRegistrant.class.getCanonicalName();
     if (registry.hasPlugin(key)) {

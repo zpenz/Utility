@@ -25,9 +25,8 @@ think.cpp
 *.cmake
 *.json
 *.jpg
-*.png
 *.out
 !CMakeLists.txt
-.gradle
+
 
 

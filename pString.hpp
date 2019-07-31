@@ -19,7 +19,8 @@
         int size;
   public:
         static bool IsIntC(const T c){
-            return (c>='0' && c<='9') || (c>='a' && c<='f') || (c>='A' && c<='F');
+            return c>='0' && c<='9';
+            //SAME?
         }
 
         static bool IsInt(const String<T>& des){
@@ -31,12 +32,6 @@
 
         static int ToIC(const T c){
             CONDITION_MESSAGE(!IsIntC(c),"invalid conver int");
-            if(c=='a' || c=='A') return 10;
-            if(c=='b' || c=='B') return 11;
-            if(c=='c' || c=='C') return 12;
-            if(c=='d' || c=='D') return 13;
-            if(c=='e' || c=='E') return 14;
-            if(c=='f' || c=='F') return 15;
             return c-'0';
         }
 
@@ -44,18 +39,7 @@
             long long sum = 0;
             bool negative = des.buffer.get()[0]=='-';
             for(int index=negative?1:0;index<des.length;index++){
-                if(des.buffer.get()[index] == ' ') continue; //skip empty
                 sum = 10*sum+ToIC(des.buffer.get()[index]);
-            }
-            return negative?-1*sum:sum;
-        }
-
-        static long long ToLH(const String<T>& des){
-            long long sum = 0;
-            bool negative = des.buffer.get()[0]=='-';
-            for(int index=negative?1:0;index<des.length;index++){
-                if(des.buffer.get()[index] == ' ') continue; //skip empty
-                sum = 16*sum+ToIC(des.buffer.get()[index]);
             }
             return negative?-1*sum:sum;
         }
@@ -389,11 +373,6 @@
             long count = cutpos<0?cutpos*-1:cutpos;
             long pos = 0;
             auto temp = *this;
-
-            if(-1 == temp.find(split)){
-                return KeyValuePair<>(temp,temp);
-            }
-
             long realpos = 0;
             while(count>0){
                 pos  = cutpos<0?temp.rfind(split):temp.find(split);
@@ -419,22 +398,14 @@
             int index=0;
             for(;index<length;index++){
                 for(int indeY = 0;indeY<slist.size;indeY++){
-                    String<T> item = slist[indeY];
-                    for(int indeZ=0;indeZ<slist[indeY].size && indeY+indeZ<length;indeZ++){
-                        if(slist[indeY][indeZ] == temp[index+indeZ]) 
-                        {
-                            continue;
-                        }
+                    if(slist[indeY] == temp[index]){
+                        list.Add(store);
+                        store = "";
                         goto next;
                     }
-                    list.Add(store);
-                    store = "";
-                    index+=item.length;
-                    break;
-                next:
-                    ;
                 }
                 store+=temp[index];
+                next:;
             }
             //left
             if(!store.Equal("")){

@@ -54,7 +54,7 @@ namespace Contain{
 
         ~LinkNode(){
             // if(pData) {SHOW_MESSAGE(*pData,1);} //if can log..
-            SHOW_MESSAGE("destructor..",1);
+            // SHOW_MESSAGE("destructor..",1);
         }
         
         bool operator==(const Node& node) const{
@@ -142,23 +142,6 @@ namespace Contain{
                 temp = temp->child;
             }
             return false;
-        }
-
-        void Clear(){
-            if(size==0 ) return ;
-            auto temp = head->child;
-            while(temp && temp!=last){
-                auto next = temp->child;
-                    temp->child->parent = nullptr;
-                    temp->child = nullptr;
-                    temp->parent->child = nullptr;
-                    temp->parent = nullptr;
-                    size--;
-                temp = next;
-            }
-            head->child  = last;
-            last->parent = head;
-            cur = nullptr;
         }
 
         bool Contain(T value){

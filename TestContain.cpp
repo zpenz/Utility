@@ -3,71 +3,39 @@
 #include "pString.hpp"
 #include "json.hpp"
 #include "HttpUtility.hpp"
-#include "adler32.hpp"
-#include <algorithm>
-
-using namespace Contain;
-using namespace Iterator;
 
 int main(int argc, char const *argv[])
 {
-    // problem
-    // {
-    //     Linker<int> lk;
-    //     lk.Add(10);
-    //     lk.Add(20);
-    //     // lk.Clear();
-    //     plog("..........");
-    // }
+    using namespace Contain;
+    using namespace Iterator;
 
-    // Linker<Utility::KeyValue> a4(Utility::KeyValue("iama","solizia"),Utility::KeyValue("xixi","ppp"));
+    Linker<int> lk;
 
-    // Utility::JObject obj;
-    // obj.Add("where",1,"iama","solizia","array",a4,"array2","aa","error_code",100,"error_code2",101);
-    // auto ret = obj.Serial();
-    // plog(ret); 
+    Linker<Utility::KeyValue> a4(Utility::KeyValue("iama","solizia"),Utility::KeyValue("xixi","ppp"));
 
-    // Linker<AString> params;
-    // params.Add("file");
-    // params.Add("md5.h");
+    Utility::JObject obj;
+    obj.Add("where",1,"iama","solizia","array",a4,"array2","aa","error_code",100,"error_code2",101);
+    auto ret = obj.Serial();
+    plog(ret); 
 
-    // Utility::JObject job;
-    // job.Add("admin_id",1001,"sid","Hd3M1a1jII4MZeUx5fIKswfgWoFVH9l","mount_point","xkraid1560365017","begin_line",1);
-    // plog(job.Serial());
+    Linker<AString> params;
+    params.Add("file");
+    params.Add("test/1.jpg");
 
-        // auto ret = LoadDiff<diff>("verify27262990");
-        // SaveFile<diff>("diff",CalcFileSlideDiff("test.test"));
-        // for_each(ret.begin(),ret.end(),[](diff& item){
-        //     plog("index: ",item.index," rvale: ",item.rvalue," md5: ",item.MD5Value);
-        // });
-        
-        // vector<range> oplist = performMarge("test.test","verify27263090");
+    Utility::JObject job;
+    job.Add("admin_id",1001,"sid","Hd3M1a1jII4MZeUx5fIKswfgWoFVH9l","mount_point","xkraid1560365017","begin_line",1);
+    plog(job.Serial());
 
-        // auto oplist = LoadRange("");
-        // for_each(oplist.begin(),oplist.end(),[](range& rg){
-        //     plog(rg.index," ",rg.length," ",rg.sameblock," ",rg.offset);
-        // });
+    // auto ret2 = Utility::FormPost("http://192.168.10.250:9000/cgi-bin/xk_file_upload_cover.cgi",params,3,Utility::TransListener([](long cur,long tal){
+    // },nullptr,nullptr),[](Utility::Request& req){
+    //     req.OtherRecord.Add(Utility::KV("XK_JSON","{\"admin_id\":1001,\"sid\":\"Hd3M1a1jII4MZeUx5fIKswfgWoFVH9l\",\"path_name\":\"%2Fvar%2Fshare%2Fmp%2Fxkraid1560365017%2Fysc%E6%9D%83%E9%99%90%2F\",\"file_name\":\"ppppppppppssssssss.txt\"}"));
+    // });
 
-        //----
-        Linker<AString> params;
-        Utility::JObject obj;
-        // obj.Add("admin_id",1001,"sid","npJ8cS1q25M9vQcXXW02H9Te2G2L7O7","directory_path","/var/share/mp/xklvm1562233594/wxy/xk","all_file_name","/var/share/mp/xklvm1562233594/wxy/xk/UtilityTest.cpp");
-        // params.Add("json",obj.Serial());
-        params.Add("file","test.test.op");
+    AString hd = "POST cgi-bin/xk_file_upload_cover.cgi HTTP/1.1\nHost: 192.168.10.250:9000\nContent-Type: multipart/form-data; boundary=--xkboundary\n";
+    hd+="Content-Length: 48737\nConnection: close\nOrigin: http://192.168.10.250:9000\n";
+    hd+="XK_JSON: {\"admin_id\":1001,\"sid\":\"Hd3M1a1jII4MZeUx5fIKswfgWoFVH9l\",\"path_name\":\"%2Fvar%2Fshare%2Fmp%2Fxkraid1560365017%2Fysc%E6%9D%83%E9%99%90%2F\",\"file_name\":\"ppppppppppssssssss.txt\"}";
 
-        // auto url = "http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi";
-        auto url = "192.168.10.250:9000";
-        FormPostTest(url,params,99999,Utility::TransListener(nullptr,[&](AString string){
-            plog("result: ",string._length()," content:",string);
-            
-        },nullptr,
-        nullptr
-        ),[](Utility::Request& req){
-                    Utility::JObject job;
-            job.Add("admin_id",1001,"sid","ydanp32o8VTum13m1zoclVu9bbyK6p0","path_name","/var/share/mp/xklvm1562233594/wxy/xk/","file_name","UnitTest.cpp");
-            req.OtherRecord.Add(Utility::KV("XK_JSON",job.Serial()));
-        });
-
-
+    auto header = Utility::Request::Parse(hd);
+    plog(header.ActionAddress);
     return 0;
 }
