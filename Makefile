@@ -136,19 +136,6 @@ TestContain/fast:
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/build
 .PHONY : TestContain/fast
 
-#=============================================================================
-# Target rules for targets named adler32
-
-# Build rule for target.
-adler32: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 adler32
-.PHONY : adler32
-
-# fast build rule for target.
-adler32/fast:
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/build
-.PHONY : adler32/fast
-
 HttpUtility.o: HttpUtility.cpp.o
 
 .PHONY : HttpUtility.o
@@ -157,7 +144,6 @@ HttpUtility.o: HttpUtility.cpp.o
 HttpUtility.cpp.o:
 	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/HttpUtility.cpp.o
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.cpp.o
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/HttpUtility.cpp.o
 .PHONY : HttpUtility.cpp.o
 
 HttpUtility.i: HttpUtility.cpp.i
@@ -168,7 +154,6 @@ HttpUtility.i: HttpUtility.cpp.i
 HttpUtility.cpp.i:
 	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/HttpUtility.cpp.i
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.cpp.i
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/HttpUtility.cpp.i
 .PHONY : HttpUtility.cpp.i
 
 HttpUtility.s: HttpUtility.cpp.s
@@ -179,7 +164,6 @@ HttpUtility.s: HttpUtility.cpp.s
 HttpUtility.cpp.s:
 	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/HttpUtility.cpp.s
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/HttpUtility.cpp.s
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/HttpUtility.cpp.s
 .PHONY : HttpUtility.cpp.s
 
 TestContain.o: TestContain.cpp.o
@@ -208,60 +192,6 @@ TestContain.s: TestContain.cpp.s
 TestContain.cpp.s:
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/TestContain.cpp.s
 .PHONY : TestContain.cpp.s
-
-adler32.o: adler32.cpp.o
-
-.PHONY : adler32.o
-
-# target to build an object file
-adler32.cpp.o:
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/adler32.cpp.o
-.PHONY : adler32.cpp.o
-
-adler32.i: adler32.cpp.i
-
-.PHONY : adler32.i
-
-# target to preprocess a source file
-adler32.cpp.i:
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/adler32.cpp.i
-.PHONY : adler32.cpp.i
-
-adler32.s: adler32.cpp.s
-
-.PHONY : adler32.s
-
-# target to generate assembly for a file
-adler32.cpp.s:
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/adler32.cpp.s
-.PHONY : adler32.cpp.s
-
-md5.o: md5.cpp.o
-
-.PHONY : md5.o
-
-# target to build an object file
-md5.cpp.o:
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/md5.cpp.o
-.PHONY : md5.cpp.o
-
-md5.i: md5.cpp.i
-
-.PHONY : md5.i
-
-# target to preprocess a source file
-md5.cpp.i:
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/md5.cpp.i
-.PHONY : md5.cpp.i
-
-md5.s: md5.cpp.s
-
-.PHONY : md5.s
-
-# target to generate assembly for a file
-md5.cpp.s:
-	$(MAKE) -f CMakeFiles/adler32.dir/build.make CMakeFiles/adler32.dir/md5.cpp.s
-.PHONY : md5.cpp.s
 
 sserver.o: sserver.cpp.o
 
@@ -296,23 +226,16 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... sserver"
-	@echo "... TestContain"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... adler32"
+	@echo "... sserver"
+	@echo "... TestContain"
 	@echo "... HttpUtility.o"
 	@echo "... HttpUtility.i"
 	@echo "... HttpUtility.s"
 	@echo "... TestContain.o"
 	@echo "... TestContain.i"
 	@echo "... TestContain.s"
-	@echo "... adler32.o"
-	@echo "... adler32.i"
-	@echo "... adler32.s"
-	@echo "... md5.o"
-	@echo "... md5.i"
-	@echo "... md5.s"
 	@echo "... sserver.o"
 	@echo "... sserver.i"
 	@echo "... sserver.s"
