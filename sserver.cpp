@@ -39,8 +39,10 @@ void exec(SOCKET conn,ReceviceListner listener){
         hString CurrentBuffer = "";
         //Head
         while(1){
+            memset(buf,0,sizeof(buf));
             ibret = recv(conn,buf,MAX_BUFFER,0);
             LastBuffer+=buf;
+   
             if(LastBuffer.Contain("\r\n\r\n")){
                 auto temp = LastBuffer.Cut("\r\n\r\n",1);
                 plog("temp key:",temp._key);
@@ -63,13 +65,16 @@ void exec(SOCKET conn,ReceviceListner listener){
                 #else
                 if(conn) shutdown(conn, 2);
                 #endif
-
+                
+                plog("TotalLength: ",TotalLength);
                 send(conn,"ACK",AString("ACK")._length(),0);
                 break;
             }
-            plog("TotalLength: ",TotalLength);
 
+            memset(buf,0,sizeof(buf));
             ibret = recv(conn,buf,MAX_BUFFER,0);
+
+            plog(buf);
 
             CurrentPackageReceviceSize += ibret;
             TotalLength+=ibret;
@@ -157,3 +162,4 @@ int main(void){
     start(ReceviceListner(nullptr));
     return 0;
 }
+
