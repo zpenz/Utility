@@ -2,7 +2,7 @@ import zlib;
 import hashlib;
 import md5;
 
-file = open("xk1.apk");
+file = open("adler32.cpp");
 
 i = 5
 while i>0:

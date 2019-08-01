@@ -1,9 +1,10 @@
-    #pragma once
+ #pragma once
 
     #include <vector>
     #include "pString.hpp"
+    #include <functional>
 
-    #define CHUNK_SIZE 1024
+    #define CHUNK_SIZE 4096
     #define MOD_DIGEST 65521
     #define MD5_SIZE 17
 
@@ -11,7 +12,7 @@
         int  index;
         int  length;
         int  offset;
-        bool sameblock;
+        int sameblock;
         range(int _index,int _length,int _offset,bool _sb = false):index(_index),length(_length),offset(_offset),sameblock(_sb){}
         range(){}
     };
@@ -25,9 +26,9 @@
     };
 
     struct diff{
-        char MD5Value[MD5_SIZE];
         int index;
         int rvalue;
+        char MD5Value[MD5_SIZE];
         diff(){};
         diff(int av,int bv,const char* mv,int _index)
         {
@@ -81,8 +82,10 @@
 
     extern vector<diff> CalcFileSlideDiff(const AString& filename);
     extern vector<diff> CalcFileDiff(const AString& filename);
-    extern vector<diff> CalcFileDiff_r(const AString& filename);
-
+    extern void CalcFileDiff_r(const AString& filename,std::function<void(diff&,bool&,int&)> func);
+    extern vector<range> performMarge(const char * src,const char * dffile);
+    
+    extern vector<range> LoadRange(const char * filename);
 
     struct Point{
         int x;
@@ -133,5 +136,3 @@
     };
 
     extern void MyersDiff(AString src,AString des);
-
-
