@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -17,24 +16,20 @@ unsigned long GetTickCount() {
 }
 
 void exec(SOCKET conn,ReceviceListner listener){
-    char buf[MAX_BUFFER * 2];
-    char sendBuf[MAX_BUFFER];
+    // char buf[MAX_BUFFER * 2];
+    // char sendBuf[MAX_BUFFER];
     long TotalLength = 0;
     long ContentLength = 0;
     long ChunkIndex  = 0;
     long ibret = 0;
+    //last
+    char buf[MAX_BUFFER];
 
     while(1){
-        ibret = recv(conn,buf,MAX_BUFFER,0);
-
+        // ibret = recv(conn,buf,MAX_BUFFER,0);
         Request request;
         Request req;
 
-        //last
-        char buf[MAX_BUFFER * 2];
-        char sendBuf[MAX_BUFFER];
-        char lastBuffer[MAX_BUFFER*2];
-        char tempBuffer[MAX_BUFFER];
         int iLastBufferSize = 0;
         int iCurrentIndex=0;
         int iTotalRecvSize = 0;
@@ -47,15 +42,17 @@ void exec(SOCKET conn,ReceviceListner listener){
             ibret = recv(conn,buf,MAX_BUFFER,0);
             LastBuffer+=buf;
             if(LastBuffer.Contain("\r\n\r\n")){
-                auto temp = LastBuffer.Cut("\r\n\r\n");
-                req = temp._key;
+                auto temp = LastBuffer.Cut("\r\n\r\n",1);
+                plog("temp key:",temp._key);
+                req = req.Parse(temp._key);
                 LastBuffer = temp._value;
                 TotalLength+=LastBuffer._length();
                 break;
             }
         }
-        //Content
 
+        plog("request: ",req.ToString());
+        //Content
         while(1){
             if(TotalLength == req.ContentLength.ToLong()) {
                 if(listener.OnHandleData)
@@ -67,8 +64,10 @@ void exec(SOCKET conn,ReceviceListner listener){
                 if(conn) shutdown(conn, 2);
                 #endif
 
+                send(conn,"ACK",AString("ACK")._length(),0);
                 break;
             }
+            plog("TotalLength: ",TotalLength);
 
             ibret = recv(conn,buf,MAX_BUFFER,0);
 
