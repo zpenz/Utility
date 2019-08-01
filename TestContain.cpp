@@ -20,16 +20,7 @@ Tree<AString> build(const AString& expr){
 
 int main(int argc, char const *argv[])
 {
-    Tree<AString> tree("*");
-    
-    tree.AddLeft("a");
-    Tree<AString> tree2("*");
-    tree.AddLeft("b");
-
-    Tree<AString> tree3("|");
-    tree3.Add(tree,tree2); 
-
-
+    using namespace Utility;
     // Utility::JObject obj;
     // AString a = 1;
     // obj.Add("where",1);
@@ -58,24 +49,24 @@ int main(int argc, char const *argv[])
         // });
 
         //----
-        // Linker<AString> params;
-        // Utility::JObject obj;
-        // // obj.Add("admin_id",1001,"sid","npJ8cS1q25M9vQcXXW02H9Te2G2L7O7","directory_path","/var/share/mp/xklvm1562233594/wxy/xk","all_file_name","/var/share/mp/xklvm1562233594/wxy/xk/UtilityTest.cpp");
-        // // params.Add("json",obj.Serial());
-        // params.Add("file","test.test.op");
+        Linker<AString> params;
+        Utility::JObject obj;
+        // obj.Add("admin_id",1001,"sid","npJ8cS1q25M9vQcXXW02H9Te2G2L7O7","directory_path","/var/share/mp/xklvm1562233594/wxy/xk","all_file_name","/var/share/mp/xklvm1562233594/wxy/xk/UtilityTest.cpp");
+        // params.Add("json",obj.Serial());
+        params.Add("file","test.test.op");
 
         // // auto url = "http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi";
-        // auto url = "192.168.10.250:9000";
-        // FormPostTest(url,params,99999,Utility::TransListener(nullptr,[&](AString string){
-        //     plog("result: ",string._length()," content:",string);
+        auto url = "192.168.10.250:9000";
+        FormPostTest(url,params,99999,TransListener(nullptr,[&](AString string){
+            plog("result: ",string._length()," content:",string);
             
-        // },nullptr,
-        // nullptr
-        // ),[](Utility::Request& req){
-        //             Utility::JObject job;
-        //     job.Add("admin_id",1001,"sid","ydanp32o8VTum13m1zoclVu9bbyK6p0","path_name","/var/share/mp/xklvm1562233594/wxy/xk/","file_name","UnitTest.cpp");
-        //     req.OtherRecord.Add(Utility::KV("XK_JSON",job.Serial()));
-        // });
+        },nullptr,
+        nullptr
+        ),[](Utility::Request& req){
+                    Utility::JObject job;
+            job.Add("admin_id",1001,"sid","ydanp32o8VTum13m1zoclVu9bbyK6p0","path_name","/var/share/mp/xklvm1562233594/wxy/xk/","file_name","UnitTest.cpp");
+            req.OtherRecord.Add(Utility::KV("XK_JSON",job.Serial()));
+        });
 
 
     return 0;
