@@ -45,7 +45,7 @@ void exec(SOCKET conn,ReceviceListner listener){
             if(LastBuffer.Contain("\r\n\r\n")){
                 auto temp = LastBuffer.Cut("\r\n\r\n",1);
                 req = req.Parse(temp._key);
-                LastBuffer = temp._value;
+                LastBuffer = AString(temp._value,temp._value._length());
                 TotalLength+=LastBuffer._length();
                 break;
             }
@@ -75,19 +75,16 @@ void exec(SOCKET conn,ReceviceListner listener){
 
             CurrentPackageReceviceSize += ibret;
             TotalLength+=ibret;
+            plog(ibret);
 
-            if(LastBuffer._length()<MAX_BUFFER ) {
-                LastBuffer += AString(buf,ibret); 
-                plog("--------",LastBuffer._length()," ",ibret);
-                continue;
-            }; 
+            LastBuffer += AString(buf,ibret); 
+            if(LastBuffer._length()<MAX_BUFFER ) continue;
 
             while(LastBuffer._length()>=MAX_BUFFER){
-                plog("-------",LastBuffer._length()," ",CurrentPackageReceviceSize);
                 CurrentBuffer = LastBuffer.substr(0,MAX_BUFFER);
                 CurrentPackageReceviceSize = LastBuffer._length()-MAX_BUFFER;
                 LastBuffer = LastBuffer.substr(MAX_BUFFER-1);
-
+                plog("-------",LastBuffer._length());
                 if(listener.OnHandleData)
                     listener.OnHandleData(CurrentBuffer,req,ChunkIndex++);
             }
@@ -155,8 +152,8 @@ bool start(ReceviceListner listener){
 int main(void){
     fstream fs = fstream("test.log",fs.binary|fs.out|fs.trunc);
     start(ReceviceListner([&](hString& hs,Request& req,long index){
-        if(index==2)
         fs.write(hs.c_str(),hs._size());
+        fs.flush();
     }));
     fs.close();
     return 0;

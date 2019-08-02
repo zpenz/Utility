@@ -365,7 +365,7 @@
         }
 
         String<T> substr(int pos){
-            return String<T>(*this,pos);
+            return String<T>(*this,pos,length-1);
         }
 
         String<T> substr(int start,int length)

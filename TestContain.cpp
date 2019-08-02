@@ -55,7 +55,7 @@ int main(int argc, char const *argv[])
         // params.Add("json",obj.Serial());
         params.Add("file","test.test.op");
 
-        // // auto url = "http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi";
+        // auto url = "http://192.168.10.23:555/cgi-bin/xk_file_rsync_upload.cgi";
         auto url = "192.168.10.250:9000/x";
         FormPostTest(url,params,99999,TransListener(nullptr,[&](AString string){
             plog("result: ",string._length()," content:",string);
@@ -64,7 +64,7 @@ int main(int argc, char const *argv[])
         nullptr
         ),[](Utility::Request& req){
                     Utility::JObject job;
-            job.Add("admin_id",1001,"sid","ydanp32o8VTum13m1zoclVu9bbyK6p0","path_name","/var/share/mp/xklvm1562233594/wxy/xk/","file_name","UnitTest.cpp");
+            job.Add("admin_id",1001,"sid","DbsG1J7TqfnJE4B63VRPgD3otHsQe1I","path_name","/var/share/mp/xklvm1562233594/wxy/xk/","file_name","UnitTest.cpp");
             req.OtherRecord.Add(Utility::KV("XK_JSON",job.Serial()));
         });
 
