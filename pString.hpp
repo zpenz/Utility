@@ -175,6 +175,15 @@
             (buffer.get())[length] = 0;
         }
 
+        String(const T* desBuffer,long _size){
+            CONDITION_MESSAGE(nullptr==desBuffer,"invalid buffer param!");
+            length = _size;
+            size = sizeof(T)*length;
+            buffer = shared_ptr<T>(new T[length+1],default_delete<T[]>());
+            memcpy(buffer.get(),desBuffer,size);
+            (buffer.get())[length] = 0;
+        }
+
         String(const String<T>&src,int start,int end){
             CONDITION_MESSAGE(start>src.length || start<0 || end<0 || end>src.length || end<start,"invalid length param!");
             length = end-start;
@@ -183,15 +192,15 @@
             memcpy(buffer.get(), src.buffer.get()+start, size);
             (buffer.get())[length] = 0;
         }
-        
-        String(const String<T>& src,int ilength) { 
-            CONDITION_MESSAGE(ilength>src.length || ilength<0,"invalid length param!");
-            length = ilength;
-            buffer = shared_ptr<T>(new T[length+1],default_delete<T[]>());
-            size = sizeof(T)*length;
-            memcpy(buffer.get(), src.buffer.get(), size);
-            (buffer.get())[length] = 0;
-        }
+
+        // String(const String<T>& src,int ilength) { 
+        //     CONDITION_MESSAGE(ilength>src.length || ilength<0,"invalid length param!");
+        //     length = ilength;
+        //     buffer = shared_ptr<T>(new T[length+1],default_delete<T[]>());
+        //     size = sizeof(T)*length;
+        //     memcpy(buffer.get(), src.buffer.get(), size);
+        //     (buffer.get())[length] = 0;
+        // }
 
         //COPY
         String(const String<T>& src){
@@ -445,10 +454,11 @@
         
         ///des copy last 0
         friend String<T> operator+(const String<T>& src,const String<T>& des){
-            T tempbuffer[src.length+des.length+1];
+            T tempbuffer[src.length+des.length];
             memcpy(tempbuffer,src.buffer.get(),src.size);
             memcpy(tempbuffer+src.length,des.buffer.get(),des.size+1*sizeof(T));
-            return String<T>(tempbuffer);
+            // return String<T>(tempbuffer);
+            return String<T>(tempbuffer,src.length+des.length);
         }
 
         const String<T>& operator=(const String<T>&src){

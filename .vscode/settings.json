@@ -68,5 +68,6 @@
         "deque": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false,
-    "commentTranslate.targetLanguage": "en"
+    "commentTranslate.targetLanguage": "en",
+    "C_Cpp.errorSquiggles": "Disabled"
 }

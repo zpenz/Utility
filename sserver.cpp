@@ -41,19 +41,18 @@ void exec(SOCKET conn,ReceviceListner listener){
         while(1){
             memset(buf,0,sizeof(buf));
             ibret = recv(conn,buf,MAX_BUFFER,0);
-            LastBuffer+=buf;
+            LastBuffer+=AString(buf,ibret);
    
             if(LastBuffer.Contain("\r\n\r\n")){
                 auto temp = LastBuffer.Cut("\r\n\r\n",1);
-                plog("temp key:",temp._key);
                 req = req.Parse(temp._key);
                 LastBuffer = temp._value;
                 TotalLength+=LastBuffer._length();
                 break;
             }
         }
-
         plog("request: ",req.ToString());
+
         //Content
         while(1){
             if(TotalLength == req.ContentLength.ToLong()) {
@@ -74,16 +73,16 @@ void exec(SOCKET conn,ReceviceListner listener){
             memset(buf,0,sizeof(buf));
             ibret = recv(conn,buf,MAX_BUFFER,0);
 
-            plog(buf);
-
             CurrentPackageReceviceSize += ibret;
             TotalLength+=ibret;
 
-            if(CurrentPackageReceviceSize<MAX_BUFFER ) {
-                LastBuffer += buf; 
+            if(LastBuffer._length()<MAX_BUFFER ) {
+                plog("--------",LastBuffer._length()," ",ibret);
+                LastBuffer += AString(buf,ibret); 
                 continue;
             }; 
 
+            plog("-------",LastBuffer._length()," ",CurrentPackageReceviceSize);
             CurrentBuffer = LastBuffer.substr(0,MAX_BUFFER);
             CurrentPackageReceviceSize = LastBuffer._length()-MAX_BUFFER;
             LastBuffer = LastBuffer.substr(MAX_BUFFER-1);
