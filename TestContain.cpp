@@ -56,7 +56,7 @@ int main(int argc, char const *argv[])
         params.Add("file","test.test.op");
 
         // // auto url = "http://192.168.10.23:5555/cgi-bin/xk_file_rsync_upload.cgi";
-        auto url = "192.168.10.250:9000";
+        auto url = "192.168.10.250:9000/x";
         FormPostTest(url,params,99999,TransListener(nullptr,[&](AString string){
             plog("result: ",string._length()," content:",string);
             

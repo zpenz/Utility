@@ -16,8 +16,7 @@ unsigned long GetTickCount() {
 }
 
 void exec(SOCKET conn,ReceviceListner listener){
-    // char buf[MAX_BUFFER * 2];
-    // char sendBuf[MAX_BUFFER];
+
     long TotalLength = 0;
     long ContentLength = 0;
     long ChunkIndex  = 0;
@@ -26,7 +25,7 @@ void exec(SOCKET conn,ReceviceListner listener){
     char buf[MAX_BUFFER];
 
     while(1){
-        // ibret = recv(conn,buf,MAX_BUFFER,0);
+
         Request request;
         Request req;
 
@@ -51,22 +50,23 @@ void exec(SOCKET conn,ReceviceListner listener){
                 break;
             }
         }
-        plog("request: ",req.ToString());
 
         //Content
         while(1){
             if(TotalLength == req.ContentLength.ToLong()) {
-                if(listener.OnHandleData)
-                    listener.OnHandleData(CurrentBuffer,req,ChunkIndex++);
+                plog("--------",LastBuffer._length()," ",ibret);
+                if(listener.OnHandleData && LastBuffer._length()!=0)
+                    listener.OnHandleData(LastBuffer,req,ChunkIndex++);
+
+                plog("TotalLength: ",TotalLength);
+                send(conn,"ACK",AString("ACK")._length(),0);
 
                 #ifdef WIN32
-                if(sock) closesocket(conn);
+                if(conn) closesocket(conn);
                 #else
                 if(conn) shutdown(conn, 2);
                 #endif
-                
-                plog("TotalLength: ",TotalLength);
-                send(conn,"ACK",AString("ACK")._length(),0);
+
                 break;
             }
 
@@ -77,25 +77,20 @@ void exec(SOCKET conn,ReceviceListner listener){
             TotalLength+=ibret;
 
             if(LastBuffer._length()<MAX_BUFFER ) {
-                plog("--------",LastBuffer._length()," ",ibret);
                 LastBuffer += AString(buf,ibret); 
+                plog("--------",LastBuffer._length()," ",ibret);
                 continue;
             }; 
 
-            plog("-------",LastBuffer._length()," ",CurrentPackageReceviceSize);
-            CurrentBuffer = LastBuffer.substr(0,MAX_BUFFER);
-            CurrentPackageReceviceSize = LastBuffer._length()-MAX_BUFFER;
-            LastBuffer = LastBuffer.substr(MAX_BUFFER-1);
+            while(LastBuffer._length()>=MAX_BUFFER){
+                plog("-------",LastBuffer._length()," ",CurrentPackageReceviceSize);
+                CurrentBuffer = LastBuffer.substr(0,MAX_BUFFER);
+                CurrentPackageReceviceSize = LastBuffer._length()-MAX_BUFFER;
+                LastBuffer = LastBuffer.substr(MAX_BUFFER-1);
 
-            if(listener.OnHandleData)
-                listener.OnHandleData(CurrentBuffer,req,ChunkIndex++);
-            // plog("ContentLength: ",ibret);
-
-        // if(ibret<=0){
-        //     plog("send ...");
-        //     ibret = send(sockConnect,AString("ACK FROM SERVER").c_str(),AString("ACK FROM SERVER")._length(),0);
-        //     plog("send length",ibret);
-        // }
+                if(listener.OnHandleData)
+                    listener.OnHandleData(CurrentBuffer,req,ChunkIndex++);
+            }
         }
     }
 }
@@ -158,7 +153,12 @@ bool start(ReceviceListner listener){
 }
 
 int main(void){
-    start(ReceviceListner(nullptr));
+    fstream fs = fstream("test.log",fs.binary|fs.out|fs.trunc);
+    start(ReceviceListner([&](hString& hs,Request& req,long index){
+        if(index==2)
+        fs.write(hs.c_str(),hs._size());
+    }));
+    fs.close();
     return 0;
 }
 
