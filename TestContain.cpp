@@ -51,11 +51,11 @@ int main(int argc, char const *argv[])
         //----
         Linker<AString> params;
         Utility::JObject obj;
-        // obj.Add("admin_id",1001,"sid","npJ8cS1q25M9vQcXXW02H9Te2G2L7O7","directory_path","/var/share/mp/xklvm1562233594/wxy/xk","all_file_name","/var/share/mp/xklvm1562233594/wxy/xk/UtilityTest.cpp");
-        // params.Add("json",obj.Serial());
-        params.Add("file","test.test.op");
+        obj.Add("admin_id",1001,"sid","npJ8cS1q25M9vQcXXW02H9Te2G2L7O7","directory_path","/var/share/mp/xklvm1562233594/wxy/xk","all_file_name","/var/share/mp/xklvm1562233594/wxy/xk/UtilityTest.cpp");
+        params.Add("json",obj.Serial());
+        // params.Add("file","test.test.op");
 
-        // auto url = "http://192.168.10.23:555/cgi-bin/xk_file_rsync_upload.cgi";
+        auto url = "http://192.168.10.23:555/cgi-bin/xk_file_rsync_verify.cgi";
         auto url = "192.168.10.250:9000/x";
         FormPostTest(url,params,99999,TransListener(nullptr,[&](AString string){
             plog("result: ",string._length()," content:",string);
@@ -67,7 +67,6 @@ int main(int argc, char const *argv[])
             job.Add("admin_id",1001,"sid","DbsG1J7TqfnJE4B63VRPgD3otHsQe1I","path_name","/var/share/mp/xklvm1562233594/wxy/xk/","file_name","UnitTest.cpp");
             req.OtherRecord.Add(Utility::KV("XK_JSON",job.Serial()));
         });
-
 
     return 0;
 }

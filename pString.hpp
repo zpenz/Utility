@@ -111,6 +111,7 @@
         }
 
         static bool Empty(const String<T>& des){
+            if(des.buffer == nullptr) return true;
             return des.length == 0;
         }
         static bool Compare(const String<T>& src,const String<T>& des)

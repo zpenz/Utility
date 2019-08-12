@@ -493,10 +493,11 @@
                         memset(buf,0, sizeof(buf));
                         goto next;
                     }
-                    if(file.eof()) {
-                        file.close();
-                        return ;
-                    }
+                }
+
+                if(file.peek()==EOF) {
+                    file.close();
+                    return ;
                 }
 
                 rChar* temp = bufcur;
