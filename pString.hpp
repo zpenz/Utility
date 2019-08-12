@@ -233,7 +233,7 @@
             return c_str();
         }
 
-        const T operator[](int index){
+        const T operator[](int index) const{
             CONDITION_MESSAGE(index<0 || index>length-1,"invalid index:");
             return buffer.get()[index];
         }
