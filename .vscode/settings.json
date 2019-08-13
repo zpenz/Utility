@@ -65,7 +65,15 @@
         "map": "cpp",
         "list": "cpp",
         "__tree": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "array": "cpp",
+        "bit": "cpp",
+        "*.tcc": "cpp",
+        "unordered_map": "cpp",
+        "numeric": "cpp",
+        "optional": "cpp",
+        "sstream": "cpp",
+        "variant": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false,
     "commentTranslate.targetLanguage": "en",

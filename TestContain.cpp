@@ -4,10 +4,20 @@
 #include "json.hpp"
 #include "HttpUtility.hpp"
 #include "adler32.hpp"
+#include "stack.hpp"
 #include <algorithm>
 
 using namespace Contain;
 using namespace Iterator;
+
+enum class op{
+    unin = 0,
+    connect,
+    star
+};
+
+pStack<AString> op;
+pStack<AString> id;
 
 AString PreBuild(const AString& expr){
     if(expr._length()==0) return "";
@@ -23,6 +33,8 @@ AString PreBuild(const AString& expr){
     }
     return ret;
 }
+
+
 
 int main(int argc, char const *argv[])
 {
@@ -74,6 +86,6 @@ int main(int argc, char const *argv[])
         //     req.OtherRecord.Add(Utility::KV("XK_JSON",job.Serial()));
         // });
 
-    plog(PreBuild("ab(a|b)*cd"));
+    plog(PreBuild("ab(a*|b*)*cd"));
     return 0;
 }
