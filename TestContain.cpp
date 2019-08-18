@@ -6,6 +6,8 @@
 #include "adler32.hpp"
 #include "stack.hpp"
 #include <algorithm>
+#include <deque>
+#include <map>
 
 using namespace Contain;
 using namespace Iterator;
@@ -18,6 +20,69 @@ enum class op{
 
 pStack<AString> op;
 pStack<AString> id;
+constexpr const char * explaint = "PSONGEXPLAINT";
+constexpr const char * none = "PSONGNONE";
+
+struct state{
+    map<AString,state> translist; 
+    bool bAccept;
+    bool bStart;
+    bool bValueState;
+    AString value="";
+    void AddTranslate(AString c,state s){
+        translist[c] = s;
+    }
+    state(bool Start):bAccept(false),bStart(Start),bValueState(false){}
+    state(){ bStart = true;bAccept=false;bValueState=false;}
+    state(AString Value):value(Value),bValueState(true),bStart(false),bAccept(false){}
+};
+
+
+struct FA{
+    deque<state> S;
+    
+    FA(){
+        S.push_back(state());
+    }
+    void Union(AString s1,AString s2){
+        state state1(false);
+        state state2(false);
+        state state3(false);
+        state state4(false);
+        state state5(false);
+        state state6(false);
+
+        state1.AddTranslate(explaint,state2);
+        state2.AddTranslate(explaint,state2);
+        state1.AddTranslate(explaint,v2);
+        v2.AddTranslate(explaint,state2);
+
+        S.push_back(state1); 
+        S.push_back(state2); 
+    }
+
+    void Connect(AString s1,AString s2){
+        state state1(false);
+        state state2(false);
+        state v1 = s1;
+        state v2 = s2;
+
+        state1.AddTranslate(explaint,v1);
+        v1.AddTranslate(explaint,v2);
+        v2.AddTranslate(explaint,state2);
+        S.push_back(state1); 
+        S.push_back(state2); 
+    }
+    
+    void Star(AString s1){
+        state state1(false);
+        state state2(false);
+        state v1 = s1;
+        state1.AddTranslate(s1,v1);
+        state1.AddTranslate(s1,v1);
+    }
+
+};
 
 AString PreBuild(const AString& expr){
     if(expr._length()==0) return "";
@@ -33,7 +98,6 @@ AString PreBuild(const AString& expr){
     }
     return ret;
 }
-
 
 
 int main(int argc, char const *argv[])
