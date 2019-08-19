@@ -25,6 +25,7 @@ constexpr const char * none = "PSONGNONE";
 
 struct state{
     map<AString,state> translist; 
+    vector<state> statelist = vector<state>(); // one or more state view as one state
     bool bAccept;
     bool bStart;
     bool bValueState;
@@ -44,6 +45,8 @@ struct FA{
     FA(){
         S.push_back(state());
     }
+
+    
     void Union(AString s1,AString s2){
         state state1(false);
         state state2(false);
@@ -53,33 +56,55 @@ struct FA{
         state state6(false);
 
         state1.AddTranslate(explaint,state2);
-        state2.AddTranslate(explaint,state2);
-        state1.AddTranslate(explaint,v2);
-        v2.AddTranslate(explaint,state2);
+        state2.AddTranslate(s1,state3);
+        state3.AddTranslate(explaint,state6);
+        state1.AddTranslate(explaint,state4);
+        state4.AddTranslate(s2,state5);
+        state5.AddTranslate(explaint,state6);
 
-        S.push_back(state1); 
-        S.push_back(state2); 
+
+        state1.statelist.push_back(state1);
+        state1.statelist.push_back(state2);
+        state1.statelist.push_back(state3);
+        state1.statelist.push_back(state4);
+        state1.statelist.push_back(state5);
+        state1.statelist.push_back(state6);
+
+        S.push_back(state1);
     }
 
     void Connect(AString s1,AString s2){
         state state1(false);
         state state2(false);
-        state v1 = s1;
-        state v2 = s2;
+        state state3(false);
+        state state4(false);
 
-        state1.AddTranslate(explaint,v1);
-        v1.AddTranslate(explaint,v2);
-        v2.AddTranslate(explaint,state2);
-        S.push_back(state1); 
-        S.push_back(state2); 
+        state1.AddTranslate(s1,state2);
+        state2.AddTranslate(explaint,state3);
+        state3.AddTranslate(s1,state4);
+
+        state1.statelist.push_back(state1);
+        state1.statelist.push_back(state2);
+        state1.statelist.push_back(state3);
+        state1.statelist.push_back(state4);
+
+        S.push_back(state1);
     }
     
     void Star(AString s1){
         state state1(false);
         state state2(false);
-        state v1 = s1;
-        state1.AddTranslate(s1,v1);
-        state1.AddTranslate(s1,v1);
+        state state3(false);
+        state state4(false);
+
+
+        state1.AddTranslate(explaint,state2);
+        state1.AddTranslate(explaint,state4);
+        state2.AddTranslate(s1,state3);
+        state3.AddTranslate(explaint,state2);
+        state3.AddTranslate(explaint,state4);
+
+        S.push_back(state1);
     }
 
 };
