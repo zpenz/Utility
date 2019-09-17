@@ -104,6 +104,11 @@ namespace Utility
             }
             return temp;
         }
+        
+
+        KeyValue Parse(JString input){
+            
+        }
     };
 
     class JObject{
