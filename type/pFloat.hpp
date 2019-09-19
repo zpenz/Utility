@@ -9,5 +9,4 @@ class pFloat : public pObject{
         pFloat operator-=(float i){data-=i;return *this;}
         pFloat operator*=(float i){data*=i;return *this;}
         pFloat operator/=(float i){data/=i;return *this;}
-
 };

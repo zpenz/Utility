@@ -77,5 +77,6 @@
     },
     "C_Cpp.dimInactiveRegions": false,
     "commentTranslate.targetLanguage": "en",
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Disabled",
+    
 }

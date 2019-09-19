@@ -1,6 +1,7 @@
 #pragma once
 #include "pString.hpp"
 #include "Contain.h"
+#include "type/pObject.hpp"
 
 namespace Utility
 {
@@ -106,9 +107,9 @@ namespace Utility
         }
         
 
-        KeyValue Parse(JString input){
+        // KeyValue Parse(JString input){
             
-        }
+        // }
     };
 
     class JObject{
@@ -158,6 +159,10 @@ namespace Utility
             }
             temp += "}";
             return temp;
+        }
+
+        template<typename type>
+        type operator[](JString key){
         }
     };
 

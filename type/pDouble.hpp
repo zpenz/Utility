@@ -9,5 +9,4 @@ class pDouble : public pObject{
         pDouble operator-=(double i){data-=i;return *this;}
         pDouble operator*=(double i){data*=i;return *this;}
         pDouble operator/=(double i){data/=i;return *this;}
-
 };

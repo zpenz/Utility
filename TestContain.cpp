@@ -45,7 +45,6 @@ struct FA{
     FA(){
         S.push_back(state());
     }
-
     
     void Union(AString s1,AString s2){
         state state1(false);
@@ -175,6 +174,6 @@ int main(int argc, char const *argv[])
         //     req.OtherRecord.Add(Utility::KV("XK_JSON",job.Serial()));
         // });
 
-    plog(PreBuild("ab(a*|b*)*cd"));
+    // plog(PreBuild("ab(a*|b*)*cd"));
     return 0;
 }

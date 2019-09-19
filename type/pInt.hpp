@@ -9,6 +9,4 @@ class pInt : public pObject{
         pInt operator-=(int i){data-=i;return *this;}
         pInt operator*=(int i){data*=i;return *this;}
         pInt operator/=(int i){data/=i;return *this;}
-
-        
 };

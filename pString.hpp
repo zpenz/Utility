@@ -494,6 +494,18 @@
             *this = *this + src;
             return *this;
         }
+        bool operator>(const String<T> & des)const{
+            return Compare(*this,des)>0;
+        }
+        bool operator<(const String<T> & des)const{
+            return Compare(*this,des)<0;
+        }
+        bool operator>=(const String<T> & des)const{
+            return Compare(*this,des)>=0;
+        }
+        bool operator<=(const String<T> & des)const{
+            return Compare(*this,des)<=0;
+        }
     };
     
     using AString = String<char>;
