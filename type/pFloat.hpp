@@ -1,12 +1,14 @@
 #include "pObject.hpp"
 
-class pFloat : public pObject{
+class pfloat : public pTypeObject<float>,public virtual pObject{
     public:
-        float data;
-        pFloat(float i):pObject(ObjectType::TYPE_FLOAT),data(i){}
-        pFloat operator=(float i){data=i;return *this;}
-        pFloat operator+=(float i){data+=i;return *this;}
-        pFloat operator-=(float i){data-=i;return *this;}
-        pFloat operator*=(float i){data*=i;return *this;}
-        pFloat operator/=(float i){data/=i;return *this;}
+
+        template<typename T>
+        pfloat(T d):pObject(ObjectType::TYPE_FLOAT),pTypeObject(d){}
+
+        pfloat operator+=(pfloat i){data+=i.data;return *this;}
+        pfloat operator-=(pfloat i){data-=i.data;return *this;}
+        pfloat operator*=(pfloat i){data*=i.data;return *this;}
+        pfloat operator/=(pfloat i){data/=i.data;return *this;}
+        operator float() {return data;}
 };

@@ -9,6 +9,8 @@
 #include <deque>
 #include <map>
 
+#include "type/pTypes.hpp"
+
 using namespace Contain;
 using namespace Iterator;
 
@@ -175,5 +177,18 @@ int main(int argc, char const *argv[])
         // });
 
     // plog(PreBuild("ab(a*|b*)*cd"));
+
+    pdouble d = 10.0;
+    pint a = 10;
+    a+=10.0;
+    d+=100;
+    d=d+a;
+    // d=d+a;
+
+    pObject c = d;
+    pObject e = a;
+    
+    
+    show_message(static_cast<pTypeObject<int> >(a).data);
     return 0;
 }

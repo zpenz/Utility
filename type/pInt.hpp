@@ -1,12 +1,14 @@
 #include "pObject.hpp"
 
-class pInt : public pObject{
+class pint : public pTypeObject<int>,virtual public pObject{
     public:
-        int data;
-        pInt(int i):pObject(ObjectType::TYPE_INT),data(i){}
-        pInt operator=(int i){data=i;return *this;}
-        pInt operator+=(int i){data+=i;return *this;}
-        pInt operator-=(int i){data-=i;return *this;}
-        pInt operator*=(int i){data*=i;return *this;}
-        pInt operator/=(int i){data/=i;return *this;}
+
+        template<typename T>
+        pint(T d):pObject(ObjectType::TYPE_INT),pTypeObject(d){}
+
+        pint operator+=(pint i){data+=i.data;return *this;}
+        pint operator-=(pint i){data-=i.data;return *this;}
+        pint operator*=(pint i){data*=i.data;return *this;}
+        pint operator/=(pint i){data/=i.data;return *this;}
+        operator int() {return data;}
 };

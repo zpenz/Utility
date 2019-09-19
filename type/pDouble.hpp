@@ -1,12 +1,13 @@
 #include "pObject.hpp"
 
-class pDouble : public pObject{
+class pdouble : public pTypeObject<double>,public virtual pObject{
     public:
-        double data;
-        pDouble(double i):pObject(ObjectType::TYPE_DOUBLE),data(i){}
-        pDouble operator=(double i){data=i;return *this;}
-        pDouble operator+=(double i){data+=i;return *this;}
-        pDouble operator-=(double i){data-=i;return *this;}
-        pDouble operator*=(double i){data*=i;return *this;}
-        pDouble operator/=(double i){data/=i;return *this;}
+        template<typename T>
+        pdouble(T d):pObject(ObjectType::TYPE_DOUBLE),pTypeObject(static_cast<double>(d)){}
+
+        pdouble operator+=(pdouble i){data+=i.data;return *this;}
+        pdouble operator-=(pdouble i){data-=i.data;return *this;}
+        pdouble operator*=(pdouble i){data*=i.data;return *this;}
+        pdouble operator/=(pdouble i){data/=i.data;return *this;}
+        operator double() {return data;}
 };
