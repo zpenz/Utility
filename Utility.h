@@ -57,4 +57,12 @@ namespace utility{
         template<class U,class P>
         KeyValuePair(U key,P value):_key(key),_value(value){}
     };
+
+    #define SINGLE_INSTANCE(classname) \
+		private: \
+			classname(){} \
+		public:\
+		inline static classname & getInstance(){\
+			static classname  cInstance;\
+			return cInstance;}
 }

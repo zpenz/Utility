@@ -4,10 +4,11 @@ cmake_minimum_required(VERSION 3.0)
 #set(CMAKE_CXX_STANDARD 14)
 #add_executable(${PROJECT_NAME} ${SOURCE})
 
+aux_source_directory(type TYPE_LIST)
 project(TestContain)
 set(SOURCE TestContain.cpp HttpUtility.cpp)
 set(CMAKE_CXX_STANDARD 14)
-add_executable(${PROJECT_NAME} ${SOURCE})
+add_executable(${PROJECT_NAME} ${SOURCE} ${TYPE_LIST})
 set(THREAD pthread)
 #target_link_libraries(TestContain ${THREAD})
 

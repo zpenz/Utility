@@ -1,7 +1,8 @@
 #pragma once
 #include "Utility.h"
+#include "type/pTypes.hpp"
 
-namespace Contain{
+namespace Contain {
     using namespace utility;
     using namespace smartpoint;
     using namespace stype;
@@ -22,7 +23,7 @@ namespace Contain{
 
     //left=>right
     template<typename T>
-    struct Tree{
+    struct Tree :public pObject{
         typedef TreeNode<T> TreeNodeType;
         shared_ptr<TreeNodeType> base = nullptr;
         Tree(const TreeNodeType head):base(move(head)){}
@@ -136,7 +137,7 @@ namespace Contain{
     };
 
     template<typename T>
-    struct Linker{
+    struct Linker :public pObject {
         using Nodetype = LinkNode<T>;
         uint size; 
         shared_ptr<Nodetype> head;

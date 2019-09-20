@@ -10,10 +10,11 @@
  #include "Contain.h"
 
  #include "Utility.h"
+ #include "type/pTypes.hpp"
  using namespace utility;
 
  template<typename T>
-    class String{
+    class String :public pObject{
         shared_ptr<T> buffer;
         int length;
         int size;

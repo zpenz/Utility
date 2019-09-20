@@ -220,6 +220,33 @@ sserver.cpp.s:
 	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/sserver.cpp.s
 .PHONY : sserver.cpp.s
 
+type/pObject.o: type/pObject.cpp.o
+
+.PHONY : type/pObject.o
+
+# target to build an object file
+type/pObject.cpp.o:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pObject.cpp.o
+.PHONY : type/pObject.cpp.o
+
+type/pObject.i: type/pObject.cpp.i
+
+.PHONY : type/pObject.i
+
+# target to preprocess a source file
+type/pObject.cpp.i:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pObject.cpp.i
+.PHONY : type/pObject.cpp.i
+
+type/pObject.s: type/pObject.cpp.s
+
+.PHONY : type/pObject.s
+
+# target to generate assembly for a file
+type/pObject.cpp.s:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pObject.cpp.s
+.PHONY : type/pObject.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -239,6 +266,9 @@ help:
 	@echo "... sserver.o"
 	@echo "... sserver.i"
 	@echo "... sserver.s"
+	@echo "... type/pObject.o"
+	@echo "... type/pObject.i"
+	@echo "... type/pObject.s"
 .PHONY : help
 
 

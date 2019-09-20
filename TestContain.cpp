@@ -125,6 +125,11 @@ AString PreBuild(const AString& expr){
     return ret;
 }
 
+struct Test:Reflect<Test>{
+    void test(){
+        show_message("ok");
+    }
+};
 
 int main(int argc, char const *argv[])
 {
@@ -185,10 +190,18 @@ int main(int argc, char const *argv[])
     d=d+a;
     // d=d+a;
 
-    pObject c = d;
+    pObject c = d;  
     pObject e = a;
     
-    
-    show_message(static_cast<pTypeObject<int> >(a).data);
+    auto ret = Reflect<int>::CreateObject();
+    createfunc s;
+
+    *ret = 10;
+    show_message(*ret);
+    // show_message(static_cast<pTypeObject<int> >(a).data);
+    show_message("\n",typeid(pObject).name(),"\n");
+    auto obj = FY.create<state>("Test");
+    // obj->test();
+    // show_message(typeid(Test).name());
     return 0;
 }
