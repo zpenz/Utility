@@ -208,6 +208,8 @@ int main(int argc, char const *argv[])
 
     show_message("\n",c.classname,"\n");
     show_message("\n",e.classname,"\n");
+
+    FY.create(c.classname);
     // show_message(typeid(Test).name());
     return 0;
 }
