@@ -12,12 +12,12 @@ enum class ObjectType {
   TYPE_STRING
 };
 
-template <typename type> class pTypeObject;
+template <typename Type,typename ClassType> class pTypeObject;
 
 class pObject {
 public:
+  char classname[256] = {0};
   ObjectType _type;
-  pObject(ObjectType tp) { _type = tp; }
   pObject() {}
   virtual ~pObject() {}
 };
@@ -27,11 +27,11 @@ using createfunc = shared_ptr<pObject> (*)();
 class Factory : public pObject {
   SINGLE_INSTANCE(Factory)
   map<const char *, createfunc> fmap;
-  shared_ptr<pObject> create(const char *classname);
 
 public:
-  template <typename T> 
-  void RegisteFunc(createfunc func) {
+  shared_ptr<pObject> create(const char *classname);
+
+  template <typename T> void RegisteFunc(createfunc func) {
     const char *name = typeid(T).name();
     utility::show_message(name);
     if (fmap.find(name) != fmap.end())
@@ -48,7 +48,7 @@ public:
 
 #define FY Factory::getInstance()
 
-template <typename ReflectType> class Reflect : public pObject {
+template <typename ReflectType> class Reflect : virtual public pObject {
 public:
   static auto CreateObject() {
     return dynamic_pointer_cast<pObject>(make_shared<ReflectType>());
@@ -65,11 +65,20 @@ public:
 
 template <typename T> typename Reflect<T>::reg Reflect<T>::rg;
 
-template <typename Type> class pTypeObject {
+template <typename Type,typename ClassType> 
+class pTypeObject :virtual public pObject{
 public:
   Type data;
+  template <typename O> pTypeObject(O o) {
+    data = static_cast<Type>(o);
+    const char *name = typeid(ClassType).name();
+    memcpy(classname,name,sizeof(char) * strlen(name));
+    utility::show_message("type: ",name,"\n");
+  }
 
-  template <typename O> pTypeObject(O o) { data = static_cast<Type>(o); }
-
+  pTypeObject() {
+    const char *name = typeid(ClassType).name();
+    memcpy(classname,name,sizeof(char) * strlen(name));
+  };
   virtual ~pTypeObject() {}
 };

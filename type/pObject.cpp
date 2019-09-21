@@ -2,7 +2,6 @@
 
 shared_ptr<pObject> Factory::create(const char * classname)
 {
-    
     auto ret = fmap.find(classname);
     if(fmap.end()==ret){
         //error

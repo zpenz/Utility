@@ -206,12 +206,8 @@ int main(int argc, char const *argv[])
     // auto ret = Reflect<int>::CreateObject();
     createfunc s;
 
-    // *ret = 10;
-    // show_message(static_cast<pTypeObject<int> >(a).data);
-    show_message("\n", typeid(pObject).name(), "\n");
-    // FY.RegisteFunc(typeid(Test).name(), s);
-    auto obj = FY.create<Test>();
-    obj->test();
+    show_message("\n",c.classname,"\n");
+    show_message("\n",e.classname,"\n");
     // show_message(typeid(Test).name());
     return 0;
 }
