@@ -14,7 +14,7 @@
  using namespace utility;
 
  template<typename T>
-    class String :public pObject{
+    class String :public Reflect<String<T> >{
         shared_ptr<T> buffer;
         int length;
         int size;
@@ -507,6 +507,10 @@
         bool operator<=(const String<T> & des)const{
             return Compare(*this,des)<=0;
         }
+
+        const char* toString()const override{
+            return c_str();
+        }
     };
     
     using AString = String<char>;
@@ -516,4 +520,9 @@
     extern AString W2AS(WString src,char * buf,size_t size);
     extern WString A2W(AString src);
     extern WString A2WS(AString src,wchar_t* buf,size_t size);
+    
+    template<typename T>
+    bool is_same_class(const AString& classname){
+        return classname.Equal(typeid(T).name());
+    }
     

@@ -19,6 +19,9 @@ public:
   char classname[256] = {0};
   ObjectType _type;
   pObject() {}
+  virtual const char * toString() const{
+    return classname;
+  }
   virtual ~pObject() {}
 };
 
@@ -33,7 +36,8 @@ public:
 
   template <typename T> void RegisteFunc(createfunc func) {
     const char *name = typeid(T).name();
-    utility::show_message(name);
+    using namespace utility;
+    plog(name);
     if (fmap.find(name) != fmap.end())
       return;
     fmap.emplace(pair<const char *, createfunc>(name, func));

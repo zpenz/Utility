@@ -21,7 +21,7 @@ public:
         CurrentNode = nullptr;
     }
     ~pStack(){
-        plog("stack destruct");
+        // plog("stack destruct");
     }
     const Type Pop(){
         shared_ptr<StackNodeType> TempNode(CurrentNode);

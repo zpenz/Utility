@@ -1,6 +1,7 @@
 #include "pObject.hpp"
 
-class plong : public pTypeObject<long, plong>, public Reflect<plong> {
+class plong : public pTypeObject<long, plong>, 
+              public Reflect<plong> {
 public:
   template <typename T> plong(T d) : pTypeObject(d) {}
   plong() = default;

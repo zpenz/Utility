@@ -205,11 +205,12 @@ int main(int argc, char const *argv[])
 
     // auto ret = Reflect<int>::CreateObject();
     createfunc s;
+    plong l = 100;
 
-    show_message("\n",c.classname,"\n");
-    show_message("\n",e.classname,"\n");
+    plog(c.toString());
+    plog(e.toString());
 
-    FY.create(c.classname);
+    FY.create<plong>();
     // show_message(typeid(Test).name());
     return 0;
 }

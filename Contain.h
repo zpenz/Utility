@@ -137,7 +137,7 @@ namespace Contain {
     };
 
     template<typename T>
-    struct Linker :public pObject {
+    struct Linker :public Reflect<Linker<T> > {
         using Nodetype = LinkNode<T>;
         uint size; 
         shared_ptr<Nodetype> head;
