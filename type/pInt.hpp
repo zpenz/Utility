@@ -1,8 +1,9 @@
 #include "pObject.hpp"
 #include "pString.hpp"
+#include <string>
 
 class pint :  public pTypeObject<int, pint>,
-              public Reflect<pint> {
+              public Reflect<pint> { 
 public:
   template <typename T> pint(T d) : pTypeObject(d) {}
   pint() = default;
@@ -25,6 +26,6 @@ public:
   operator int() { return data; }
 
   const char* toString()const override{
-    return AString(data).c_str();
+    return "s";
   }
 };

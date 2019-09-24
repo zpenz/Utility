@@ -2,6 +2,7 @@
 #include "Utility.h"
 #include <map>
 #include <memory>
+#include <string>
 using namespace std;
 
 enum class ObjectType {
@@ -13,12 +14,16 @@ enum class ObjectType {
 };
 
 template <typename Type,typename ClassType> class pTypeObject;
+typedef shared_ptr<char*> safechar;
 
 class pObject {
 public:
   char classname[256] = {0};
   ObjectType _type;
-  pObject() {}
+  pObject() { 
+    const char *name = typeid(pObject).name();
+    memcpy(classname,name,sizeof(char) * strlen(name));
+  }
   virtual const char * toString() const{
     return classname;
   }

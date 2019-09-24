@@ -16,7 +16,7 @@ template <class T> struct is_string {
   enum { value = sizeof(is_str(t)) == sizeof(char) };
 };
 
-struct KeyValue : public Reflect<KeyValue> {
+struct KeyValue : public Reflect<KeyValue>{
   JString key;
   pObject value;
   Linker<KeyValue> list;
@@ -45,7 +45,7 @@ struct KeyValue : public Reflect<KeyValue> {
 //     blist = false;
 //     barraylist = true;
 //   }
-
+  
   JString SerialArrayList() {
     JString temp = "";
     for (int index = 0; index < arraylist.size; index++) {
@@ -95,7 +95,8 @@ struct KeyValue : public Reflect<KeyValue> {
         temp += "\"";
       }
       // else
-      // temp+=value;
+      // temp+=value;+
+
     }
     return temp;
   }
@@ -121,6 +122,8 @@ struct KeyValue : public Reflect<KeyValue> {
         }
         temp += "]";
     }else{
+      // auto ret = value.toString();
+      plog("classname: ",value.classname);
       temp+=value.toString();
     }
     return temp;
@@ -131,7 +134,9 @@ class JObject {
 public:
   Linker<KeyValue> list;
 
-  void Add(KeyValue obj) { list.Add(move(obj)); }
+  void Add(KeyValue obj) { 
+    list.Add(move(obj)); 
+    }
 
   template <typename Key, typename Value> void Add(Key key, Value value) {
     list.Add(KeyValue(key, value));

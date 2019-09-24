@@ -200,13 +200,17 @@ int main(int argc, char const *argv[])
 
     pObject c = d;
     pObject e = a;
-
+    pObject g = AString("zz");
+    
+    plog(a.toString());
     // auto ret = Reflect<int>::CreateObject();
     createfunc s;
     plong l = 100;
 
     JObject obj;
-    obj.Add(KeyValue(19,1));
+    // obj.Add("key",a);
+    KeyValue kv = KeyValue("key",a);
+    plog(kv.value.classname)
     plog(obj.Serial());
     FY.create<plong>();
     // show_message(typeid(Test).name());
