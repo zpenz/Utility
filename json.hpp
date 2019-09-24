@@ -1,6 +1,5 @@
 #pragma once
-#include "Contain.h"
-#include "pString.hpp"
+
 #include "type/pTypes.hpp"
 
 namespace Utility {
@@ -121,6 +120,8 @@ struct KeyValue : public Reflect<KeyValue> {
                 temp+=",";
         }
         temp += "]";
+    }else{
+      temp+=value.toString();
     }
     return temp;
   }
@@ -162,7 +163,7 @@ public:
     JString temp = "{";
     for (int index = 0; index < list.size; index++) {
       auto item = list[index];
-      temp += item.Serial();
+      temp += item.Serial2();
       if (index != list.size - 1)
         temp += ",";
     }

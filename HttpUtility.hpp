@@ -1,7 +1,6 @@
 #pragma once
 
-#include "pString.hpp"
-#include "Contain.h"
+#include "type/pTypes.hpp"
 #include <functional>
 
 namespace Utility

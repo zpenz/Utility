@@ -1,9 +1,7 @@
-#include "Contain.h"
 #include "HttpUtility.hpp"
 #include "Iterator.hpp"
 #include "adler32.hpp"
 #include "json.hpp"
-#include "pString.hpp"
 #include "stack.hpp"
 #include <algorithm>
 #include <deque>
@@ -207,9 +205,9 @@ int main(int argc, char const *argv[])
     createfunc s;
     plong l = 100;
 
-    plog(c.toString());
-    plog(e.toString());
-
+    JObject obj;
+    obj.Add(KeyValue(19,1));
+    plog(obj.Serial());
     FY.create<plong>();
     // show_message(typeid(Test).name());
     return 0;

@@ -1,4 +1,5 @@
 #include "pObject.hpp"
+#include "pString.hpp"
 
 class pint :  public pTypeObject<int, pint>,
               public Reflect<pint> {
@@ -22,4 +23,8 @@ public:
     return *this;
   }
   operator int() { return data; }
+
+  const char* toString()const override{
+    return AString(data).c_str();
+  }
 };

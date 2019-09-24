@@ -7,10 +7,10 @@
  #include <cctype>
  #include <cmath>
  #include <string.h>
- #include "Contain.h"
 
  #include "Utility.h"
- #include "type/pTypes.hpp"
+ #include "Contain.h"
+ #include "pObject.hpp"
  using namespace utility;
 
  template<typename T>

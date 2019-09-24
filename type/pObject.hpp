@@ -1,5 +1,5 @@
 #pragma once
-#include "../Utility.h"
+#include "Utility.h"
 #include <map>
 #include <memory>
 using namespace std;
@@ -37,7 +37,7 @@ public:
   template <typename T> void RegisteFunc(createfunc func) {
     const char *name = typeid(T).name();
     using namespace utility;
-    plog(name);
+    // plog(name);
     if (fmap.find(name) != fmap.end())
       return;
     fmap.emplace(pair<const char *, createfunc>(name, func));
@@ -58,6 +58,7 @@ public:
     return dynamic_pointer_cast<pObject>(make_shared<ReflectType>());
   }
 
+  typedef ReflectType __type;
   struct reg {
     reg() { FY.RegisteFunc<ReflectType>(CreateObject); }
     inline constexpr void _nothing() {}
@@ -77,7 +78,6 @@ public:
     data = static_cast<Type>(o);
     const char *name = typeid(ClassType).name();
     memcpy(classname,name,sizeof(char) * strlen(name));
-    utility::show_message("type: ",name,"\n");
   }
 
   pTypeObject() {
