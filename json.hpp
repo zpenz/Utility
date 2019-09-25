@@ -85,8 +85,8 @@ struct KeyValue : public Reflect<KeyValue> {
           temp += ",";
       }
       temp += "]";
-    }else{
-      temp+=value;
+    } else {
+      temp += value;
     }
     return temp;
   }
@@ -118,6 +118,8 @@ struct KeyValue : public Reflect<KeyValue> {
   //   return temp;
   // }
 };
+
+using JAarry = Linker<KeyValue>;
 
 class JObject {
 public:
@@ -164,11 +166,78 @@ public:
   }
 
   template <typename type> type operator[](JString key) {}
-};
 
-class JArray {
-  JString key;
-  Linker<JObject> list;
+  auto static Parse(JString input) {
+    JAarry ret = JAarry();
+    // pStack<JString> op = pStack<JString>();
+    Linker<JString> op = Linker<JString>();
+    int index = 0;
+    auto skipspace = [&](const JString &errmsg) {
+      while (index < input._length()) {
+        if (input[index] != ' ' && input[index] != '\r' &&
+            input[index] != '\n' && input[index] != '\t' && input[index] != ' ')
+          break;
+        index++;
+      }
+      if (index == input._length() - 1) {
+        plog(errmsg);
+        return;
+      }
+    };
+
+    while (index < input._length()) {
+      auto temp = input[index];
+      // bool bString = false;
+      if (temp == '{' || temp == '}' || temp == '[' || temp == ']')
+        op.Add(temp);
+
+      if (temp == '"'
+          // && bString
+      ) {
+        index++;
+        JString value = "";
+        while (index < input._length()) {
+          if (input[index] == '"' && input[index - 1] != '\\')
+            break;
+          value += input[index];
+          index++;
+        }
+        if (index == input._length() - 1) {
+          // error
+          return op;
+        }
+
+        // op.Add("\"");
+        op.Add(value);
+        // op.Add("\"");
+      }
+
+      if (temp == ':') {
+        skipspace("非预期的字符串");
+
+        index++;
+        if (input[index] == '{' || input[index] == '[')
+          continue;
+        JString value = "";
+        while (index < input._length()) {
+          if (input[index] == ',' || input[index] == '}')
+            break;
+          value += input[index];
+          index++;
+        }
+
+        if (index == input._length() - 1) {
+          // error
+          return op;
+        }
+        op.Add(value);
+      }
+      else
+        index++;
+    }
+
+    return op;
+  }
 };
 
 } // namespace Utility

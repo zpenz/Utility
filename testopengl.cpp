@@ -1,6 +1,6 @@
 
 //Test.cpp
-#include <GL/glut.h>
+#include <GLUT/glut.h>
  
 #define ColoredVertex(c, v) do{ glColor3fv(c); glVertex3fv(v); }while(0)
 static int angle = 0;

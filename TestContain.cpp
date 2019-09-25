@@ -2,7 +2,6 @@
 #include "Iterator.hpp"
 #include "adler32.hpp"
 #include "json.hpp"
-#include "stack.hpp"
 #include <algorithm>
 #include <deque>
 #include <map>
@@ -198,20 +197,24 @@ int main(int argc, char const *argv[])
     d = d + a;
     // d=d+a;
     AString z = "zz";
-
+    
     // auto ret = Reflect<int>::CreateObject();
     createfunc s;
     plong l = 100;
 
     JObject obj;
     // obj.Add("key",a);
-    Linker<KeyValue> list = Linker<KeyValue>();
-    Linker<KeyValue> list2 = Linker<KeyValue>();
+    JAarry list  = JAarry();
+    JAarry list2 = JAarry();
     list2.Add(KeyValue("zz",123),KeyValue("cc","dd"));
     list.Add(KeyValue("zz",123),KeyValue("cc","dd"),KeyValue("list2",list2));
-    obj.Add("nihao",123,"zzz","oo","test",23.0,"list",list);
+    obj.Add("nihao",123,"zzz","oo","test",23.01,"list",list);
     // plog(kv.value->toString())
     plog(obj.Serial());
+    auto ret = JObject::Parse(obj.Serial());
+    for(int index=0;index<ret.size;index++){
+        plog(ret[index]);
+    }
     FY.create<plong>();
     // show_message(typeid(Test).name());
     return 0;

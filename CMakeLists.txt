@@ -19,8 +19,10 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(${PROJECT_NAME} ${SOURCE})
 target_link_libraries(sserver ${THREAD})
 
+#clang++ testopengl.cpp -o opengl -framework OpenGL -framework GLUT
 #project(opengl)
 #set(OPENGL GL glut)
+#set(OPENGL gl)
 #set(SOURCE testopengl.cpp )
 #set(CMAKE_CXX_STANDARD 14)
 #add_executable(${PROJECT_NAME} ${SOURCE})

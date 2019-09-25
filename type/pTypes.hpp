@@ -5,3 +5,4 @@
 #include "pDouble.hpp"
 #include "Contain.hpp"
 #include "pString.hpp"
+#include "stack.hpp"

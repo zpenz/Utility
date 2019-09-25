@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named opengl
+
+# Build rule for target.
+opengl: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 opengl
+.PHONY : opengl
+
+# fast build rule for target.
+opengl/fast:
+	$(MAKE) -f CMakeFiles/opengl.dir/build.make CMakeFiles/opengl.dir/build
+.PHONY : opengl/fast
+
+#=============================================================================
 # Target rules for targets named sserver
 
 # Build rule for target.
@@ -220,6 +233,33 @@ sserver.cpp.s:
 	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/sserver.cpp.s
 .PHONY : sserver.cpp.s
 
+testopengl.o: testopengl.cpp.o
+
+.PHONY : testopengl.o
+
+# target to build an object file
+testopengl.cpp.o:
+	$(MAKE) -f CMakeFiles/opengl.dir/build.make CMakeFiles/opengl.dir/testopengl.cpp.o
+.PHONY : testopengl.cpp.o
+
+testopengl.i: testopengl.cpp.i
+
+.PHONY : testopengl.i
+
+# target to preprocess a source file
+testopengl.cpp.i:
+	$(MAKE) -f CMakeFiles/opengl.dir/build.make CMakeFiles/opengl.dir/testopengl.cpp.i
+.PHONY : testopengl.cpp.i
+
+testopengl.s: testopengl.cpp.s
+
+.PHONY : testopengl.s
+
+# target to generate assembly for a file
+testopengl.cpp.s:
+	$(MAKE) -f CMakeFiles/opengl.dir/build.make CMakeFiles/opengl.dir/testopengl.cpp.s
+.PHONY : testopengl.cpp.s
+
 type/pObject.o: type/pObject.cpp.o
 
 .PHONY : type/pObject.o
@@ -247,6 +287,60 @@ type/pObject.cpp.s:
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pObject.cpp.s
 .PHONY : type/pObject.cpp.s
 
+type/pString.o: type/pString.cpp.o
+
+.PHONY : type/pString.o
+
+# target to build an object file
+type/pString.cpp.o:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pString.cpp.o
+.PHONY : type/pString.cpp.o
+
+type/pString.i: type/pString.cpp.i
+
+.PHONY : type/pString.i
+
+# target to preprocess a source file
+type/pString.cpp.i:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pString.cpp.i
+.PHONY : type/pString.cpp.i
+
+type/pString.s: type/pString.cpp.s
+
+.PHONY : type/pString.s
+
+# target to generate assembly for a file
+type/pString.cpp.s:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pString.cpp.s
+.PHONY : type/pString.cpp.s
+
+type/stack.o: type/stack.cpp.o
+
+.PHONY : type/stack.o
+
+# target to build an object file
+type/stack.cpp.o:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/stack.cpp.o
+.PHONY : type/stack.cpp.o
+
+type/stack.i: type/stack.cpp.i
+
+.PHONY : type/stack.i
+
+# target to preprocess a source file
+type/stack.cpp.i:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/stack.cpp.i
+.PHONY : type/stack.cpp.i
+
+type/stack.s: type/stack.cpp.s
+
+.PHONY : type/stack.s
+
+# target to generate assembly for a file
+type/stack.cpp.s:
+	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/stack.cpp.s
+.PHONY : type/stack.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -255,6 +349,7 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... opengl"
 	@echo "... sserver"
 	@echo "... TestContain"
 	@echo "... HttpUtility.o"
@@ -266,9 +361,18 @@ help:
 	@echo "... sserver.o"
 	@echo "... sserver.i"
 	@echo "... sserver.s"
+	@echo "... testopengl.o"
+	@echo "... testopengl.i"
+	@echo "... testopengl.s"
 	@echo "... type/pObject.o"
 	@echo "... type/pObject.i"
 	@echo "... type/pObject.s"
+	@echo "... type/pString.o"
+	@echo "... type/pString.i"
+	@echo "... type/pString.s"
+	@echo "... type/stack.o"
+	@echo "... type/stack.i"
+	@echo "... type/stack.s"
 .PHONY : help
 
 
