@@ -25,7 +25,7 @@ public:
   }
   operator int() { return data; }
 
-  const char* toString()const override{
-    return "s";
+  virtual const char* toString()const override{
+    return "z";
   }
 };

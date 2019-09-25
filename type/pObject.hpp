@@ -63,6 +63,10 @@ public:
     return dynamic_pointer_cast<pObject>(make_shared<ReflectType>());
   }
 
+  auto test(){
+    return make_shared<ReflectType>();
+  }
+
   typedef ReflectType __type;
   struct reg {
     reg() { FY.RegisteFunc<ReflectType>(CreateObject); }

@@ -503,10 +503,9 @@ public:
     return Compare(*this, des) <= 0;
   }
 
-  // const char* toString()const override{
-  //     // return c_str();
-  //     return "string";
-  // }
+  virtual const char* toString()const override{
+      return c_str();
+  }
 };
 
 using AString = String<char>;

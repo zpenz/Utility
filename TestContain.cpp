@@ -197,20 +197,20 @@ int main(int argc, char const *argv[])
     d += 100;
     d = d + a;
     // d=d+a;
+    AString z = "zz";
 
-    pObject c = d;
-    pObject e = a;
-    pObject g = AString("zz");
-    
-    plog(a.toString());
     // auto ret = Reflect<int>::CreateObject();
     createfunc s;
     plong l = 100;
 
     JObject obj;
     // obj.Add("key",a);
-    KeyValue kv = KeyValue("key",a);
-    plog(kv.value.classname)
+    Linker<KeyValue> list = Linker<KeyValue>();
+    Linker<KeyValue> list2 = Linker<KeyValue>();
+    list2.Add(KeyValue("zz",123),KeyValue("cc","dd"));
+    list.Add(KeyValue("zz",123),KeyValue("cc","dd"),KeyValue("list2",list2));
+    obj.Add("nihao",123,"zzz","oo","test",23.0,"list",list);
+    // plog(kv.value->toString())
     plog(obj.Serial());
     FY.create<plong>();
     // show_message(typeid(Test).name());

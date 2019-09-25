@@ -137,12 +137,13 @@ namespace Contain {
     };
 
     template<typename T>
-    struct Linker :public Reflect<Linker<T> > {
+    struct Linker {
         using Nodetype = LinkNode<T>;
         uint size; 
         shared_ptr<Nodetype> head;
         shared_ptr<Nodetype> last;
         Nodetype* cur;
+
 
         template<typename U>
         bool Add(U && value) {
