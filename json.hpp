@@ -271,31 +271,38 @@ public:
     return op;
   }
 
-  static JObject parseKeyValue(Linker<JString> op, int index) {
-    JObject obj = JObject();
-    if (op[index].Equal("[")) {
-      JAarry array = JAarry();
-      for (int j = index + 1; j < op.size; j+=2) {
-        if(op[j+1].Equal("["))
-          obj.Add(op[j],parseKeyValue(op[j+1]));
-        if(op[j+1].Equal("{"))
-          obj.Add(op[j],parseKeyValue(op[j+1]));
-        if (op[j+1].Equal("]"))
-          return obj;
-        else 
-          obj.Add(op[j],op[j+1]);
+  static JAarry parseKeyValue(Linker<JString> op, int& index) {
+    JAarry obj = JAarry();
+    auto temp = op[index];
+    if(temp.Equal("{")){
+        for (int j = index + 1; j < op.size; j++) {
+          if (op[j].Equal("}"))
+            return obj;
+          else{
+            if(op[j+1].Equal("[")){
+              j+=1;
+              obj.Add(op[j],parseKeyValue(op,j));
+            }else{
+              obj.Add(op[j],op[j+1]);
+            }
+          }
+        }
+      }else if(temp.Equal("[")){
+        for (int j = index + 1; j < op.size; j++) {
+          if (op[j].Equal("]"))
+            return obj;
+          else{
+            if(op[j].Equal("{")){
+              obj.Add(op[j],parseKeyValue(op,j));
+            }else{
+              obj.Add(op[j],op[j+1]);
+            }
+          }
+        }
       }
-    } else if (op[index].Equal("{")) {
-      for (int j = index + 1; j < op.size; j++) {
-        if (op[j].Equal("["))
-          parseKeyValue(op, j);
-        if (op[j].Equal("}"))
-          return obj;
-      }
-    }else{
+    
 
-    }
-    return kv;
+    return obj;
   }
 };
 

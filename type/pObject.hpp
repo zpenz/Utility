@@ -2,7 +2,7 @@
 #include "Utility.h"
 #include <map>
 #include <memory>
-#include <string>
+#include <string.h>
 using namespace std;
 
 enum class ObjectType {
