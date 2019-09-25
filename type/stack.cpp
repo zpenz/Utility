@@ -129,38 +129,38 @@ struct is_pointer{
     static const bool value = sizeof(test(t))==sizeof(char);
 };
 
-int main(int argc, char const *argv[])
-{
-    auto result = is_pointer<int>::value;
-    mytype t1,t2;
-    t1.a = 10;
-    t2.a = 20;
-    // auto m3 = f(std::move(t1),t2);
-    auto m4 = f2();
-    auto time = std::chrono::system_clock::now();
+// int main(int argc, char const *argv[])
+// {
+//     auto result = is_pointer<int>::value;
+//     mytype t1,t2;
+//     t1.a = 10;
+//     t2.a = 20;
+//     // auto m3 = f(std::move(t1),t2);
+//     auto m4 = f2();
+//     auto time = std::chrono::system_clock::now();
     
-    localtime_r
-    // auto m5 = f3(t1);
-    // Stack<int> stack;
-    // stack.Push(1);
+//     localtime_r
+//     // auto m5 = f3(t1);
+//     // Stack<int> stack;
+//     // stack.Push(1);
 
-    // test<int> test;
-    // test.xx(new int(123));
-    // static_assert(stack.size()>1,"");
-    // std::vector<int> a;
-    // f(a);
-    // test2 t2;
-    // std::string a = "asdfas";
-    // mytype b ;
-    // b.b = "xxx";
+//     // test<int> test;
+//     // test.xx(new int(123));
+//     // static_assert(stack.size()>1,"");
+//     // std::vector<int> a;
+//     // f(a);
+//     // test2 t2;
+//     // std::string a = "asdfas";
+//     // mytype b ;
+//     // b.b = "xxx";
     
-    // std::cout<<"before: a="<<a<<std::endl;
-    // std::cout<<"before: b="<<b.b<<std::endl;
-    // t2.SetValue(a);
-    // t2.SetValue2(b);
-    // std::cout<<"after:  a="<<a<<std::endl;    
-    // std::cout<<"after:  b="<<b.b<<std::endl;    
+//     // std::cout<<"before: a="<<a<<std::endl;
+//     // std::cout<<"before: b="<<b.b<<std::endl;
+//     // t2.SetValue(a);
+//     // t2.SetValue2(b);
+//     // std::cout<<"after:  a="<<a<<std::endl;    
+//     // std::cout<<"after:  b="<<b.b<<std::endl;    
 
 
-    return 0;
-}
+//     return 0;
+// }

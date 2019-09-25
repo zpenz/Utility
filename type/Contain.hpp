@@ -1,6 +1,7 @@
 #pragma once
 #include "Utility.h"
 #include "pString.hpp"
+#include "pObject.hpp"
 
 namespace Contain {
     using namespace utility;

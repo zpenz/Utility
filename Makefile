@@ -111,19 +111,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named opengl
-
-# Build rule for target.
-opengl: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 opengl
-.PHONY : opengl
-
-# fast build rule for target.
-opengl/fast:
-	$(MAKE) -f CMakeFiles/opengl.dir/build.make CMakeFiles/opengl.dir/build
-.PHONY : opengl/fast
-
-#=============================================================================
 # Target rules for targets named sserver
 
 # Build rule for target.
@@ -233,33 +220,6 @@ sserver.cpp.s:
 	$(MAKE) -f CMakeFiles/sserver.dir/build.make CMakeFiles/sserver.dir/sserver.cpp.s
 .PHONY : sserver.cpp.s
 
-testopengl.o: testopengl.cpp.o
-
-.PHONY : testopengl.o
-
-# target to build an object file
-testopengl.cpp.o:
-	$(MAKE) -f CMakeFiles/opengl.dir/build.make CMakeFiles/opengl.dir/testopengl.cpp.o
-.PHONY : testopengl.cpp.o
-
-testopengl.i: testopengl.cpp.i
-
-.PHONY : testopengl.i
-
-# target to preprocess a source file
-testopengl.cpp.i:
-	$(MAKE) -f CMakeFiles/opengl.dir/build.make CMakeFiles/opengl.dir/testopengl.cpp.i
-.PHONY : testopengl.cpp.i
-
-testopengl.s: testopengl.cpp.s
-
-.PHONY : testopengl.s
-
-# target to generate assembly for a file
-testopengl.cpp.s:
-	$(MAKE) -f CMakeFiles/opengl.dir/build.make CMakeFiles/opengl.dir/testopengl.cpp.s
-.PHONY : testopengl.cpp.s
-
 type/pObject.o: type/pObject.cpp.o
 
 .PHONY : type/pObject.o
@@ -349,7 +309,6 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... opengl"
 	@echo "... sserver"
 	@echo "... TestContain"
 	@echo "... HttpUtility.o"
@@ -361,9 +320,6 @@ help:
 	@echo "... sserver.o"
 	@echo "... sserver.i"
 	@echo "... sserver.s"
-	@echo "... testopengl.o"
-	@echo "... testopengl.i"
-	@echo "... testopengl.s"
 	@echo "... type/pObject.o"
 	@echo "... type/pObject.i"
 	@echo "... type/pObject.s"
