@@ -50,5 +50,8 @@ public:
     unsigned int size(){
         return iSize;
     }
+    bool Empty(){
+        return 0 == iSize;
+    }
 };
 

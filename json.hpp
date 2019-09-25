@@ -168,8 +168,7 @@ public:
   template <typename type> type operator[](JString key) {}
 
   auto static Parse(JString input) {
-    JAarry ret = JAarry();
-    // pStack<JString> op = pStack<JString>();
+
     Linker<JString> op = Linker<JString>();
     int index = 0;
     auto skipspace = [&](const JString &errmsg) {
@@ -231,13 +230,72 @@ public:
           return op;
         }
         op.Add(value);
-      }
-      else
+      } else
         index++;
     }
 
-    
+    JAarry ret = JAarry();
+    pStack<JString> st = pStack<JString>();
+
+    int indexY = 0;
+    for (indexY = 0; indexY < op.size; indexY++) {
+      if (op[indexY].Equal("{") || op[indexY].Equal("[")) {
+        st.Push(op[indexY]);
+      } else if (op[indexY].Equal("}") || op[indexY].Equal("]")) {
+        if (st.Empty() || op[indexY] != st.Peek()) {
+          plog("synax error: } or [ not match");
+          return op;
+        }
+        st.Pop();
+      }
+    }
+
+    // decltype(auto) parseKeyValue =[&](int index)->KeyValue{
+    //   KeyValue kv = KeyValue();
+    //   if(op[index].Equal("[")){
+    //     JAarry array = JAarry();
+    //     for(int j =index+1;j<op.size;j++){
+    //       if(op[j].Equal("[") || op[j].Equal("{")) return parseKeyValue(j);
+    //       if(op[j].Equal("]")) return kv;
+    //     }
+    //   }
+    //   else if(op[index].Equal("{")){
+    //      for(int j =index+1;j<op.size;j++){
+    //       if(op[j].Equal("[")) return parseKeyValue(j);
+    //       if(op[j].Equal("}")) return kv;
+    //     }
+    //   }
+    //   return kv;
+    // };
+
     return op;
+  }
+
+  static JObject parseKeyValue(Linker<JString> op, int index) {
+    JObject obj = JObject();
+    if (op[index].Equal("[")) {
+      JAarry array = JAarry();
+      for (int j = index + 1; j < op.size; j+=2) {
+        if(op[j+1].Equal("["))
+          obj.Add(op[j],parseKeyValue(op[j+1]));
+        if(op[j+1].Equal("{"))
+          obj.Add(op[j],parseKeyValue(op[j+1]));
+        if (op[j+1].Equal("]"))
+          return obj;
+        else 
+          obj.Add(op[j],op[j+1]);
+      }
+    } else if (op[index].Equal("{")) {
+      for (int j = index + 1; j < op.size; j++) {
+        if (op[j].Equal("["))
+          parseKeyValue(op, j);
+        if (op[j].Equal("}"))
+          return obj;
+      }
+    }else{
+
+    }
+    return kv;
   }
 };
 
