@@ -16,13 +16,10 @@ template <class T> struct is_string {
   enum { value = sizeof(is_str(t)) == sizeof(char) };
 };
 
-// class JObject;
-
 struct KeyValue : public Reflect<KeyValue> {
   JString key;
   JString value;
   Linker<KeyValue> list;
-  // KeyValue* mobj;
 
   bool bstr = false;
   bool blist = false;
@@ -34,7 +31,6 @@ struct KeyValue : public Reflect<KeyValue> {
   }
 
   KeyValue() = default;
-  // KeyValue(JString _key, pObject * _value) : key(_key), value(_value) {}
 
   KeyValue(JString _key, Linker<KeyValue> _value) : key(_key) {
     list = _value;
@@ -235,39 +231,6 @@ public:
         index++;
     }
 
-    // JAarry ret = JAarry();
-    // pStack<JString> st = pStack<JString>();
-
-    // int indexY = 0;
-    // for (indexY = 0; indexY < op.size; indexY++) {
-    //   if (op[indexY].Equal("{") || op[indexY].Equal("[")) {
-    //     st.Push(op[indexY]);
-    //   } else if (op[indexY].Equal("}") || op[indexY].Equal("]")) {
-    //     if (st.Empty() || op[indexY] != st.Peek()) {
-    //       plog("synax error: } or [ not match");
-    //       return op;
-    //     }
-    //     st.Pop();
-    //   }
-    // }
-
-    // decltype(auto) parseKeyValue =[&](int index)->KeyValue{
-    //   KeyValue kv = KeyValue();
-    //   if(op[index].Equal("[")){
-    //     JAarry array = JAarry();
-    //     for(int j =index+1;j<op.size;j++){
-    //       if(op[j].Equal("[") || op[j].Equal("{")) return parseKeyValue(j);
-    //       if(op[j].Equal("]")) return kv;
-    //     }
-    //   }
-    //   else if(op[index].Equal("{")){
-    //      for(int j =index+1;j<op.size;j++){
-    //       if(op[j].Equal("[")) return parseKeyValue(j);
-    //       if(op[j].Equal("}")) return kv;
-    //     }
-    //   }
-    //   return kv;
-    // };
     int pos = 0;
     auto rpos = parseKeyValue(op, pos);
 

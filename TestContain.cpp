@@ -198,22 +198,16 @@ int main(int argc, char const *argv[])
     // d=d+a;
     AString z = "zz";
     
-    // auto ret = Reflect<int>::CreateObject();
     createfunc s;
     plong l = 100;
 
     JObject obj;
-    // obj.Add("key",a);
     JAarry list  = JAarry();
-    JAarry list2 = JAarry();
-    JAarry list3 = JAarry();
 
-    // JObject obj2;
-    list2.Add(KeyValue("zz",123),KeyValue("cc","dd"));
+    list.Add(KeyValue("zz",123),KeyValue("cc","dd"));
+    list.Add(KeyValue("zz",123),KeyValue("cc","dd"));
+    obj.Add("nihao",123,"zzz","oo","test",23.01,"list",JAarry(KeyValue(list)));
 
-    list.Add(KeyValue(list2));
-    obj.Add("nihao",123,"zzz","oo","test",23.01,"list",list);
-    // plog(kv.value->toString())
     plog(obj.Serial());
     auto ret = JObject::Parse(obj.Serial());
     for(int index=0;index<ret.size;index++){
