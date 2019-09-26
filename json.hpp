@@ -165,8 +165,10 @@ public:
   template <typename type> type operator[](JString key) {}
 
   auto static Parse(JString input) {
-
+    plog(input);
     Linker<JString> op = Linker<JString>();
+    JAarry ret= JAarry();
+
     int index = 0;
     auto skipspace = [&](const JString &errmsg) {
       while (index < input._length()) {
@@ -200,7 +202,8 @@ public:
         }
         if (index == input._length() - 1) {
           // error
-          return op;
+          plog("error : end");
+          return ret;
         }
 
         // op.Add("\"");
@@ -222,22 +225,29 @@ public:
           index++;
         }
 
-        if (index == input._length() - 1) {
+        if (index == input._length() - 1 && input[index]!='}') {
           // error
-          return op;
+          plog("value ",value);
+          plog("error : end");
+          return ret;
         }
         op.Add(value);
       } else
         index++;
     }
 
+    //for debug
+    // for(int j=0;j<op.size;j++){
+    //   plog(op[j]);
+    // }
+
     int pos = 0;
     auto rpos = parseKeyValue(op, pos);
 
-    plog(rpos[3].key);
-    plog(rpos[3].list[0].list[1].key);
-    plog(rpos[3].list[0].list[1].value);
-    return op;
+    // plog(rpos[1].key);
+    // plog(rpos[3].list[0].list[1].key);
+    // plog(rpos[3].list[0].list[1].value);
+    return rpos;
   }
 
   static JAarry parseKeyValue(Linker<JString> op, int &index) {

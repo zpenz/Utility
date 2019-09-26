@@ -209,10 +209,10 @@ int main(int argc, char const *argv[])
     obj.Add("nihao",123,"zzz","oo","test",23.01,"list",JAarry(KeyValue(list)));
 
     plog(obj.Serial());
-    auto ret = JObject::Parse(obj.Serial());
-    for(int index=0;index<ret.size;index++){
-        plog(ret[index]);
-    }
+    auto ret = JObject::Parse(
+        "{\"begin_line\":0,\"count\":2,\"file_list\":[{\"file\":\"/var/share/mp/xkraid1569382834/12\"},{\"file\":\"/var/share/mp/xkraid1569382834/34\"}],\"error_code\":0}");
+
+    plog(ret[2].list[1].list[0].value);
     FY.create<plong>();
     // show_message(typeid(Test).name());
     return 0;
