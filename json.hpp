@@ -31,7 +31,6 @@ struct KeyValue : public Reflect<KeyValue> {
   }
 
   KeyValue() = default;
-
   KeyValue(JString _key, Linker<KeyValue> _value) : key(_key) {
     list = _value;
     blist = true;
@@ -39,6 +38,13 @@ struct KeyValue : public Reflect<KeyValue> {
 
   KeyValue(Linker<KeyValue> _value) : list(_value) {
     bObj = true;
+  }
+
+  KeyValue operator[](const JString& key) {
+    for(int index=0;index<list.size;index++){
+      if(list[index].key.Equal(key)) return list[index];
+    }
+    return KeyValue("null","null");
   }
 
   JString SerialList() {
@@ -120,8 +126,7 @@ using JAarry = Linker<KeyValue>;
 
 class JObject {
 public:
-  Linker<KeyValue> list;
-
+  JAarry list;
   void Add(KeyValue obj) { list.Add(move(obj)); }
 
   template <typename Key, typename Value> void Add(Key key, Value value) {
@@ -167,7 +172,7 @@ public:
   auto static Parse(JString input) {
     plog(input);
     Linker<JString> op = Linker<JString>();
-    JAarry ret= JAarry();
+    KeyValue ret= KeyValue();
 
     int index = 0;
     auto skipspace = [&](const JString &errmsg) {
@@ -206,9 +211,7 @@ public:
           return ret;
         }
 
-        // op.Add("\"");
         op.Add(value);
-        // op.Add("\"");
       }
 
       if (temp == ':') {
@@ -242,12 +245,8 @@ public:
     // }
 
     int pos = 0;
-    auto rpos = parseKeyValue(op, pos);
-
-    // plog(rpos[1].key);
-    // plog(rpos[3].list[0].list[1].key);
-    // plog(rpos[3].list[0].list[1].value);
-    return rpos;
+    auto keyvalues = parseKeyValue(op, pos);
+    return KeyValue(keyvalues);
   }
 
   static JAarry parseKeyValue(Linker<JString> op, int &index) {

@@ -212,7 +212,8 @@ int main(int argc, char const *argv[])
     auto ret = JObject::Parse(
         "{\"begin_line\":0,\"count\":2,\"file_list\":[{\"file\":\"/var/share/mp/xkraid1569382834/12\"},{\"file\":\"/var/share/mp/xkraid1569382834/34\"}],\"error_code\":0}");
 
-    plog(ret[2].list[1].list[0].value);
+    plog(ret["file_list"].list[1]["file"].value);
+    
     FY.create<plong>();
     // show_message(typeid(Test).name());
     return 0;
