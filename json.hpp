@@ -16,13 +16,17 @@ template <class T> struct is_string {
   enum { value = sizeof(is_str(t)) == sizeof(char) };
 };
 
+// class JObject;
+
 struct KeyValue : public Reflect<KeyValue> {
   JString key;
   JString value;
   Linker<KeyValue> list;
+  // KeyValue* mobj;
 
   bool bstr = false;
   bool blist = false;
+  bool bObj = false;
 
   template <typename PValue> KeyValue(JString _key, PValue _value) : key(_key) {
     bstr = is_string<PValue>::value;
@@ -37,23 +41,9 @@ struct KeyValue : public Reflect<KeyValue> {
     blist = true;
   }
 
-  // JString SerialArrayList() {
-  //   JString temp = "";
-  //   for (int index = 0; index < arraylist.size; index++) {
-  //     auto item = arraylist[index];
-  //     for (int indexY = 0; indexY < item.size; indexY++) {
-  //       temp += "{";
-  //       auto internalItem = item[indexY];
-  //       temp += internalItem.Serial();
-  //       temp += "}";
-  //       if (indexY != item.size - 1)
-  //         temp += ",";
-  //     }
-  //     if (index != arraylist.size - 1)
-  //       temp += ",";
-  //   }
-  //   return temp;
-  // }
+  KeyValue(Linker<KeyValue> _value) : list(_value) {
+    bObj = true;
+  }
 
   JString SerialList() {
     JString temp = "{";
@@ -68,9 +58,12 @@ struct KeyValue : public Reflect<KeyValue> {
   }
 
   JString Serial() {
-    JString temp = "\"";
-    temp += key;
-    temp += "\":";
+    JString temp = "";
+    if(!bObj){
+      temp += "\"";
+      temp += key;
+      temp += "\":";
+    }
     if (bstr) {
       temp += "\"";
       temp += value;
@@ -85,6 +78,14 @@ struct KeyValue : public Reflect<KeyValue> {
           temp += ",";
       }
       temp += "]";
+    } else if (bObj) {
+      // temp += "{";
+      for (int index = 0; index < list.size; index++) {
+        temp += list[index].Serial();
+        if (index != list.size - 1)
+          temp += ",";
+      }
+      // temp += "}";
     } else {
       temp += value;
     }
@@ -234,21 +235,21 @@ public:
         index++;
     }
 
-    JAarry ret = JAarry();
-    pStack<JString> st = pStack<JString>();
+    // JAarry ret = JAarry();
+    // pStack<JString> st = pStack<JString>();
 
-    int indexY = 0;
-    for (indexY = 0; indexY < op.size; indexY++) {
-      if (op[indexY].Equal("{") || op[indexY].Equal("[")) {
-        st.Push(op[indexY]);
-      } else if (op[indexY].Equal("}") || op[indexY].Equal("]")) {
-        if (st.Empty() || op[indexY] != st.Peek()) {
-          plog("synax error: } or [ not match");
-          return op;
-        }
-        st.Pop();
-      }
-    }
+    // int indexY = 0;
+    // for (indexY = 0; indexY < op.size; indexY++) {
+    //   if (op[indexY].Equal("{") || op[indexY].Equal("[")) {
+    //     st.Push(op[indexY]);
+    //   } else if (op[indexY].Equal("}") || op[indexY].Equal("]")) {
+    //     if (st.Empty() || op[indexY] != st.Peek()) {
+    //       plog("synax error: } or [ not match");
+    //       return op;
+    //     }
+    //     st.Pop();
+    //   }
+    // }
 
     // decltype(auto) parseKeyValue =[&](int index)->KeyValue{
     //   KeyValue kv = KeyValue();
@@ -267,40 +268,46 @@ public:
     //   }
     //   return kv;
     // };
+    int pos = 0;
+    auto rpos = parseKeyValue(op, pos);
 
+    plog(rpos[3].key);
     return op;
   }
 
-  static JAarry parseKeyValue(Linker<JString> op, int& index) {
+  static JAarry parseKeyValue(Linker<JString> op, int &index) {
     JAarry obj = JAarry();
     auto temp = op[index];
-    if(temp.Equal("{")){
-        for (int j = index + 1; j < op.size; j++) {
-          if (op[j].Equal("}"))
-            return obj;
-          else{
-            if(op[j+1].Equal("[")){
-              j+=1;
-              obj.Add(op[j],parseKeyValue(op,j));
-            }else{
-              obj.Add(op[j],op[j+1]);
-            }
-          }
-        }
-      }else if(temp.Equal("[")){
-        for (int j = index + 1; j < op.size; j++) {
-          if (op[j].Equal("]"))
-            return obj;
-          else{
-            if(op[j].Equal("{")){
-              obj.Add(op[j],parseKeyValue(op,j));
-            }else{
-              obj.Add(op[j],op[j+1]);
-            }
+    if (temp.Equal("{")) {
+      for (int j = index + 1; j < op.size; j++) {
+        if (op[j].Equal("}")) {
+          index = j;
+          return obj;
+        } else {
+          if (op[j + 1].Equal("[")) {
+            j += 1;
+            obj.Add(KeyValue(op[j - 1], parseKeyValue(op, j)));
+          } else {
+            obj.Add(KeyValue(op[j], op[j + 1]));
+            j += 1;
           }
         }
       }
-    
+    } else if (temp.Equal("[")) {
+      for (int j = index + 1; j < op.size; j++) {
+        if (op[j].Equal("]")) {
+          index = j;
+          return obj;
+        } else {
+          if (op[j].Equal("{")) {
+            obj.Add(KeyValue(op[j], parseKeyValue(op, j)));
+          } else {
+            obj.Add(KeyValue(op[j], op[j + 1]));
+            j += 1;
+          }
+        }
+      }
+    }
 
     return obj;
   }
