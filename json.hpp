@@ -272,6 +272,8 @@ public:
     auto rpos = parseKeyValue(op, pos);
 
     plog(rpos[3].key);
+    plog(rpos[3].list[0].list[1].key);
+    plog(rpos[3].list[0].list[1].value);
     return op;
   }
 
@@ -300,7 +302,7 @@ public:
           return obj;
         } else {
           if (op[j].Equal("{")) {
-            obj.Add(KeyValue(op[j], parseKeyValue(op, j)));
+            obj.Add(KeyValue(parseKeyValue(op, j)));
           } else {
             obj.Add(KeyValue(op[j], op[j + 1]));
             j += 1;

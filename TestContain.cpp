@@ -211,7 +211,7 @@ int main(int argc, char const *argv[])
     // JObject obj2;
     list2.Add(KeyValue("zz",123),KeyValue("cc","dd"));
 
-    list.Add(KeyValue("zz",123),KeyValue("cc","dd"),KeyValue(list2));
+    list.Add(KeyValue(list2));
     obj.Add("nihao",123,"zzz","oo","test",23.01,"list",list);
     // plog(kv.value->toString())
     plog(obj.Serial());
