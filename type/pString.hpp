@@ -127,10 +127,14 @@ public:
     if (diff == 0.0f)
       return LToS(static_cast<long long>(value));
     ret+=".";
-    
-    while (diff - static_cast<long long>(diff) > precision){
+
+    while (diff - static_cast<long long>(diff) > precision ){
+      // plog(diff - static_cast<long long>(diff));
       diff *= 10;
       ret+=static_cast<long long>(diff);
+      plog(diff - static_cast<long long>(diff));
+      //??? 
+      if((diff - static_cast<long long>(diff)) >=1) break;
     }
     return ret;
   }
