@@ -210,9 +210,10 @@ int main(int argc, char const *argv[])
 
     plog(obj.Serial());
     auto ret = JObject::Parse(
-        "{\"begin_line\":0,\"count\":2,\"file_list\":[{\"file\":\"/var/share/mp/xkraid1569382834/12\"},{\"file\":\"/var/share/mp/xkraid1569382834/34\"}],\"error_code\":0}");
+        "{\"begin_line\":0,\"count\":2,\"file_list\":[{\"file\":\"/var/share/mp/xkraid1569382834/12\"},{\"file\":\"/var/share/mp/xkraid1569382834/34\",\"origin\":\"heiheihei\"}],\"error_code\":0}");
 
-    plog(ret["file_list"].list[1]["file"].value);
+    plog("error_code",ret["error_code"].value);
+    plog(ret["file_list"].list[1]["origin"].value);
     
     FY.create<plong>();
     // show_message(typeid(Test).name());

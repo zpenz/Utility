@@ -18,6 +18,7 @@ class String : public Reflect<String<T>>, public pTypeObject<T, String<T>> {
   shared_ptr<T> buffer;
   int length;
   int size;
+  double precision = 0.0000001;
 
 public:
   static bool IsIntC(const T c) {
@@ -118,14 +119,20 @@ public:
     return String<T>(intpart) + String<T>(".") + String<T>(diff);
   }
 
-  static const String<T> DToS(double value) {
+  static const String<T> DToS(double value,double precision) {
+
     long long intpart = static_cast<long long>(value);
+    String<T> ret = intpart;
     double diff = value - intpart;
     if (diff == 0.0f)
       return LToS(static_cast<long long>(value));
-    while (diff - static_cast<long long>(diff) != 0.0f)
+    ret+=".";
+    
+    while (diff - static_cast<long long>(diff) > precision){
       diff *= 10;
-    return String<T>(intpart) + String<T>('.') + String<T>(diff);
+      ret+=static_cast<long long>(diff);
+    }
+    return ret;
   }
 
   static bool Empty(const String<T> &des) {
@@ -174,7 +181,7 @@ public:
 
   String(long long value) { *this = LToS(value); }
 
-  String(double value) { *this = DToS(value); }
+  String(double value) { *this = DToS(value,precision); }
 
   String(double value, int effective) { *this = DToS(value, effective); }
 
