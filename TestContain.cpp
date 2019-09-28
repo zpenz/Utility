@@ -216,7 +216,7 @@ int main(int argc, char const *argv[])
     plog(ret["file_list"].list[1]["origin"].value);
     
     FY.create<plong>();
-    plog(AString::ToD("1234.12345"));
+    plog(AString::ToD("1234.03"));
     // show_message(typeid(Test).name());
     return 0;
 }
