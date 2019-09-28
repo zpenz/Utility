@@ -18,15 +18,15 @@ namespace utility{
         if(!showline){cout<<message<<"\n";}\
         else{cout<<"[INFO] "<<message<<"                          "<<"(in File:"<<__FILE__<<" Func:"<<__FUNCTION__<<" Line:"<<__LINE__<<")\n";}
 
-    #define CONDITION_MESSAGE(condition,message)\
-        if(condition){ SHOW_MESSAGE(message,true);}
-
     #define SAFE_CLOSE(subject)\
         if(subject){ fclose(subject);}
 
     #define plog(params...)\
         {show_message(params);\
         cout<<"                          "<<"(in File:"<<__FILE__<<" Func:"<<__FUNCTION__<<" Line:"<<__LINE__<<")\n";}
+
+    #define CONDITION_MESSAGE(condition,message...)\
+    if(condition){ plog(message);}
 
     template<typename T>
     void show_message(T param){
@@ -65,4 +65,12 @@ namespace utility{
 		inline static classname & getInstance(){\
 			static classname  cInstance;\
 			return cInstance;}
+    
+    template<typename T>
+    T ppow(T value, int count){
+      T sum = 1;
+      for (int index = 0; index < count; index++)
+        sum *= value;
+      return sum;
+    };
 }
