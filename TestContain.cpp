@@ -190,7 +190,7 @@ int main(int argc, char const *argv[]) {
 
   list.Add(KeyValue("zz", 123), KeyValue("cc", "dd"));
   list.Add(KeyValue("zz", 123), KeyValue("cc", "dd"));
-  obj.Add("nihao", 123, "zzz", "oo", "test", 230.0101, "list",
+  obj.Add("nihao", 123, "zzz", "oo", "test", 230.011201, "list",
           JAarry(KeyValue(list)));
 
   plog(obj.Serial());
