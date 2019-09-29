@@ -42,6 +42,82 @@ struct FA {
 
   FA() { S.push_back(state()); }
 
+  AString PreBuild(const AString &expr) {
+    if (expr._length() == 0)
+      return "";
+    AString ret = "", realRet = "";
+    for (int index = 0; index < expr._length(); index++) {
+      auto temp = expr[index];
+      ret += temp;
+      if (temp != '(' && temp != '|' && index + 1 < expr._length())
+        if (expr[index + 1] != '|' && expr[index + 1] != ')' &&
+            expr[index + 1] != '*') {
+          ret += '.';
+        }
+    }
+
+    return ret;
+  }
+
+  AString MiddleBuild(const AString &prev,int& start) {
+    AString ret = "";
+    for (int index = start; index < prev._length(); index++) {
+      auto temp = prev[index];
+      if (temp == '.' || temp == '|') {
+        auto j = index + 1;
+        while (j < prev._length()) {
+          if (prev[j] == '(') {
+            MiddleBuild(prev,j);
+          }
+        }
+      }
+    }
+    return ret;
+  }
+
+  // deal ()
+  // ab(a*|b*)*cd
+  AString SubBuild(const AString &prev,int& start) {
+    AString ret = "";
+    for (int index = start; index < prev._length(); index++) {
+      auto temp = prev[index];
+      if (temp == '.' || temp == '|') {
+        auto j = index + 1;
+        while (j < prev._length()) {
+          if (prev[j] == '(') {
+            MiddleBuild(prev,j);
+          }
+        }
+      }
+    }
+  }
+
+  bool IsSpecialInput(const char c) {
+    return (c == '*' || c == '|' || c == '.' || c == '(' || c == ')');
+  }
+
+  void build(const AString &expr) {
+    auto src = PreBuild(expr);
+    int index = 0;
+
+    while (index < src._length()) {
+      auto temp = src[index];
+      if (temp == '\\') {
+        if (index + 1 > src._length() - 1) {
+          plog("unexpceted '\\'");
+        }
+        id.Push(src[index + 1]);
+        index += 2;
+        continue;
+      } else if (op.Empty()) {
+        op.Push(temp);
+      } else if (IsSpecialInput(temp)) {
+        op.Push(src[index]);
+      }
+    }
+  }
+
+#pragma region state op
   void Union(AString s1, AString s2) {
     state state1(false);
     state state2(false);
@@ -99,31 +175,41 @@ struct FA {
 
     S.push_back(state1);
   }
+#pragma endregion
 };
 
-AString PreBuild(const AString &expr) {
-  if (expr._length() == 0)
-    return "";
-  AString ret = "";
-  for (int index = 0; index < expr._length(); index++) {
-    auto temp = expr[index];
-    ret += temp;
-    if (temp != '(' && temp != '|' && index + 1 < expr._length())
-      if (expr[index + 1] != '|' && expr[index + 1] != ')' &&
-          expr[index + 1] != '*') {
-        ret += '.';
-      }
+	bool IsOperator(char ch) { return((ch == 42) || (ch == 124) || (ch == 40) || (ch == 41) || (ch == 8)); };
+	//! Checks if the specific character is input character
+	bool IsInput(char ch) { return(!IsOperator(ch)); };
+
+	//! Checks is a character left parantheses
+	bool IsLeftParanthesis(char ch) { return(ch == 40); };
+
+	//! Checks is a character right parantheses
+	bool IsRightParanthesis(char ch) { return(ch == 41); };
+
+  string ConcatExpand(string strRegEx)
+  {
+    string strRes;
+
+    for(int i=0; i<strRegEx.size()-1; ++i)
+    {
+      char cLeft	= strRegEx[i];
+      char cRight = strRegEx[i+1];
+      strRes	   += cLeft;
+      if((IsInput(cLeft)) || (IsRightParanthesis(cLeft)) || (cLeft == '*'))
+        if((IsInput(cRight)) || (IsLeftParanthesis(cRight)))
+          strRes += char(8);
+    }
+    strRes += strRegEx[strRegEx.size()-1];
+
+    return strRes;
   }
-  return ret;
-}
-
-struct Test : public Reflect<Test> {
-  Test(){};
-  void test() { show_message("ok"); }
-};
 
 int main(int argc, char const *argv[]) {
   using namespace Utility;
+
+  // Test file sync
   // Utility::JObject obj;
   // AString a = 1;
   // obj.Add("where",1);
@@ -152,7 +238,7 @@ int main(int argc, char const *argv[]) {
   //     plog(rg.index," ",rg.length," ",rg.sameblock," ",rg.offset);
   // });
 
-  //----
+  // Test FormPost
   // Linker<AString> params;
   // Utility::JObject obj;
   // obj.Add("admin_id",1001,"sid","npJ8cS1q25M9vQcXXW02H9Te2G2L7O7","directory_path","/var/share/mp/xklvm1562233594/wxy/xk","all_file_name","/var/share/mp/xklvm1562233594/wxy/xk/UtilityTest.cpp");
@@ -172,38 +258,40 @@ int main(int argc, char const *argv[]) {
   //     req.OtherRecord.Add(Utility::KV("XK_JSON",job.Serial()));
   // });
 
-  // plog(PreBuild("ab(a*|b*)*cd"));
+  // Test Json
+  // pdouble d = 10.0;
+  // pint a = 10;
+  // a += 10.0;
+  // d += 100;
+  // d = d + a;
+  // // d=d+a;
+  // AString z = "zz";
 
-  pdouble d = 10.0;
-  pint a = 10;
-  a += 10.0;
-  d += 100;
-  d = d + a;
-  // d=d+a;
-  AString z = "zz";
+  // createfunc s;
+  // plong l = 100;
 
-  createfunc s;
-  plong l = 100;
+  // JObject obj;
+  // JAarry list = JAarry();
 
-  JObject obj;
-  JAarry list = JAarry();
+  // list.Add(KeyValue("zz", 123), KeyValue("cc", "dd"));
+  // list.Add(KeyValue("zz", 123), KeyValue("cc", "dd"));
+  // obj.Add("nihao", 123, "zzz", "oo", "test", 230.011201, "list",
+  //         JAarry(KeyValue(list)));
 
-  list.Add(KeyValue("zz", 123), KeyValue("cc", "dd"));
-  list.Add(KeyValue("zz", 123), KeyValue("cc", "dd"));
-  obj.Add("nihao", 123, "zzz", "oo", "test", 230.011201, "list",
-          JAarry(KeyValue(list)));
+  // plog(obj.Serial());
+  // auto ret = JObject::Parse(
+  //     "{\"begin_line\":0,\"count\":2,\"file_list\":[{\"file\":\"/var/share/mp/"
+  //     "xkraid1569382834/12\"},{\"file\":\"/var/share/mp/xkraid1569382834/"
+  //     "34\",\"origin\":\"heiheihei\"}],\"error_code\":0}");
 
-  plog(obj.Serial());
-  auto ret = JObject::Parse(
-      "{\"begin_line\":0,\"count\":2,\"file_list\":[{\"file\":\"/var/share/mp/"
-      "xkraid1569382834/12\"},{\"file\":\"/var/share/mp/xkraid1569382834/"
-      "34\",\"origin\":\"heiheihei\"}],\"error_code\":0}");
+  // plog("error_code", ret["error_code"].value);
+  // plog(ret["file_list"].list[1]["origin"].value);
 
-  plog("error_code", ret["error_code"].value);
-  plog(ret["file_list"].list[1]["origin"].value);
-
-  FY.create<plong>();
-  plog(AString::ToD("1234.03"));
+  // FY.create<plong>();
+  // plog(AString::ToD("1234.03"));
+  // plog(1234.046);
   // show_message(typeid(Test).name());
+
+  plog(ConcatExpand("ab(a*|b*)*cd"));
   return 0;
 }
