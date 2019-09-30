@@ -1,2 +1,3 @@
-## for_each
-## 
+## update gen
+## gen usage:
+## gen sqlfile position

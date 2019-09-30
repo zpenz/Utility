@@ -242,13 +242,21 @@ next:
 
             AString TableName = Parse::mCreateList.at(index).TableName;
             AString ClassName = Normalize(TableName);
-            AString FolerName = GenPath.EndWith("/")?GenPath:GenPath+"/"+ClassName;
+            AString FolerName = (GenPath.EndWith("/")?GenPath:GenPath+"/")+ClassName;
             AString FileName  = "_"+ClassName+".php";
             AString GFileName = FolerName+"/_"+ClassName+".php";
             AString WrpperFileName = FolerName+"/"+ClassName+".php";
             
-            plog(FolerName);
+            //create dir
+            AString subj="";
+            for(int zndex=0;zndex<FolerName._length();zndex++){
+                if(FolerName[zndex]=='/' && !subj.Empty()){
+                    mkdir(subj.c_str(),0755);
+                }
+                subj+=FolerName[zndex];
+            }
             mkdir(FolerName.c_str(),0755);
+
             Filed PrimaryKey  = Parse::mCreateList.at(index).PrimaryKey;
             auto   ThisFiled  = Parse::mCreateList.at(index);
             auto   FiledList  = Parse::mCreateList.at(index).FiledList;
