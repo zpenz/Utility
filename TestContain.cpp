@@ -199,7 +199,7 @@ struct FA {
       strRes	   += cLeft;
       if((IsInput(cLeft)) || (IsRightParanthesis(cLeft)) || (cLeft == '*'))
         if((IsInput(cRight)) || (IsLeftParanthesis(cRight)))
-          strRes += char(8);
+          strRes += '.';
     }
     strRes += strRegEx[strRegEx.size()-1];
 
@@ -293,5 +293,7 @@ int main(int argc, char const *argv[]) {
   // show_message(typeid(Test).name());
 
   plog(ConcatExpand("ab(a*|b*)*cd"));
+  FA f;
+  plog(f.PreBuild("ab(a*|b*)*cd"));
   return 0;
 }

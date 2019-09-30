@@ -74,7 +74,8 @@
         "optional": "cpp",
         "sstream": "cpp",
         "variant": "cpp",
-        "__functional_03": "cpp"
+        "__functional_03": "cpp",
+        "stack": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false,
     "commentTranslate.targetLanguage": "en",
