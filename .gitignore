@@ -26,6 +26,7 @@ think.cpp
 *.json
 *.jpg
 *.out
+*.log
 *.sql
 !CMakeLists.txt
 
