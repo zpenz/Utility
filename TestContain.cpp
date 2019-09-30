@@ -18,6 +18,13 @@ pStack<AString> id;
 constexpr const char *explaint = "PSONGEXPLAINT";
 constexpr const char *none = "PSONGNONE";
 
+map<AString,int> priority ={
+  make_pair<AString,int>('|',0),
+  make_pair<AString,int>('.',1),
+  make_pair<AString,int>('(',2),
+  make_pair<AString,int>('*',3),
+};
+
 struct state {
   map<AString, state> translist;
   vector<state> statelist =
@@ -55,41 +62,39 @@ struct FA {
           ret += '.';
         }
     }
-
     return ret;
   }
 
-  AString MiddleBuild(const AString &prev,int& start) {
+  //ab.a*b*|*.c.d.
+  AString MiddleBuild(const AString &prev) {
     AString ret = "";
-    for (int index = start; index < prev._length(); index++) {
+    pStack<AString> op;
+    for (int index = 0; index < prev._length(); index++) {
       auto temp = prev[index];
-      if (temp == '.' || temp == '|') {
-        auto j = index + 1;
-        while (j < prev._length()) {
-          if (prev[j] == '(') {
-            MiddleBuild(prev,j);
+      if(!IsSpecialInput(temp))
+        ret+=temp;
+      else if(op.Empty()){
+        op.Push(temp);
+      }else{
+        if(temp=='(') op.Push(temp);
+        else if(temp==')') {
+          while(!op.Empty() ){
+            plog(op.Peek());
+            if(op.Peek()=="(") break;
+            ret+=op.Pop();
           }
+          CONDITION_MESSAGE(op.Empty(),"unexpected (");
+          op.Pop();
+        }
+        else if(priority[temp]<=priority[op.Peek()]){
+          ret+=op.Pop();
+          op.Push(temp);
         }
       }
     }
+    while(!op.Empty())
+    ret+=op.Pop();
     return ret;
-  }
-
-  // deal ()
-  // ab(a*|b*)*cd
-  AString SubBuild(const AString &prev,int& start) {
-    AString ret = "";
-    for (int index = start; index < prev._length(); index++) {
-      auto temp = prev[index];
-      if (temp == '.' || temp == '|') {
-        auto j = index + 1;
-        while (j < prev._length()) {
-          if (prev[j] == '(') {
-            MiddleBuild(prev,j);
-          }
-        }
-      }
-    }
   }
 
   bool IsSpecialInput(const char c) {
@@ -292,8 +297,10 @@ int main(int argc, char const *argv[]) {
   // plog(1234.046);
   // show_message(typeid(Test).name());
 
-  plog(ConcatExpand("ab(a*|b*)*cd"));
+  // plog(ConcatExpand("ab(a*|b*)*cd"));
   FA f;
-  plog(f.PreBuild("ab(a*|b*)*cd"));
+  auto ret = f.PreBuild("ab(a*|b*)*cd");
+  plog(ret);
+  plog(f.MiddleBuild(ret));
   return 0;
 }

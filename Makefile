@@ -111,19 +111,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named gen
-
-# Build rule for target.
-gen: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 gen
-.PHONY : gen
-
-# fast build rule for target.
-gen/fast:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/build
-.PHONY : gen/fast
-
-#=============================================================================
 # Target rules for targets named sserver
 
 # Build rule for target.
@@ -206,33 +193,6 @@ TestContain.cpp.s:
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/TestContain.cpp.s
 .PHONY : TestContain.cpp.s
 
-gen.o: gen.cpp.o
-
-.PHONY : gen.o
-
-# target to build an object file
-gen.cpp.o:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/gen.cpp.o
-.PHONY : gen.cpp.o
-
-gen.i: gen.cpp.i
-
-.PHONY : gen.i
-
-# target to preprocess a source file
-gen.cpp.i:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/gen.cpp.i
-.PHONY : gen.cpp.i
-
-gen.s: gen.cpp.s
-
-.PHONY : gen.s
-
-# target to generate assembly for a file
-gen.cpp.s:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/gen.cpp.s
-.PHONY : gen.cpp.s
-
 sserver.o: sserver.cpp.o
 
 .PHONY : sserver.o
@@ -266,7 +226,6 @@ type/pObject.o: type/pObject.cpp.o
 
 # target to build an object file
 type/pObject.cpp.o:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/type/pObject.cpp.o
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pObject.cpp.o
 .PHONY : type/pObject.cpp.o
 
@@ -276,7 +235,6 @@ type/pObject.i: type/pObject.cpp.i
 
 # target to preprocess a source file
 type/pObject.cpp.i:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/type/pObject.cpp.i
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pObject.cpp.i
 .PHONY : type/pObject.cpp.i
 
@@ -286,7 +244,6 @@ type/pObject.s: type/pObject.cpp.s
 
 # target to generate assembly for a file
 type/pObject.cpp.s:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/type/pObject.cpp.s
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pObject.cpp.s
 .PHONY : type/pObject.cpp.s
 
@@ -296,7 +253,6 @@ type/pString.o: type/pString.cpp.o
 
 # target to build an object file
 type/pString.cpp.o:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/type/pString.cpp.o
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pString.cpp.o
 .PHONY : type/pString.cpp.o
 
@@ -306,7 +262,6 @@ type/pString.i: type/pString.cpp.i
 
 # target to preprocess a source file
 type/pString.cpp.i:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/type/pString.cpp.i
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pString.cpp.i
 .PHONY : type/pString.cpp.i
 
@@ -316,7 +271,6 @@ type/pString.s: type/pString.cpp.s
 
 # target to generate assembly for a file
 type/pString.cpp.s:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/type/pString.cpp.s
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/pString.cpp.s
 .PHONY : type/pString.cpp.s
 
@@ -326,7 +280,6 @@ type/stack.o: type/stack.cpp.o
 
 # target to build an object file
 type/stack.cpp.o:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/type/stack.cpp.o
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/stack.cpp.o
 .PHONY : type/stack.cpp.o
 
@@ -336,7 +289,6 @@ type/stack.i: type/stack.cpp.i
 
 # target to preprocess a source file
 type/stack.cpp.i:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/type/stack.cpp.i
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/stack.cpp.i
 .PHONY : type/stack.cpp.i
 
@@ -346,7 +298,6 @@ type/stack.s: type/stack.cpp.s
 
 # target to generate assembly for a file
 type/stack.cpp.s:
-	$(MAKE) -f CMakeFiles/gen.dir/build.make CMakeFiles/gen.dir/type/stack.cpp.s
 	$(MAKE) -f CMakeFiles/TestContain.dir/build.make CMakeFiles/TestContain.dir/type/stack.cpp.s
 .PHONY : type/stack.cpp.s
 
@@ -358,7 +309,6 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... gen"
 	@echo "... sserver"
 	@echo "... TestContain"
 	@echo "... HttpUtility.o"
@@ -367,9 +317,6 @@ help:
 	@echo "... TestContain.o"
 	@echo "... TestContain.i"
 	@echo "... TestContain.s"
-	@echo "... gen.o"
-	@echo "... gen.i"
-	@echo "... gen.s"
 	@echo "... sserver.o"
 	@echo "... sserver.i"
 	@echo "... sserver.s"
