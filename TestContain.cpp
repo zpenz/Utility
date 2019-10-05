@@ -18,12 +18,18 @@ pStack<AString> id;
 constexpr const char *explaint = "PSONGEXPLAINT";
 constexpr const char *none = "PSONGNONE";
 
-map<AString,int> priority ={
-  make_pair<AString,int>('|',0),
-  make_pair<AString,int>('.',1),
-  make_pair<AString,int>('(',2),
-  make_pair<AString,int>('*',3),
-};
+// map<AString,int> priority ={
+//   make_pair<AString,int>("|",0),
+//   make_pair<AString,int>(".",1),
+//   make_pair<AString,int>("(",2),
+//   make_pair<AString,int>("*",3),
+// };
+
+map<AString,int> priority = {};
+priority["|"] = 0;
+priority["."] = 1;
+priority["("] = 2;
+priority["*"] = 3;
 
 struct state {
   map<AString, state> translist;
@@ -86,9 +92,18 @@ struct FA {
           CONDITION_MESSAGE(op.Empty(),"unexpected (");
           op.Pop();
         }
-        else if(priority[temp]<=priority[op.Peek()]){
-          ret+=op.Pop();
-          op.Push(temp);
+        else {
+            if(op.Peek()!='('){
+              plog(temp," ",op.Peek()," ",priority[temp]," ",priority[op.Peek()])
+              if(priority[temp]<=priority[op.Peek()]){
+                ret+=op.Pop();
+                op.Push(temp);
+              }else{
+                ret+=temp;
+              }
+          }else{
+            op.Push(temp);
+          }
         }
       }
     }
@@ -298,9 +313,11 @@ int main(int argc, char const *argv[]) {
   // show_message(typeid(Test).name());
 
   // plog(ConcatExpand("ab(a*|b*)*cd"));
+
   FA f;
   auto ret = f.PreBuild("ab(a*|b*)*cd");
   plog(ret);
   plog(f.MiddleBuild(ret));
+  plog(priority.find("*")->second);
   return 0;
 }
