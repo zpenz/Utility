@@ -2,10 +2,10 @@
 #include "Iterator.hpp"
 #include "adler32.hpp"
 #include "json.hpp"
+#include "type/pTypes.hpp"
 #include <algorithm>
 #include <deque>
-
-#include "type/pTypes.hpp"
+#include <unordered_map>
 
 using namespace Contain;
 using namespace Iterator;
@@ -22,15 +22,16 @@ pMap<AString, int> priority = pMap<AString, int>(
     pKeyValue<AString, int>('.', 2), pKeyValue<AString, int>('*', 3));
 
 struct state {
-  map<AString, state> translist;
+  multimap<AString, state> translist;
   vector<state> statelist;
   bool bAccept;
   bool bStart;
   bool bValueState;
   AString value = "";
-  void AddTranslate(AString c, state s) { translist[c] = s; }
-  state(bool Start) : bAccept(false), bStart(Start), bValueState(false) {
+  void AddTranslate(AString c, state s) {
+    translist.emplace(c,s);
   }
+  state(bool Start) : bAccept(false), bStart(Start), bValueState(false) {}
   state() {
     bStart = true;
     bAccept = false;
@@ -107,30 +108,34 @@ struct FA {
     return ret;
   }
 
-  auto FinalBuild(const AString &middle) { 
-    pStack<state> ret; 
-    for(int index=0;index<middle._length();index++){
+  auto FinalBuild(const AString &middle) {
+    pStack<state> ret;
+    for (int index = 0; index < middle._length(); index++) {
       auto temp = middle[index];
       plog(temp);
-      if(!IsSpecialInput(temp)){
+      if (!IsSpecialInput(temp)) {
         ret.Push(state(AString(temp)));
-      }else{
-        if(temp=='.'){
+      } else {
+        if (temp == '.') {
           state s2 = ret.Pop();
           state s1 = ret.Pop();
-          ret.Push(Connect(s1,s2));
-        }else if(temp=='*'){
+          ret.Push(Connect(s1, s2));
+        } else if (temp == '*') {
           state s1 = ret.Pop();
           ret.Push(Star(s1));
-        }else if(temp=='|'){
+        } else if (temp == '|') {
           state s2 = ret.Pop();
           state s1 = ret.Pop();
-          ret.Push(Union(s1,s2));
-        }else{
+          ret.Push(Union(s1, s2));
+        } else {
           plog("not support char");
         }
       }
     }
+    CONDITION_MESSAGE(ret.size()<1,"stack exception: try to access a empty stack")
+    auto top = ret.Pop();
+    top.statelist[top.statelist.size()-1].bAccept=true;
+    return top;
   }
 
   bool IsSpecialInput(const char c) {
@@ -301,7 +306,7 @@ int main(int argc, char const *argv[]) {
   FA f;
   auto ret = f.PreBuild("ab(a*|b*)*cd");
   plog(ret);
-  plog((ret=f.MiddleBuild(ret)));
-  f.FinalBuild(ret);
+  plog((ret = f.MiddleBuild(ret)));
+  plog(f.FinalBuild(ret).statelist.size());
   return 0;
 }
