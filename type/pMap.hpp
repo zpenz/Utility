@@ -28,13 +28,6 @@ class pMap{
         list.Add(item);
     }
 
-    // template<typename... Ts>
-    // void Add(K k,V v,Ts... ts){
-    //     list.Add(pKeyValue<K,V>(k,v));
-    //     Add(ts...);
-    // }
-
-    // template<pKeyValue<K,V> ... Ts>
     template<typename ...Ts>
     pMap(Ts... ts){
         Add(ts...);
@@ -49,4 +42,5 @@ class pMap{
         plog("can not find key: ",k);
         return static_cast<V>(0);
     }
+    
 };

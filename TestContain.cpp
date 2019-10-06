@@ -4,7 +4,6 @@
 #include "json.hpp"
 #include <algorithm>
 #include <deque>
-#include <map>
 
 #include "type/pTypes.hpp"
 
@@ -18,44 +17,36 @@ pStack<AString> id;
 constexpr const char *explaint = "PSONGEXPLAINT";
 constexpr const char *none = "PSONGNONE";
 
-// map<AString, int> priority = {
-//   // {'(',0},
-//   // {'|',1},
-//   // {'(',2},
-//   // {'*',3}
-// };
-
-pMap<AString,int> priority = pMap<AString,int>(
-  pKeyValue<AString,int>('(',0),
-  pKeyValue<AString,int>('|',1),
-  pKeyValue<AString,int>('.',2),
-  pKeyValue<AString,int>('*',3)
-  );
-
+pMap<AString, int> priority = pMap<AString, int>(
+    pKeyValue<AString, int>('(', 0), pKeyValue<AString, int>('|', 1),
+    pKeyValue<AString, int>('.', 2), pKeyValue<AString, int>('*', 3));
 
 struct state {
   map<AString, state> translist;
-  vector<state> statelist =
-      vector<state>(); // one or more state view as one state
+  vector<state> statelist;
   bool bAccept;
   bool bStart;
   bool bValueState;
   AString value = "";
   void AddTranslate(AString c, state s) { translist[c] = s; }
-  state(bool Start) : bAccept(false), bStart(Start), bValueState(false) {}
+  state(bool Start) : bAccept(false), bStart(Start), bValueState(false) {
+  }
   state() {
     bStart = true;
     bAccept = false;
     bValueState = false;
   }
   state(AString Value)
-      : value(Value), bValueState(true), bStart(false), bAccept(false) {}
+      : value(Value), bValueState(true), bStart(false), bAccept(false) {
+    statelist.push_back(*this);
+  }
 };
 
 struct FA {
-  deque<state> S;
+  // deque<state> S;
+  pStack<state> S;
 
-  FA() { S.push_back(state()); }
+  FA() { S.Push(state()); }
 
   AString PreBuild(const AString &expr) {
     if (expr._length() == 0)
@@ -73,9 +64,8 @@ struct FA {
     return ret;
   }
 
-  // ab.a*b*|*.c.d.
+  // ab.a*b*|*.c.d. conver to suffix
   AString MiddleBuild(const AString &prev) {
-
     AString ret = "";
     pStack<AString> op;
     for (int index = 0; index < prev._length(); index++) {
@@ -89,7 +79,7 @@ struct FA {
           op.Push(temp);
         } else if (temp == ')') {
           while (!op.Empty()) {
-            plog(op.Peek());
+            // plog(op.Peek());
             if (op.Peek() == "(")
               break;
             ret += op.Pop();
@@ -99,7 +89,8 @@ struct FA {
         } else {
           if (op.Peek() != '(') {
             if (priority[temp] <= priority[op.Peek()]) {
-              plog(temp," ",priority[temp]," ",op.Peek()," ",priority[op.Peek()]," ");
+              // plog(temp," ",priority[temp]," ",op.Peek(),"
+              // ",priority[op.Peek()]," ");
               ret += op.Pop();
               op.Push(temp);
             } else {
@@ -114,6 +105,32 @@ struct FA {
     while (!op.Empty())
       ret += op.Pop();
     return ret;
+  }
+
+  auto FinalBuild(const AString &middle) { 
+    pStack<state> ret; 
+    for(int index=0;index<middle._length();index++){
+      auto temp = middle[index];
+      plog(temp);
+      if(!IsSpecialInput(temp)){
+        ret.Push(state(AString(temp)));
+      }else{
+        if(temp=='.'){
+          state s2 = ret.Pop();
+          state s1 = ret.Pop();
+          ret.Push(Connect(s1,s2));
+        }else if(temp=='*'){
+          state s1 = ret.Pop();
+          ret.Push(Star(s1));
+        }else if(temp=='|'){
+          state s2 = ret.Pop();
+          state s1 = ret.Pop();
+          ret.Push(Union(s1,s2));
+        }else{
+          plog("not support char");
+        }
+      }
+    }
   }
 
   bool IsSpecialInput(const char c) {
@@ -142,93 +159,57 @@ struct FA {
   }
 
 #pragma region state op
-  void Union(AString s1, AString s2) {
-    state state1(false);
-    state state2(false);
-    state state3(false);
-    state state4(false);
-    state state5(false);
-    state state6(false);
+  state Union(state s1, state s2) {
+    state start(false);
+    state end(false);
 
-    state1.AddTranslate(explaint, state2);
-    state2.AddTranslate(s1, state3);
-    state3.AddTranslate(explaint, state6);
-    state1.AddTranslate(explaint, state4);
-    state4.AddTranslate(s2, state5);
-    state5.AddTranslate(explaint, state6);
+    start.AddTranslate(explaint, s1.statelist[0]);
+    start.AddTranslate(explaint, s2.statelist[0]);
+    s1.statelist[s1.statelist.size() - 1].AddTranslate(explaint, end);
+    s2.statelist[s2.statelist.size() - 1].AddTranslate(explaint, end);
 
-    state1.statelist.push_back(state1);
-    state1.statelist.push_back(state2);
-    state1.statelist.push_back(state3);
-    state1.statelist.push_back(state4);
-    state1.statelist.push_back(state5);
-    state1.statelist.push_back(state6);
+    s2.statelist.push_back(end);
+    s1.statelist.insert(s1.statelist.begin(), start);
+    s1.statelist.insert(s1.statelist.end(), s2.statelist.begin(),
+                        s2.statelist.end());
 
-    S.push_back(state1);
+    S.Push(s1);
+    return s1;
   }
 
-  void Connect(AString s1, AString s2) {
-    state state1(false);
-    state state2(false);
-    state state3(false);
-    state state4(false);
+  state Connect(state s1, state s2) {
+    state start(false);
+    state end(false);
 
-    state1.AddTranslate(s1, state2);
-    state2.AddTranslate(explaint, state3);
-    state3.AddTranslate(s1, state4);
+    start.AddTranslate(explaint, s1.statelist[0]);
+    s1.statelist[s1.statelist.size() - 1].AddTranslate(explaint,
+                                                       s2.statelist[0]);
+    s2.statelist[s2.statelist.size() - 1].AddTranslate(explaint, end);
 
-    state1.statelist.push_back(state1);
-    state1.statelist.push_back(state2);
-    state1.statelist.push_back(state3);
-    state1.statelist.push_back(state4);
+    s2.statelist.push_back(end);
+    s1.statelist.insert(s1.statelist.begin(), start);
+    s1.statelist.insert(s1.statelist.end(), s2.statelist.begin(),
+                        s2.statelist.end());
 
-    S.push_back(state1);
+    S.Push(s1);
+    return s1;
   }
 
-  void Star(AString s1) {
-    state state1(false);
-    state state2(false);
-    state state3(false);
-    state state4(false);
+  state Star(state s1) {
+    state start(false);
+    state end(false);
 
-    state1.AddTranslate(explaint, state2);
-    state1.AddTranslate(explaint, state4);
-    state2.AddTranslate(s1, state3);
-    state3.AddTranslate(explaint, state2);
-    state3.AddTranslate(explaint, state4);
+    start.AddTranslate(explaint, s1.statelist[0]);
+    s1.statelist[s1.statelist.size() - 1].AddTranslate(explaint, end);
+    start.AddTranslate(explaint, end);
+    s1.statelist[s1.statelist.size() - 1].AddTranslate(explaint,
+                                                       s1.statelist[0]);
 
-    S.push_back(state1);
+    S.Push(s1);
+    return s1;
   }
 #pragma endregion
 };
-
-bool IsOperator(char ch) {
-  return ((ch == 42) || (ch == 124) || (ch == 40) || (ch == 41) || (ch == 8));
-};
-//! Checks if the specific character is input character
-bool IsInput(char ch) { return (!IsOperator(ch)); };
-
-//! Checks is a character left parantheses
-bool IsLeftParanthesis(char ch) { return (ch == 40); };
-
-//! Checks is a character right parantheses
-bool IsRightParanthesis(char ch) { return (ch == 41); };
-
-string ConcatExpand(string strRegEx) {
-  string strRes;
-
-  for (int i = 0; i < strRegEx.size() - 1; ++i) {
-    char cLeft = strRegEx[i];
-    char cRight = strRegEx[i + 1];
-    strRes += cLeft;
-    if ((IsInput(cLeft)) || (IsRightParanthesis(cLeft)) || (cLeft == '*'))
-      if ((IsInput(cRight)) || (IsLeftParanthesis(cRight)))
-        strRes += '.';
-  }
-  strRes += strRegEx[strRegEx.size() - 1];
-
-  return strRes;
-}
 
 int main(int argc, char const *argv[]) {
   using namespace Utility;
@@ -320,15 +301,7 @@ int main(int argc, char const *argv[]) {
   FA f;
   auto ret = f.PreBuild("ab(a*|b*)*cd");
   plog(ret);
-  plog(f.MiddleBuild(ret));
-
-  // priority['*'] = 0;
-  // priority['|'] = 1;
-  // priority['.'] = 2;
-  // priority['*'] = 3;
-
-  // for(auto it = priority.begin();it!=priority.end();it++){
-  //   plog(it->first," ",it->second);
-  // }
+  plog((ret=f.MiddleBuild(ret)));
+  f.FinalBuild(ret);
   return 0;
 }
