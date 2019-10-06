@@ -23,8 +23,7 @@ class String : public Reflect<String<T>>, public pTypeObject<T, String<T>> {
 public:
   static bool IsIntC(const T c) {
     return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') ||
-           (c >= 'A' && c <= 'F')
-           ||(c=='-');
+           (c >= 'A' && c <= 'F') || (c == '-');
   }
 
   static bool IsInt(const String<T> &des) {
@@ -35,11 +34,11 @@ public:
     return true;
   }
 
-  static bool IsFloatC(const T c){
-    return ((c >= '0' && c <= '9') || c=='.' || c=='-');
+  static bool IsFloatC(const T c) {
+    return ((c >= '0' && c <= '9') || c == '.' || c == '-');
   }
 
-  static bool IsFloat(const String<T> & des){
+  static bool IsFloat(const String<T> &des) {
     int pos = 0;
     while (pos < des.length)
       if (!IsFloatC(des.buffer.get()[pos++]))
@@ -132,52 +131,56 @@ public:
     return String<T>(intpart) + String<T>(".") + String<T>(diff);
   }
 
-  static long long toint(double value,double precision){
+  static long long toint(double value, double precision) {
     long long ret = static_cast<long long>(value);
-    if(ret+1 - value<precision ) return ret+1;
+    if (ret + 1 - value < precision)
+      return ret + 1;
     return ret;
   }
 
-  static const String<T> DToS(double value,double precision) {
+  static const String<T> DToS(double value, double precision) {
 
     long long intpart = static_cast<long long>(value);
     String<T> ret = intpart;
     double diff = value - intpart;
     if (diff == 0.0f)
       return LToS(static_cast<long long>(value));
-    ret+=".";
+    ret += ".";
 
-    while (diff - static_cast<long long>(diff) > precision ){
+    while (diff - static_cast<long long>(diff) > precision) {
       diff *= 10;
-      ret+=toint(diff,precision);
-      auto internal = diff -static_cast<long long>(diff);
+      ret += toint(diff, precision);
+      auto internal = diff - static_cast<long long>(diff);
       // plog(diff);
       // plog(static_cast<int>(diff)," bool:",1 - internal < precision);
       //
-      if(1 - internal < precision) break;
+      if (1 - internal < precision)
+        break;
       diff = diff - static_cast<long long>(diff);
     }
     return ret;
   }
 
-  static double ToD(const String<T> & des){
-    CONDITION_MESSAGE(!IsFloat(des), "error: \"",des,"\" is not invalid double!");
+  static double ToD(const String<T> &des) {
+    CONDITION_MESSAGE(!IsFloat(des), "error: \"", des,
+                      "\" is not invalid double!");
     bool meetDecimalPoints = false;
     int posDecimalPoints = -1;
-    double sum=0;
+    double sum = 0;
     bool negative = des.buffer.get()[0] == '-';
     for (int index = negative ? 1 : 0; index < des.length; index++) {
       if (des.buffer.get()[index] == ' ')
         continue; // skip empty
-      if(des.buffer.get()[index] == '.') { 
-        meetDecimalPoints = true; 
+      if (des.buffer.get()[index] == '.') {
+        meetDecimalPoints = true;
         posDecimalPoints = index;
         continue;
       }
-      if(!meetDecimalPoints)
+      if (!meetDecimalPoints)
         sum = 10 * sum + ToIC(des.buffer.get()[index]);
-      else{
-        sum+=ToIC(des.buffer.get()[index])*ppow(0.1,index-posDecimalPoints);
+      else {
+        sum +=
+            ToIC(des.buffer.get()[index]) * ppow(0.1, index - posDecimalPoints);
       }
     }
     return negative ? -1 * sum : sum;
@@ -230,7 +233,7 @@ public:
 
   String(long long value) { *this = LToS(value); }
 
-  String(double value) { *this = DToS(value,precision); }
+  String(double value) { *this = DToS(value, precision); }
 
   String(double value, int effective) { *this = DToS(value, effective); }
 
@@ -552,6 +555,7 @@ public:
   }
   bool operator>(const String<T> &des) const { return Compare(*this, des) > 0; }
   bool operator<(const String<T> &des) const { return Compare(*this, des) < 0; }
+  // friend bool operator<(const String<T> &ls, const String<T> &rs) {return Compare(ls, rs) < 0;}
   bool operator>=(const String<T> &des) const {
     return Compare(*this, des) >= 0;
   }

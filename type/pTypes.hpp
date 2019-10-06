@@ -6,3 +6,4 @@
 #include "Contain.hpp"
 #include "pString.hpp"
 #include "stack.hpp"
+#include "pMap.hpp"

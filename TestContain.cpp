@@ -18,12 +18,20 @@ pStack<AString> id;
 constexpr const char *explaint = "PSONGEXPLAINT";
 constexpr const char *none = "PSONGNONE";
 
-map<AString,int> priority ={
-  make_pair<AString,int>('|',0),
-  make_pair<AString,int>('.',1),
-  make_pair<AString,int>('(',2),
-  make_pair<AString,int>('*',3),
-};
+// map<AString, int> priority = {
+//   // {'(',0},
+//   // {'|',1},
+//   // {'(',2},
+//   // {'*',3}
+// };
+
+pMap<AString,int> priority = pMap<AString,int>(
+  pKeyValue<AString,int>('(',0),
+  pKeyValue<AString,int>('|',1),
+  pKeyValue<AString,int>('.',2),
+  pKeyValue<AString,int>('*',3)
+  );
+
 
 struct state {
   map<AString, state> translist;
@@ -65,35 +73,46 @@ struct FA {
     return ret;
   }
 
-  //ab.a*b*|*.c.d.
+  // ab.a*b*|*.c.d.
   AString MiddleBuild(const AString &prev) {
+
     AString ret = "";
     pStack<AString> op;
     for (int index = 0; index < prev._length(); index++) {
       auto temp = prev[index];
-      if(!IsSpecialInput(temp))
-        ret+=temp;
-      else if(op.Empty()){
+      if (!IsSpecialInput(temp))
+        ret += temp;
+      else if (op.Empty()) {
         op.Push(temp);
-      }else{
-        if(temp=='(') op.Push(temp);
-        else if(temp==')') {
-          while(!op.Empty() ){
-            plog(op.Peek());
-            if(op.Peek()=="(") break;
-            ret+=op.Pop();
-          }
-          CONDITION_MESSAGE(op.Empty(),"unexpected (");
-          op.Pop();
-        }
-        else if(priority[temp]<=priority[op.Peek()]){
-          ret+=op.Pop();
+      } else {
+        if (temp == '(') {
           op.Push(temp);
+        } else if (temp == ')') {
+          while (!op.Empty()) {
+            plog(op.Peek());
+            if (op.Peek() == "(")
+              break;
+            ret += op.Pop();
+          }
+          CONDITION_MESSAGE(op.Empty(), "unexpected (");
+          op.Pop();
+        } else {
+          if (op.Peek() != '(') {
+            if (priority[temp] <= priority[op.Peek()]) {
+              plog(temp," ",priority[temp]," ",op.Peek()," ",priority[op.Peek()]," ");
+              ret += op.Pop();
+              op.Push(temp);
+            } else {
+              ret += temp;
+            }
+          } else {
+            op.Push(temp);
+          }
         }
       }
     }
-    while(!op.Empty())
-    ret+=op.Pop();
+    while (!op.Empty())
+      ret += op.Pop();
     return ret;
   }
 
@@ -183,33 +202,33 @@ struct FA {
 #pragma endregion
 };
 
-	bool IsOperator(char ch) { return((ch == 42) || (ch == 124) || (ch == 40) || (ch == 41) || (ch == 8)); };
-	//! Checks if the specific character is input character
-	bool IsInput(char ch) { return(!IsOperator(ch)); };
+bool IsOperator(char ch) {
+  return ((ch == 42) || (ch == 124) || (ch == 40) || (ch == 41) || (ch == 8));
+};
+//! Checks if the specific character is input character
+bool IsInput(char ch) { return (!IsOperator(ch)); };
 
-	//! Checks is a character left parantheses
-	bool IsLeftParanthesis(char ch) { return(ch == 40); };
+//! Checks is a character left parantheses
+bool IsLeftParanthesis(char ch) { return (ch == 40); };
 
-	//! Checks is a character right parantheses
-	bool IsRightParanthesis(char ch) { return(ch == 41); };
+//! Checks is a character right parantheses
+bool IsRightParanthesis(char ch) { return (ch == 41); };
 
-  string ConcatExpand(string strRegEx)
-  {
-    string strRes;
+string ConcatExpand(string strRegEx) {
+  string strRes;
 
-    for(int i=0; i<strRegEx.size()-1; ++i)
-    {
-      char cLeft	= strRegEx[i];
-      char cRight = strRegEx[i+1];
-      strRes	   += cLeft;
-      if((IsInput(cLeft)) || (IsRightParanthesis(cLeft)) || (cLeft == '*'))
-        if((IsInput(cRight)) || (IsLeftParanthesis(cRight)))
-          strRes += '.';
-    }
-    strRes += strRegEx[strRegEx.size()-1];
-
-    return strRes;
+  for (int i = 0; i < strRegEx.size() - 1; ++i) {
+    char cLeft = strRegEx[i];
+    char cRight = strRegEx[i + 1];
+    strRes += cLeft;
+    if ((IsInput(cLeft)) || (IsRightParanthesis(cLeft)) || (cLeft == '*'))
+      if ((IsInput(cRight)) || (IsLeftParanthesis(cRight)))
+        strRes += '.';
   }
+  strRes += strRegEx[strRegEx.size() - 1];
+
+  return strRes;
+}
 
 int main(int argc, char const *argv[]) {
   using namespace Utility;
@@ -302,5 +321,14 @@ int main(int argc, char const *argv[]) {
   auto ret = f.PreBuild("ab(a*|b*)*cd");
   plog(ret);
   plog(f.MiddleBuild(ret));
+
+  // priority['*'] = 0;
+  // priority['|'] = 1;
+  // priority['.'] = 2;
+  // priority['*'] = 3;
+
+  // for(auto it = priority.begin();it!=priority.end();it++){
+  //   plog(it->first," ",it->second);
+  // }
   return 0;
 }
