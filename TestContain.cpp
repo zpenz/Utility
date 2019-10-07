@@ -17,9 +17,24 @@ pStack<AString> id;
 constexpr const char *explaint = "PSONGEXPLAINT";
 constexpr const char *none = "PSONGNONE";
 
+<<<<<<< HEAD
 pMap<AString, int> priority = pMap<AString, int>(
     pKeyValue<AString, int>('(', 0), pKeyValue<AString, int>('|', 1),
     pKeyValue<AString, int>('.', 2), pKeyValue<AString, int>('*', 3));
+=======
+// map<AString,int> priority ={
+//   make_pair<AString,int>("|",0),
+//   make_pair<AString,int>(".",1),
+//   make_pair<AString,int>("(",2),
+//   make_pair<AString,int>("*",3),
+// };
+
+map<AString,int> priority = {};
+priority["|"] = 0;
+priority["."] = 1;
+priority["("] = 2;
+priority["*"] = 3;
+>>>>>>> e2f53f4519a556a81fa72ad16cb60d7181e7b4dd
 
 struct state {
   multimap<AString, state> translist;
@@ -303,6 +318,7 @@ int main(int argc, char const *argv[]) {
   // show_message(typeid(Test).name());
 
   // plog(ConcatExpand("ab(a*|b*)*cd"));
+
   FA f;
   auto ret = f.PreBuild("ab(a*|b*)*cd");
   plog(ret);
