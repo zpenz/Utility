@@ -113,7 +113,7 @@ struct FA {
     pStack<state> ret;
     for (int index = 0; index < middle._length(); index++) {
       auto temp = middle[index];
-      plog(temp);
+      // plog(temp);
       if (!IsSpecialInput(temp)) {
         ret.Push(state(AString(temp)));
       } else {
@@ -208,30 +208,49 @@ struct FA {
     start.AddTranslate(explaint, s1.statelist[0]);
     s1.statelist[s1.statelist.size() - 1].AddTranslate(explaint, end);
     start.AddTranslate(explaint, end);
-    s1.statelist[s1.statelist.size() - 1].AddTranslate(explaint,
-                                                       s1.statelist[0]);
+    s1.statelist[s1.statelist.size() - 1].AddTranslate(explaint,s1.statelist[0]);
 
     S.Push(s1);
     return s1;
   }
 #pragma endregion
 
-  set<state> explaintcloser(set<state> s){
-    set<state> ret;
-    for(auto it=s.begin();it!=s.end();it++){
-      set<state> temp;
-      auto m = it->translist.find(explaint);
-      for(m=it->translist.lower_bound(explaint);m!=it->translist.upper_bound(explaint);m++){
-        // auto rss = ret.find(*m);
-        // if(ret.find(*m)!=ret.end()) continue;
-        temp.emplace(*m);
-      }
-      if(!temp.empty()){
-        ret.emplace(temp);
+  vector<state> CloserItem(state item){
+    vector<state> ret;
+    auto m =item.translist.find(explaint);
+    // set<state>::ite
+    if(m==item.translist.end() ) return vector<state>{item};
+    for(m=item.translist.begin();m!=item.translist.end();m++){
+      if(m->first.Equal(explaint)){
+        auto tempset = CloserItem(m->second);
+        for(auto it = tempset.begin();it!=tempset.end();it++){
+          ret.push_back(*it);
+        }
       }
     }
     return ret;
   }
+
+  // set<state> explaintcloser(set<state> s){
+  //   set<state> ret;
+  //   for(auto it=s.begin();it!=s.end();it++){
+  //     set<state> temp;
+  //     auto m =it->translist.find(explaint);
+  //     if(m==it->translist.end() ) continue;
+
+  //     // auto m = it->translist.find(explaint);
+  //     // for(m=it->translist.lower_bound(explaint);m!=it->translist.upper_bound(explaint);m++){
+  //     //   // auto rss = ret.find(*m);
+  //     //   // if(ret.find(*m)!=ret.end()) continue;
+  //     //   temp.emplace(*m);
+  //     // }
+  //     // if(!temp.empty()){
+  //     //   ret.emplace(temp);
+  //     // }
+  //   }
+  //   return ret;
+  // }
+  
 };
 
 int main(int argc, char const *argv[]) {
@@ -241,7 +260,12 @@ int main(int argc, char const *argv[]) {
   auto ret = f.PreBuild("ab(a*|b*)*cd");
   plog(ret);
   plog((ret = f.MiddleBuild(ret)));
-  plog(f.FinalBuild(ret).statelist.size());
+  // plog(f.FinalBuild(ret).statelist.size());
+  auto start = f.FinalBuild(ret);
+  auto temp = f.CloserItem(start);
+  for(auto it =temp.begin();it!=temp.end();it++){
+    plog(it->value);
+  }
   return 0;
 
   // Test file sync
