@@ -23,20 +23,22 @@ pMap<AString, int> priority = pMap<AString, int>(
     pKeyValue<AString, int>('.', 2), pKeyValue<AString, int>('*', 3));
 
 struct state {
+  // vecotr vaild
   multimap<AString, state> translist;
   vector<state> statelist;
   bool bAccept;
   bool bStart;
   bool bValueState;
   AString value = "";
-  void AddTranslate(AString c, state s) {
-    translist.emplace(c,s);
+  void AddTranslate(AString c, state s) { translist.emplace(c, s); }
+  state(bool Start) : bAccept(false), bStart(Start), bValueState(false) {
+    statelist.push_back(*this);
   }
-  state(bool Start) : bAccept(false), bStart(Start), bValueState(false) {}
   state() {
     bStart = true;
     bAccept = false;
     bValueState = false;
+    statelist.push_back(*this);
   }
   state(AString Value)
       : value(Value), bValueState(true), bStart(false), bAccept(false) {
@@ -120,22 +122,34 @@ struct FA {
         if (temp == '.') {
           state s2 = ret.Pop();
           state s1 = ret.Pop();
-          ret.Push(Connect(s1, s2));
+          Connect(s1, s2);
+          // plog(cret.translist.size());
+          // plog(s1.statelist[0].translist.size());
+          // ret.Push(Connect(s1, s2));
+          ret.Push(s1);
         } else if (temp == '*') {
           state s1 = ret.Pop();
-          ret.Push(Star(s1));
+          Star(s1);
+          // ret.Push(Star(s1));
+          plog(s1.statelist[0].translist.size());
+          ret.Push(s1);
         } else if (temp == '|') {
           state s2 = ret.Pop();
           state s1 = ret.Pop();
-          ret.Push(Union(s1, s2));
+          Union(s1, s2);
+          // ret.Push(Union(s1, s2));
+          ret.Push(s1);
         } else {
           plog("not support char");
         }
       }
     }
-    CONDITION_MESSAGE(ret.size()<1,"stack exception: try to access a empty stack")
+    CONDITION_MESSAGE(ret.size() < 1,
+                      "stack exception: try to access a empty stack")
+    plog(ret.size());
     auto top = ret.Pop();
-    top.statelist[top.statelist.size()-1].bAccept=true;
+    top.statelist[top.statelist.size() - 1].bAccept = true;
+    plog(top.statelist.size());
     return top;
   }
 
@@ -165,7 +179,7 @@ struct FA {
   }
 
 #pragma region state op
-  state Union(state s1, state s2) {
+  state Union(state &s1, state &s2) {
     state start(false);
     state end(false);
 
@@ -183,7 +197,7 @@ struct FA {
     return s1;
   }
 
-  state Connect(state s1, state s2) {
+  state Connect(state &s1, state &s2) {
     state start(false);
     state end(false);
 
@@ -201,29 +215,37 @@ struct FA {
     return s1;
   }
 
-  state Star(state s1) {
+  state Star(state &s1) {
     state start(false);
     state end(false);
 
     start.AddTranslate(explaint, s1.statelist[0]);
     s1.statelist[s1.statelist.size() - 1].AddTranslate(explaint, end);
     start.AddTranslate(explaint, end);
-    s1.statelist[s1.statelist.size() - 1].AddTranslate(explaint,s1.statelist[0]);
+    s1.statelist[s1.statelist.size() - 1].AddTranslate(explaint,
+                                                       s1.statelist[0]);
+
+    s1.statelist.push_back(end);
+    s1.statelist.insert(s1.statelist.begin(), start);
 
     S.Push(s1);
     return s1;
   }
 #pragma endregion
 
-  vector<state> CloserItem(state item){
+  vector<state> CloserItem(state item) {
     vector<state> ret;
-    auto m =item.translist.find(explaint);
+    auto first = item.statelist[0];
+    auto m = first.translist.find(explaint);
     // set<state>::ite
-    if(m==item.translist.end() ) return vector<state>{item};
-    for(m=item.translist.begin();m!=item.translist.end();m++){
-      if(m->first.Equal(explaint)){
+    if (m == first.translist.end())
+      return vector<state>{first};
+    plog(first.translist.size());
+    for (m = first.translist.begin(); m != first.translist.end(); m++) {
+      plog(m->second.statelist[0].value);
+      if (m->first.Equal(explaint)) {
         auto tempset = CloserItem(m->second);
-        for(auto it = tempset.begin();it!=tempset.end();it++){
+        for (auto it = tempset.begin(); it != tempset.end(); it++) {
           ret.push_back(*it);
         }
       }
@@ -239,7 +261,8 @@ struct FA {
   //     if(m==it->translist.end() ) continue;
 
   //     // auto m = it->translist.find(explaint);
-  //     // for(m=it->translist.lower_bound(explaint);m!=it->translist.upper_bound(explaint);m++){
+  //     //
+  //     for(m=it->translist.lower_bound(explaint);m!=it->translist.upper_bound(explaint);m++){
   //     //   // auto rss = ret.find(*m);
   //     //   // if(ret.find(*m)!=ret.end()) continue;
   //     //   temp.emplace(*m);
@@ -250,7 +273,6 @@ struct FA {
   //   }
   //   return ret;
   // }
-  
 };
 
 int main(int argc, char const *argv[]) {
@@ -260,10 +282,11 @@ int main(int argc, char const *argv[]) {
   auto ret = f.PreBuild("ab(a*|b*)*cd");
   plog(ret);
   plog((ret = f.MiddleBuild(ret)));
-  // plog(f.FinalBuild(ret).statelist.size());
   auto start = f.FinalBuild(ret);
+
+  // plog(f.S.Peek().translist.size());
   auto temp = f.CloserItem(start);
-  for(auto it =temp.begin();it!=temp.end();it++){
+  for (auto it = temp.begin(); it != temp.end(); it++) {
     plog(it->value);
   }
   return 0;
@@ -352,6 +375,4 @@ int main(int argc, char const *argv[]) {
   // show_message(typeid(Test).name());
 
   // plog(ConcatExpand("ab(a*|b*)*cd"));
-
-
 }
