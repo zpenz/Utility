@@ -123,6 +123,7 @@ struct FA {
           state s2 = ret.Pop();
           state s1 = ret.Pop();
           Connect(s1, s2);
+          plog(s1.statelist[0].translist.size());
           // plog(cret.translist.size());
           // plog(s1.statelist[0].translist.size());
           // ret.Push(Connect(s1, s2));
@@ -131,7 +132,7 @@ struct FA {
           state s1 = ret.Pop();
           Star(s1);
           // ret.Push(Star(s1));
-          plog(s1.statelist[0].translist.size());
+
           ret.Push(s1);
         } else if (temp == '|') {
           state s2 = ret.Pop();
@@ -237,19 +238,20 @@ struct FA {
     vector<state> ret;
     auto first = item.statelist[0];
     auto m = first.translist.find(explaint);
-    // set<state>::ite
+
+    ret.push_back(first);
     if (m == first.translist.end())
-      return vector<state>{first};
-    plog(first.translist.size());
+      return ret;
     for (m = first.translist.begin(); m != first.translist.end(); m++) {
-      plog(m->second.statelist[0].value);
       if (m->first.Equal(explaint)) {
         auto tempset = CloserItem(m->second);
-        for (auto it = tempset.begin(); it != tempset.end(); it++) {
-          ret.push_back(*it);
-        }
+        ret.insert(ret.end(),tempset.begin(),tempset.end());
       }
+      // else{
+      //   ret.push_back(m->second);
+      // }
     }
+    plog(ret.size());
     return ret;
   }
 
