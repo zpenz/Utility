@@ -123,7 +123,8 @@ struct FA {
           state s2 = ret.Pop();
           state s1 = ret.Pop();
           Connect(s1, s2);
-          plog(s1.statelist[0].translist.size());
+          // plog(s1.statelist[0].translist.size());
+          plog(s1.statelist[0].value+"plog");
           // plog(cret.translist.size());
           // plog(s1.statelist[0].translist.size());
           // ret.Push(Connect(s1, s2));
@@ -288,8 +289,12 @@ int main(int argc, char const *argv[]) {
 
   // plog(f.S.Peek().translist.size());
   auto temp = f.CloserItem(start);
-  for (auto it = temp.begin(); it != temp.end(); it++) {
-    plog(it->value);
+  // for (auto it = temp.begin(); it != temp.end(); it++) {
+  //   plog(it->value);
+  // }
+  AString test = "abacd";
+  for(int index=0;index<test._size();index++){
+    // temp
   }
   return 0;
 

@@ -244,6 +244,7 @@ next:
             AString ClassName = Normalize(TableName);
             AString FolerName = (GenPath.EndWith("/")?GenPath:GenPath+"/")+ClassName;
             AString FileName  = "_"+ClassName+".php";
+            AString ActionFileName = ClassName+".php";
             AString GFileName = FolerName+"/_"+ClassName+".php";
             AString WrpperFileName = FolerName+"/"+ClassName+".php";
             
@@ -344,7 +345,7 @@ next:
             }
             ret+="        }\n";
             //Add Action
-            AString AddCode = "<?php \n    include_once(\'"+FileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return (new "+ClassName+"(\n            ";
+            AString AddCode = "<?php \n    include_once(\'"+ActionFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return (new "+ClassName+"(\n            ";
             for(int indexY=0;indexY<FiledSize;indexY++){
                 AString temp = FiledList.at(indexY).FiledComment;
 
@@ -370,7 +371,7 @@ next:
             ret+="\n        public static function GetTotalCount(){\n            return MysqlHelper::SafeQueryResult(\"SELECT count(*) AS 'count' FROM "
             + TableName + " WHERE 1 = ?\",'i',1);\n        }\n";
             //Count Action
-            AString CountCode = "<?php \n    include_once(\'"+FileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::GetTotalCount();\n    })());";
+            AString CountCode = "<?php \n    include_once(\'"+ActionFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::GetTotalCount();\n    })());";
             auto CountFile = fopen(FolerName+"/Count.php","wr");
             fwrite(CountCode.c_str(),sizeof(char),CountCode._length(),CountFile);
             SAFE_CLOSE(CountFile);
@@ -379,7 +380,7 @@ next:
             ret+="\n        public static function GetList($page,$num=10000){\n            $start = $num*($page-1);\n            MysqlHelper::$UseUTF8 = true;\n            ";
                     ret+="return MysqlHelper::SafeQueryResult(\"SELECT * FROM "+TableName+" LIMIT ?,?\",\"dd\",$start,$num);\n        }\n\n";
             //GetList Action
-            AString GetListCode = "<?php \n    include_once(\'"+FileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::GetList(\n            GetRealValueSafe('page',1),\n            GetRealValueSafe('num',10000));\n    })());";
+            AString GetListCode = "<?php \n    include_once(\'"+ActionFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::GetList(\n            GetRealValueSafe('page',1),\n            GetRealValueSafe('num',10000));\n    })());";
             auto GetListFile = fopen(FolerName+"/GetList.php","wr");
             fwrite(GetListCode.c_str(),sizeof(char),GetListCode._length(),GetListFile);
             SAFE_CLOSE(GetListFile);
@@ -419,7 +420,7 @@ next:
             //Find Action 
             for(int indexY=0;indexY<FiledSize;indexY++){
                 AString temp = Normalize(FiledList.at(indexY).FiledName);
-                AString FindCode = "<?php \n    include_once(\'"+FileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::FindBy"+temp+"(\n            GetRealValueSafe('value'),\n            GetRealValueSafe('page',1),\n            GetRealValueSafe('num',10000));\n    })());";
+                AString FindCode = "<?php \n    include_once(\'"+ActionFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::FindBy"+temp+"(\n            GetRealValueSafe('value'),\n            GetRealValueSafe('page',1),\n            GetRealValueSafe('num',10000));\n    })());";
                 auto FindFile = fopen((FolerName+"/FindBy"+temp+".php").c_str(),"wr");
                 fwrite(FindCode.c_str(),sizeof(char),FindCode._length(),FindFile);
                 SAFE_CLOSE(FindFile);
@@ -469,7 +470,7 @@ next:
             ret+="//DELETE FUNCTIONS END----------------------------------------------------\n\n        ";
 
             //DeleteAction
-            AString DeleteCode = "<?php \n    include_once(\'"+FileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::DeleteBy"+Normalize(ThisFiled.PrimaryKey.FiledName)+"(\n            GetRealValueSafe('value')\n        );\n    })());\n        ";
+            AString DeleteCode = "<?php \n    include_once(\'"+ActionFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::DeleteBy"+Normalize(ThisFiled.PrimaryKey.FiledName)+"(\n            GetRealValueSafe('value')\n        );\n    })());\n        ";
             auto DeleteFile = fopen(FolerName+"/Delete.php","wr");
             fwrite(DeleteCode.c_str(),sizeof(char),DeleteCode._length(),DeleteFile);
             SAFE_CLOSE(DeleteFile);
@@ -480,7 +481,7 @@ next:
                 ret+="        public static function DeleteArrayBy"+Normalize(FiledList.at(indexY).FiledName)+"($IdArray){\n            foreach($IdArray as $item){\n              if(($ret="+ClassName+"::DeleteBy"+Normalize(FiledList.at(indexY).FiledName)+"($item))->resultcode<0) return new ReturnObject(-224,\"failed when delete {$item} failed reason: {$ret->data}\");\n            }\n            return new ReturnObject(0,\"Delete All Ok!\");"+"\n        }\n\n";
             }
             ret+="        //DELETE FUNCTIONS END----------------------------------------------------\n\n";
-            AString DeleteArrayCode = "<?php \n    include_once(\'"+FileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::DeleteArrayBy"+Normalize(ThisFiled.PrimaryKey.FiledName)+"(\n            GetRealValueSafe('array','none')\n        );\n    })());\n";
+            AString DeleteArrayCode = "<?php \n    include_once(\'"+ActionFileName+"');\n\n    echo json_encode((function(){\n        header(\"content-type:application/json\");\n        return "+ClassName+"::DeleteArrayBy"+Normalize(ThisFiled.PrimaryKey.FiledName)+"(\n            GetRealValueSafe('array','none')\n        );\n    })());\n";
             auto DeleteArrayFile = fopen(FolerName+"/DeleteArray.php","wr");
             fwrite(DeleteArrayCode.c_str(),sizeof(char),DeleteArrayCode._length(),DeleteArrayFile);
             SAFE_CLOSE(DeleteArrayFile);
