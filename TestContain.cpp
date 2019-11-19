@@ -187,8 +187,8 @@ struct FA {
 
 #pragma region state op
   state Union(state &s1, state &s2) {
-    state start(false);
-    state end(false);
+    state start(explaint);
+    state end(explaint);
 
     start.AddTranslate(explaint, s1.statelist[0]);
     start.AddTranslate(explaint, s2.statelist[0]);
@@ -223,8 +223,8 @@ struct FA {
   }
 
   state Star(state &s1) {
-    state start(false);
-    state end(false);
+    state start(explaint);
+    state end(explaint);
 
     start.AddTranslate(explaint, s1.statelist[0]);
     s1.statelist[s1.statelist.size() - 1].AddTranslate(explaint, end);
@@ -296,15 +296,22 @@ int main(int argc, char const *argv[]) {
   using namespace Utility;
 
   FA f;
-  auto ret = f.PreBuild("ab(a*|b*)*cd");
+  // auto test = "ab(a*|b*)*cd";
+  auto test = "ab";
+  auto ret = f.PreBuild(test);
   plog(ret);
   plog((ret = f.MiddleBuild(ret)));
   auto start = f.FinalBuild(ret);
 
+  for(int i=0;i<start.statelist.size();i++){
+    plog(start.statelist[i].value);
+    plog(start.statelist[i].translist.size())
+  }
   // plog(f.S.Peek().translist.size());
-  auto temp = f.CloserItem(start);
-  plog(temp.size());
-  plog(temp[1].value);
+  // auto temp = f.CloserItem(start);
+  // plog(temp.size());
+  // plog(temp[0].value);
+  // plog(temp[1].value);
   // plog(temp[0].translist);
 
   // for (auto it = temp.begin(); it != temp.end(); it++) {
