@@ -252,17 +252,31 @@ struct FA {
 
   vector<state> CloserItem(state item) {
     vector<state> ret;
-    auto first = item.statelist[0];
+    // auto first = item.statelist[0];
+    auto first = item;
 
-    state* ptemp= nullptr;
-    bool find = false;
+    // plog(first.statelist[0].translist.size());
+    // for(int index=0;index<first.statelist[0].translist.size();index++){
+    //   plog(first.statelist[0].translist[index]._key," : ",first.statelist[0].translist[index]._value.value);
+    // }
+    
     ret.push_back(first);
-    for(auto pair=first.translist.begin();pair!=first.translist.end();pair++){
-      if(pair->_key.Equal(explaint)){
-        auto temp = CloserItem(pair->_value);
+    for(int index=0;index<first.translist.size();index++){
+        // plog(first.translist[index]._key," : ",first.translist[index]._value.value);
+        auto pair = first.translist[index];
+        if(pair._key.Equal(explaint)){
+        // ret.push_back(pair._value); //not  need !
+        auto temp = CloserItem(pair._value);
         ret.insert(ret.end(),temp.begin(),temp.end());
       }
     }
+    // for(auto pair=first.translist.begin();pair!=first.translist.end();pair++){
+    //   if(pair->_key.Equal(explaint)){
+    //     ret.push_back(pair->_value);
+    //     auto temp = CloserItem(pair->_value);
+    //     ret.insert(ret.end(),temp.begin(),temp.end());
+    //   }
+    // }
     return ret;
   }
 
@@ -297,19 +311,23 @@ int main(int argc, char const *argv[]) {
 
   FA f;
   // auto test = "ab(a*|b*)*cd";
-  auto test = "ab";
+  auto test = "abc";
   auto ret = f.PreBuild(test);
   plog(ret);
   plog((ret = f.MiddleBuild(ret)));
   auto start = f.FinalBuild(ret);
 
-  for(int i=0;i<start.statelist.size();i++){
-    plog(start.statelist[i].value);
-    plog(start.statelist[i].translist.size())
-  }
+  // for(int i=0;i<start.statelist.size();i++){
+  //   plog(start.statelist[i].value);
+  //   plog(start.statelist[i].translist.size())
+  // }
   // plog(f.S.Peek().translist.size());
-  // auto temp = f.CloserItem(start);
+  auto temp = f.CloserItem(start.statelist[0]);
   // plog(temp.size());
+  for(int i=0;i<temp.size();i++){
+    plog(temp[i].value);
+  }
+
   // plog(temp[0].value);
   // plog(temp[1].value);
   // plog(temp[0].translist);
