@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Compile",
+        "type": "shell",
+        "command": "clang++",
+        "args": [
+          "-g",
+          "-std=c++14",
+          "${file}",
+          "-o",
+          "${fileBasenameNoExtension}",
+          "2.txt 3.txt"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": [
+          "$gcc"
+        ]
+      }
+    ]
+  }

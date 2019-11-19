@@ -1,5 +1,5 @@
 /ipch
-ipch/* 
+ipch/*
 XkShows/*
 XkUser/*
 XkUserLike/*
@@ -9,7 +9,7 @@ XkAgent/*
 ruan/*
 CMakeFiles/*
 lua/*
-.vscode/*
+
 *.ipch
 *.bin
 *.php
@@ -23,7 +23,6 @@ think.cpp
 *.list
 *.op
 *.cmake
-*.json
 *.jpg
 *.out
 *.log
