@@ -514,7 +514,7 @@ int main(int argc, char const *argv[])
     {
         // SHOW_MESSAGE(*++argv++,1);
         CONDITION_MESSAGE(argc<2,"should hava a sql file.");
-        Parse::init(argc>1?*++argv:"xk_show.sql");
+        Parse::init(argc>1?*++argv:"test.sql");
         // Parse::init("xk_show.sql");
         AString path = "";
         if(argc>2) {

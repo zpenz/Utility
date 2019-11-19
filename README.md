@@ -1,3 +1,3 @@
 ## update gen
 ## gen usage:
-## gen sqlfile position
+## gen [sqlfile path] [gen path] [COMPLEX]

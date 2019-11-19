@@ -24,23 +24,29 @@ pMap<AString, int> priority = pMap<AString, int>(
 
 struct state {
   // vecotr vaild
-  multimap<AString, state> translist;
+  typedef KeyValuePair<AString,state> item;
+  vector<item> translist;
+  // multimap<AString, state> translist;
   vector<state> statelist;
   bool bAccept;
   bool bStart;
   bool bValueState;
   AString value = "";
-  void AddTranslate(AString c, state s) { translist.emplace(c, s); }
-  state(bool Start) : bAccept(false), bStart(Start), bValueState(false) {
-    statelist.push_back(*this);
+  void AddTranslate(AString c, state s) { 
+    // translist.emplace(c, s); 
+    translist.push_back(item(c,s));
   }
+  // state(bool Start) : bAccept(false), bStart(Start), bValueState(false) {
+  //   plog(value);
+  //   statelist.push_back(*this);
+  // }
   state() {
     bStart = true;
     bAccept = false;
     bValueState = false;
     statelist.push_back(*this);
   }
-  state(AString Value)
+  state(const AString &Value)
       : value(Value), bValueState(true), bStart(false), bAccept(false) {
     statelist.push_back(*this);
   }
@@ -124,7 +130,6 @@ struct FA {
           state s1 = ret.Pop();
           Connect(s1, s2);
           // plog(s1.statelist[0].translist.size());
-          plog(s1.statelist[0].value+"plog");
           // plog(cret.translist.size());
           // plog(s1.statelist[0].translist.size());
           // ret.Push(Connect(s1, s2));
@@ -200,8 +205,8 @@ struct FA {
   }
 
   state Connect(state &s1, state &s2) {
-    state start(false);
-    state end(false);
+    state start(explaint);
+    state end(explaint);
 
     start.AddTranslate(explaint, s1.statelist[0]);
     s1.statelist[s1.statelist.size() - 1].AddTranslate(explaint,
@@ -235,26 +240,33 @@ struct FA {
   }
 #pragma endregion
 
+  // bool isSame(const vector<state> &vPar, const vector<state> &vSub) {
+  //   for (auto itSub = vSub.begin(); itSub != vSub.end(); itSub++) {
+  //     for (auto itPar = vPar.begin(); itPar != vPar.end(); itPar++) {
+  //       if(*itSub==*itPar) continue;
+  //     }
+  //     return false; 
+  //   }
+  //   return true;
+  // }
+
   vector<state> CloserItem(state item) {
     vector<state> ret;
     auto first = item.statelist[0];
-    auto m = first.translist.find(explaint);
 
+    state* ptemp= nullptr;
+    bool find = false;
     ret.push_back(first);
-    if (m == first.translist.end())
-      return ret;
-    for (m = first.translist.begin(); m != first.translist.end(); m++) {
-      if (m->first.Equal(explaint)) {
-        auto tempset = CloserItem(m->second);
-        ret.insert(ret.end(),tempset.begin(),tempset.end());
+    for(auto pair=first.translist.begin();pair!=first.translist.end();pair++){
+      if(pair->_key.Equal(explaint)){
+        auto temp = CloserItem(pair->_value);
+        ret.insert(ret.end(),temp.begin(),temp.end());
       }
-      // else{
-      //   ret.push_back(m->second);
-      // }
     }
-    plog(ret.size());
     return ret;
   }
+
+  vector<state> CloserItems(vector<state> items) {}
 
   // set<state> explaintcloser(set<state> s){
   //   set<state> ret;
@@ -278,6 +290,8 @@ struct FA {
   // }
 };
 
+
+
 int main(int argc, char const *argv[]) {
   using namespace Utility;
 
@@ -289,14 +303,21 @@ int main(int argc, char const *argv[]) {
 
   // plog(f.S.Peek().translist.size());
   auto temp = f.CloserItem(start);
+  plog(temp.size());
+  plog(temp[1].value);
+  // plog(temp[0].translist);
+
   // for (auto it = temp.begin(); it != temp.end(); it++) {
   //   plog(it->value);
   // }
-  AString test = "abacd";
-  for(int index=0;index<test._size();index++){
-    // temp
-  }
+  // AString test = "abacd";
+  // for (int index = 0; index < test._size(); index++) {
+  //   // temp
+  // }
   return 0;
+
+}
+
 
   // Test file sync
   // Utility::JObject obj;
@@ -382,4 +403,3 @@ int main(int argc, char const *argv[]) {
   // show_message(typeid(Test).name());
 
   // plog(ConcatExpand("ab(a*|b*)*cd"));
-}
