@@ -280,6 +280,10 @@ struct FA {
     return ret;
   }
 
+  vector<state> move(vector<state> obj,const AString & input){
+    
+  }
+
   vector<state> CloserItems(vector<state> items) {}
 
   // set<state> explaintcloser(set<state> s){
