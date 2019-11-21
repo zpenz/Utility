@@ -41,11 +41,11 @@ struct NameToken:Token{
 };
 
 struct Filed{
-    AString FiledName;
-    AString FiledComment;
-    AString OtherDesc;
-    AString FiledType;
-    AString FiledSize;
+    AString FiledName="";
+    AString FiledComment="";
+    AString OtherDesc="";
+    AString FiledType="";
+    AString FiledSize="";
 };
 
 struct ForeignKey{
@@ -65,6 +65,7 @@ constexpr const char* REPEATCOND  = "%NOREPEAT%";
 constexpr const char* FILEREFCOND = "%FILEREF%";
 constexpr const char* ALTERCOND   = "%ALTER%";
 
+#define DEBUG
 
 class Parse{
     public:
@@ -113,6 +114,11 @@ class Parse{
             if(feof(file)) break;
         }
         fclose(file);
+        #ifdef DEBUG
+        for(int i=0;i<mList.size();i++){
+            plog(mList[i]);
+        }
+        #endif
     } 
 
     static void parse(){
@@ -134,6 +140,14 @@ class Parse{
                 temp.TableName = *it++;
                 SkipSingle(it);
                 it++;
+                if(it==mList.end()){
+                    plog("sql error: except a ')'");
+                    break;
+                }
+                if(it->Equal(")") && (it+1)==mList.end()) {
+                    plog("warning: this sql table hava no numbers!")
+                    break;
+                }
                 while(1){
                     if(it->Equal(")") && (it+1)!=mList.end() && (it+1)->Equal(")")) break;
                     Filed filed;
@@ -175,6 +189,7 @@ class Parse{
 
 next:
                     while(it!=mList.end()){
+                        // if(it->Equal(")") && (it+1)==mList.end()) break;
                         if(it->Equal(")") && (it+1)!=mList.end() && (it+1)->Equal(")")) break;
 
                         if((it->ToUpperN()).Equal("COMMENT")){
@@ -182,8 +197,9 @@ next:
                             while(!it->Equal("'"))
                                 filed.FiledComment += *it++;
                             // for debug
-                            // SHOW_MESSAGE(filed.FiledComment,1); 
+                            SHOW_MESSAGE(filed.FiledComment,1); 
                         }
+                        // i(filed.OtherDesc.Empty()) 
                         filed.OtherDesc+=*it;
 
                         if(it->Equal(",")) break;
@@ -202,6 +218,8 @@ next:
                     }
                 }
 
+                if(it==mList.end()) break;
+
                 mCreateList.push_back(temp);
             }
         }
@@ -211,7 +229,7 @@ next:
     static void Test(const AString& GenPath=""){
 
         size_t TableSize = Parse::mCreateList.size();
-
+        
         auto ToType = [](AString & subject)->AString{
             subject.ToLowwer();
             if(subject.Equal("varchar")||subject.Equal("longtext"))
@@ -514,7 +532,7 @@ int main(int argc, char const *argv[])
     {
         // SHOW_MESSAGE(*++argv++,1);
         CONDITION_MESSAGE(argc<2,"should hava a sql file.");
-        Parse::init(argc>1?*++argv:"test.sql");
+        Parse::init(argc>1?*++argv:"mrx.sql");
         // Parse::init("xk_show.sql");
         AString path = "";
         if(argc>2) {

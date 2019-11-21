@@ -445,7 +445,13 @@ public:
     return (*this = TempBuffer);
   }
 
-  bool Equal(String<T> des) const { return des == *this; }
+  bool Equal(String<T> des) const { 
+    if(des.buffer==nullptr || !this->buffer) {
+      plog("try compare nullptr");
+      return false;
+    }
+    return des == *this; 
+  }
 
   // KeyValueType
   template <typename type = String<T>> struct KeyValuePair {
@@ -515,6 +521,10 @@ public:
 
   /// des copy last 0
   friend String<T> operator+(const String<T> &src, const String<T> &des) {
+    if(des.buffer==nullptr) {
+      plog("try add a null string to src: ",src);
+      return src;
+    }
     T tempbuffer[src.length + des.length];
     memcpy(tempbuffer, src.buffer.get(), src.size);
     memcpy(tempbuffer + src.length, des.buffer.get(), des.size + 1 * sizeof(T));
